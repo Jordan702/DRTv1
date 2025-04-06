@@ -1,74 +1,31 @@
-// backend/index.js
+// Load environment variables
 require('dotenv').config();
+
+// Import dependencies
 const express = require('express');
 const multer = require('multer');
-const { ethers } = require('ethers');
-const { Configuration, OpenAIApi } = require('openai');
-const Tesseract = require('tesseract.js');
-const fs = require('fs');
 const path = require('path');
 
+// Initialize Express app
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+
+// Middleware to parse JSON
 app.use(express.json());
 
-// OpenAI setup
-const openai = new OpenAIApi(new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-}));
+// Set up multer for file uploads
+const upload = multer({ dest: 'uploads/' });
 
-// Ethers setup
-const provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
-const signer = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
-const DRT_ABI = require('./DRT_abi.json');
-const contract = new ethers.Contract(process.env.DRT_CONTRACT_ADDRESS, DRT_ABI, signer);
+// Import and use the verify route
+const verifyRoute = require('./routes/verify');
+app.use('/api/verify', upload.single('proof'), verifyRoute);
 
-// POST endpoint for submission
-app.post('/api/submit', upload.single('proof'), async (req, res) => {
-  const { name, walletAddress, description } = req.body;
-  const proofFile = req.file;
-
-  try {
-    if (!walletAddress || !description || !proofFile) {
-      return res.status(400).json({ error: 'Missing required fields or file' });
-    }
-
-    // OCR on uploaded file
-    const proofPath = path.resolve(__dirname, proofFile.path);
-    const ocrResult = await Tesseract.recognize(proofPath, 'eng');
-    const extractedText = ocrResult.data.text;
-    fs.unlinkSync(proofPath); // Clean up uploaded file
-
-    // Combine input for OpenAI
-    const prompt = `Estimate the real-world contribution value (USD) based on this:
-Description: ${description}
-Document Data: ${extractedText}
-Value:`;
-
-    const aiResponse = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt,
-      max_tokens: 10,
-      temperature: 0.5,
-    });
-
-    let valueEstimate = parseFloat(aiResponse.data.choices[0].text.trim());
-    if (isNaN(valueEstimate)) valueEstimate = 0;
-
-    let tokensToMint = Math.min(valueEstimate / 1000, 100); // Cap at 100 DRT
-    const mintAmount = ethers.parseUnits(tokensToMint.toString(), 18);
-
-    const tx = await contract.mint(walletAddress, mintAmount);
-    await tx.wait();
-
-    res.json({
-      message: `Minted ${tokensToMint} DRT to ${walletAddress}`,
-      txHash: tx.hash,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Submission failed' });
-  }
+// Default route (for testing)
+app.get('/', (req, res) => {
+  res.send('DRTv1 Backend API is live 🚀');
 });
 
-app.listen(3000, () => console.log('DRTv1 backend running on port 3000'));
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ DRTv1 backend running on port ${PORT}`);
+});
