@@ -22,7 +22,7 @@
     <h1>DRTv1 Submission Portal</h1>
     <p class="slogan">"Evolution Through Contribution"</p>
 
-    <form id="submissionForm">
+    <form id="submissionForm" enctype="multipart/form-data">
       <label for="name">Your Name:</label>
       <input type="text" id="name" name="name" required>
 
@@ -51,7 +51,7 @@
       const formData = new FormData(form);
 
       try {
-        const response = await fetch('http://localhost:3000/api/submit', {
+        const response = await fetch('http://localhost:3000/api/verify', {
           method: 'POST',
           body: formData
         });
