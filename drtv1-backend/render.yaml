@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: drtv1-backend
+    env: node
+    plan: free
+    branch: main
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: MAINNET_RPC_URL
+        sync: false
+      - key: MINTER_PRIVATE_KEY
+        sync: false
+      - key: DRT_CONTRACT_ADDRESS
+        sync: false
+      - key: OPEN_AI_KEY
+        sync: false
