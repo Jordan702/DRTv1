@@ -1,3 +1,4 @@
+//backend/routes/submit.js
 const express = require('express');
 const multer = require('multer');
 const { verifyAndMint } = require('../controllers/resourceVerifier');
