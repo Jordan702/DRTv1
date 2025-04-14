@@ -1,6 +1,6 @@
 // backend/controllers/resourceVerifer.js
 require('dotenv').config({ path: './.env' });
-console.log("Loaded contract address from env:", process.env.DRT_CONTRACT_ADDRESS);
+
 const fs = require('fs');
 const path = require('path');
 const Tesseract = require('tesseract.js');
@@ -15,6 +15,7 @@ const contract = new ethers.Contract(process.env.DRT_CONTRACT_ADDRESS, DRT_ABI, 
 
 // Wrap startup logs in an async IIFE to use await
 (async () => {
+  console.log("Loaded contract address from env:", process.env.DRT_CONTRACT_ADDRESS);
   console.log("✅ Using contract:", contract.address);
   console.log("✅ Signer address:", await signer.getAddress());
 })();
