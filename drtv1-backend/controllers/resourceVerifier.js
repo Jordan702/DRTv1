@@ -1,5 +1,6 @@
 // backend/controllers/resourceVerifer.js
-require('dotenv').config()
+require('dotenv').config({ path: './.env' });
+console.log("Loaded contract address from env:", process.env.DRT_CONTRACT_ADDRESS);
 const fs = require('fs');
 const path = require('path');
 const Tesseract = require('tesseract.js');
