@@ -51,20 +51,35 @@
       const formData = new FormData(form);
 
       try {
+        console.log('Submitting...');
+
         const response = await fetch('http://localhost:3000/api/verify', {
           method: 'POST',
           body: formData
         });
 
-        const result = await response.json();
+        console.log('Response:', response);
+
+        let result;
+        try {
+          result = await response.json();
+        } catch (parseErr) {
+          const rawText = await response.text();
+          console.error('X Failed to parse JSON response:', parseErr);
+          console.log('Raw response:', rawText);
+          status.textContent = 'Server error: Non-JSON response received.';
+          return;
+        }
 
         if (response.ok) {
-          status.textContent = result.message;
+          status.textContent = result.message || 'Submitted sucessfully!';
         } else {
           status.textContent = `Error: ${result.error || 'Unknown issue'}`;
+
         }
-      } catch (error) {
-        console.error(error);
+
+      } catch (err) {
+        console.error('X Fetch error:', err);
         status.textContent = 'Submission failed. Please try again later.';
       }
     });
