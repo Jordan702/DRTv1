@@ -16,7 +16,7 @@ const contract = new ethers.Contract(process.env.DRT_CONTRACT_ADDRESS, DRT_ABI, 
 // Wrap startup logs in an async IIFE to use await
 (async () => {
   console.log("Loaded contract address from env:", process.env.DRT_CONTRACT_ADDRESS);
-  console.log("✅ Using contract:", contract.address);
+  console.log("✅ Using contract:", contract.target);
   console.log("✅ Signer address:", await signer.getAddress());
 })();
 
