@@ -28,7 +28,7 @@ const upload = multer({
 });
 
 // Import and use the /api/verify submission route
-const submitRoute = require('./routes/submit');
+const submitRoute = require('./routes/submit.js');
 app.use('/api/verify', submitRoute);
 
 // Test route
