@@ -13,7 +13,7 @@ const app = express();
 
 // Enable CORS for frontend origin (adjust if hosted elsewhere)
 app.use(cors({
-  origin: 'http://localhost:51265', // Match your frontend port
+  origin: 'https://jordan702.github.io/', // Match your frontend port
   methods: ['GET', 'POST'],
   credentials: false
 }));
