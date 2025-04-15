@@ -7,28 +7,7 @@ const path = require('path');
 
 // Initialize Express app
 const app = express();
-
-// Enable CORS for the frontend origin (adjust if hosted elsewhere)
-const allowedOrigins = ['https://jordan702.github.io']; // Add other allowed origins if needed
-app.use(cors({
-  origin: function (origin, callback) {
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type']
-}));
-
-// Middleware to add CORS headers explicitly (optional but redundant safety measure)
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://jordan702.github.io');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
+app.use(cors());
 
 // Middleware to parse JSON
 app.use(express.json({ limit: '20mb' }));
