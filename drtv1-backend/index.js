@@ -21,6 +21,8 @@ app.use(cors({
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
+app.options('*', cors());
+
 // Setup multer for file uploads
 const upload = multer({ 
   dest: 'uploads/',
