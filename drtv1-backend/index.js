@@ -14,7 +14,7 @@ const app = express();
 app.use(cors({
   origin: 'https://jordan702.github.io/DRTv1', // Match your frontend port
   methods: ['GET', 'POST'],
-  credentials: true
+  credentials: false
 }));
 
 // Middleware to parse JSON
