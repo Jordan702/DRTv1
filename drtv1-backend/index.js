@@ -13,9 +13,15 @@ const app = express();
 // Enable CORS for frontend origin (adjust if hosted elsewhere)
 app.use(cors({
   origin: 'https://jordan702.github.io', // Match your frontend port
-  methods: ['GET', 'POST'],
-  credentials: false
+  methods: ['GET', 'POST']
 }));
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://jordan702.github.io');
+  res.setHeader('Access-Control-Allow-Methods', 'Get,Post');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-type');
+  next();
+});
 
 // Middleware to parse JSON
 app.use(express.json({ limit: '20mb' }));
