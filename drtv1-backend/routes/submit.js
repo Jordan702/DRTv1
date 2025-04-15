@@ -1,11 +1,11 @@
 //backend/routes/submit.js
 const express = require('express');
-const multer = require('multer');
-const { verifyAndMint } = require('../controllers/resourceVerifier');
-
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' });
+const { verifyAndMint } = require('../controllers/resourceVerifier');
+const multer = require('multer');
 
-router.post('/', upload.single('proof'), verifyAndMint);
+const upload = multer({ dest: 'uploads/', limits: { fileSize: 20 * 1024 * 1024 } });
+
+router.post('/', upload.single('proofFile'), verifyAndMint);
 
 module.exports = router;
