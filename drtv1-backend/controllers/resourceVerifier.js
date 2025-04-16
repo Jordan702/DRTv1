@@ -26,6 +26,7 @@ const contract = new ethers.Contract(process.env.DRT_CONTRACT_ADDRESS, DRT_ABI, 
 })();
 
 async function verifyAndMint(req, res) {
+  console.log('verifyAndMint called');
   try {
     const { walletAddress, description } = req.body;
     const proofFile = req.file;
