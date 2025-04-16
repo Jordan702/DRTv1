@@ -61,13 +61,20 @@
         console.log('Response:', response);
 
         let result;
+        let rawText;
+        
         try {
-          result = await response.json();
-        } catch (parseErr) {
-          const rawText = await response.text();
-          console.error('X Failed to parse JSON response:', parseErr);
-          console.log('Raw response:', rawText);
-          status.textContent = 'Server error: Non-JSON response received.';
+          rawText = await response.text();
+          try {
+            result = JSON.parse(rawText);
+          } catch (jsonErr) {
+            console.error('Failed to parse JSON response:', jsonErr);
+            console.log('Raw response:', rawText);
+            status.textContent = 'Server error: Non-JSON response received.';
+            return;
+          }
+        } catch (readErr) {
+          console.error('Failed to read response body:', readErr);
           return;
         }
 
