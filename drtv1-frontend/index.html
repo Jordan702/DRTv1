@@ -82,12 +82,10 @@
           status.textContent = result.message || 'Submitted sucessfully!';
         } else {
           status.textContent = `Error: ${result.error || 'Unknown issue'}`;
-
         }
-
       } catch (err) {
-        console.error('X Fetch error:', err);
-        status.textContent = 'Submission failed. Please try again later.';
+        console.error('❌ Fetch error:', err);
+        status.textContent = `Submission failed: ${err.message || 'Check server connection.'}`;
       }
     });
   </script>
