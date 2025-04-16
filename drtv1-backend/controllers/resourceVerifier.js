@@ -38,7 +38,7 @@ async function verifyAndMint(req, res) {
     const proofPath = path.resolve(__dirname, '..', proofFile.path);
     const ocrResult = await Tesseract.recognize(proofPath, 'eng');
     const extractedText = ocrResult.data.text;
-    fs.unlinkSync(proofPath); // Clean up uploaded file
+    // fs.unlinkSync(proofPath); Clean up uploaded file
 
     // Build and evaluate prompt
     const prompt = `Estimate the real-world contribution value (USD) based on this description: ${description}\n\n${extractedText}`;
