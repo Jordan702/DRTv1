@@ -14,6 +14,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Middleware to parse JSON
 app.use(express.json({ limit: '20mb' }));
@@ -25,7 +26,7 @@ const upload = multer({
   limits: { fileSize: 20 * 1024 * 1024 } // Allow up to 20MB
 });
 
-app.options('*', cors(corsOptions));
+
 
 // Import and use the /api/verify submission route
 const submitRoute = require('./routes/submit');
