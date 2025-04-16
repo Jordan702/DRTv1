@@ -1,5 +1,3 @@
-// backend/services/openaiService.js
-
 require('dotenv').config();
 const OpenAI = require('openai');
 
@@ -10,7 +8,7 @@ const openai = new OpenAI({
 async function evaluateResourcePrompt(prompt) {
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-3.5-turbo", // 🧠 Cost-efficient model
       messages: [
         { role: "system", content: "You are a verifier for the DRTv1 protocol." },
         { role: "user", content: prompt }
@@ -19,9 +17,12 @@ async function evaluateResourcePrompt(prompt) {
       max_tokens: 500,
     });
 
-    return completion.choices[0].message.content;
+    const output = completion?.choices?.[0]?.message?.content || '';
+    console.log("✅ OpenAI responded:", output.substring(0, 100), '...');
+    return output;
+
   } catch (error) {
-    console.error("OpenAI error:", error);
+    console.error("❌ OpenAI API error:", error.message || error);
     return null;
   }
 }
