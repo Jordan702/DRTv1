@@ -1,5 +1,3 @@
-// backend/controllers/resourceVerifier.js
-
 require('dotenv').config({ path: './.env' });
 
 const fs = require('fs');
@@ -26,10 +24,17 @@ const contract = new ethers.Contract(process.env.DRT_CONTRACT_ADDRESS, DRT_ABI, 
 })();
 
 async function verifyAndMint(req, res) {
-  console.log('verifyAndMint called');
+  console.log('🛂 verifyAndMint called');
+
   try {
     const { walletAddress, description } = req.body;
     const proofFile = req.file;
+
+    console.log("🧾 Incoming Data:", {
+      walletAddress,
+      description,
+      file: proofFile?.path || '[NO FILE]'
+    });
 
     if (!walletAddress || !description || !proofFile) {
       return res.status(400).json({ error: 'Missing required fields or file.' });
@@ -39,7 +44,11 @@ async function verifyAndMint(req, res) {
     const proofPath = path.resolve(__dirname, '..', proofFile.path);
     const ocrResult = await Tesseract.recognize(proofPath, 'eng');
     const extractedText = ocrResult.data.text;
-    // fs.unlinkSync(proofPath); Clean up uploaded file
+
+    // Clean up uploaded file safely
+    fs.unlink(proofPath, (err) => {
+      if (err) console.error("⚠️ Failed to delete uploaded file:", err.message);
+    });
 
     // Build and evaluate prompt
     const prompt = `Estimate the real-world contribution value (USD) based on this description: ${description}\n\n${extractedText}`;
@@ -51,9 +60,9 @@ async function verifyAndMint(req, res) {
     const tokensToMint = Math.min((valueEstimate * 1000) / 100, 100); // Cap at 100 DRT
     const mintAmount = ethers.parseUnits(tokensToMint.toString(), 18);
 
-    console.log(`🔍 Description: ${description}`);
-    console.log(`📄 Extracted Text: ${extractedText.substring(0, 100)}...`);
-    console.log(`💡 Estimated Value: $${valueEstimate}`);
+    console.log(`📝 Description: ${description}`);
+    console.log(`📄 OCR Text (first 100): ${extractedText.substring(0, 100)}...`);
+    console.log(`💵 Estimated USD Value: $${valueEstimate}`);
     console.log(`🪙 Minting ${tokensToMint} DRT to ${walletAddress}`);
 
     const tx = await contract.mint(walletAddress, mintAmount);
@@ -65,7 +74,8 @@ async function verifyAndMint(req, res) {
     });
 
   } catch (err) {
-    console.error('❌ verifyAndMint ERROR:', err);
+    console.error('❌ verifyAndMint ERROR:', err.message);
+    console.error('🧠 Stack Trace:', err.stack);
     return res.status(500).json({
       error: 'Submission failed',
       details: err?.message || 'Unknown error'
