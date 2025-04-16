@@ -25,62 +25,70 @@ const contract = new ethers.Contract(process.env.DRT_CONTRACT_ADDRESS, DRT_ABI, 
 
 async function verifyAndMint(req, res) {
   console.log('🛂 verifyAndMint called');
-
   try {
     const { walletAddress, description } = req.body;
     const proofFile = req.file;
 
-    console.log("🧾 Incoming Data:", {
-      walletAddress,
-      description,
-      file: proofFile?.path || '[NO FILE]'
-    });
+    console.log('🧾 Incoming Data:', { walletAddress, description, file: proofFile?.path });
 
     if (!walletAddress || !description || !proofFile) {
       return res.status(400).json({ error: 'Missing required fields or file.' });
     }
 
-    // Run OCR
     const proofPath = path.resolve(__dirname, '..', proofFile.path);
-    const ocrResult = await Tesseract.recognize(proofPath, 'eng');
-    const extractedText = ocrResult.data.text;
+    console.log('📎 Proof path:', proofPath);
 
-    // Clean up uploaded file safely
-    fs.unlink(proofPath, (err) => {
-      if (err) console.error("⚠️ Failed to delete uploaded file:", err.message);
-    });
+    let extractedText = '';
+    try {
+      const ocrResult = await Tesseract.recognize(proofPath, 'eng');
+      extractedText = ocrResult.data.text;
+      console.log('🧠 Extracted Text:', extractedText.substring(0, 200));
+    } catch (ocrErr) {
+      console.error('❌ OCR Error:', ocrErr);
+      return res.status(500).json({ error: 'OCR failed', details: ocrErr.message });
+    }
 
-    // Build and evaluate prompt
     const prompt = `Estimate the real-world contribution value (USD) based on this description: ${description}\n\n${extractedText}`;
-    const content = await evaluateResourcePrompt(prompt);
+    let content;
+    try {
+      console.log('📤 Sending prompt to OpenAI...');
+      content = await evaluateResourcePrompt(prompt);
+      console.log('🧠 OpenAI response:', content);
+      if (!content) throw new Error('No content returned from OpenAI');
+    } catch (aiErr) {
+      console.error('❌ OpenAI Error:', aiErr);
+      return res.status(500).json({ error: 'AI evaluation failed', details: aiErr.message });
+    }
 
-    let valueEstimate = parseFloat(content?.trim());
+    let valueEstimate = parseFloat(content.trim());
     if (isNaN(valueEstimate)) valueEstimate = 0;
 
     const tokensToMint = Math.min((valueEstimate * 1000) / 100, 100); // Cap at 100 DRT
     const mintAmount = ethers.parseUnits(tokensToMint.toString(), 18);
 
-    console.log(`📝 Description: ${description}`);
-    console.log(`📄 OCR Text (first 100): ${extractedText.substring(0, 100)}...`);
-    console.log(`💵 Estimated USD Value: $${valueEstimate}`);
-    console.log(`🪙 Minting ${tokensToMint} DRT to ${walletAddress}`);
+    console.log(`💡 Value Estimate: $${valueEstimate}`);
+    console.log(`🪙 Minting ${tokensToMint} DRT to ${walletAddress}...`);
 
-    const tx = await contract.mint(walletAddress, mintAmount);
-    await tx.wait();
+    try {
+      const tx = await contract.mint(walletAddress, mintAmount);
+      await tx.wait();
+      console.log(`✅ Minted successfully. TX Hash: ${tx.hash}`);
 
-    return res.json({
-      message: `✅ Minted ${tokensToMint} DRT to ${walletAddress}`,
-      txHash: tx.hash
-    });
+      return res.json({
+        message: `✅ Minted ${tokensToMint} DRT to ${walletAddress}`,
+        txHash: tx.hash
+      });
+    } catch (mintErr) {
+      console.error('❌ Minting failed:', mintErr);
+      return res.status(500).json({ error: 'Blockchain mint failed', details: mintErr.message });
+    }
 
   } catch (err) {
-    console.error('❌ verifyAndMint ERROR:', err.message);
-    console.error('🧠 Stack Trace:', err.stack);
+    console.error('❌ verifyAndMint FATAL ERROR:', err);
     return res.status(500).json({
       error: 'Submission failed',
-      details: err?.message || 'Unknown error'
+      details: err.message || 'Unknown error'
     });
   }
 }
-
 module.exports = { verifyAndMint };
