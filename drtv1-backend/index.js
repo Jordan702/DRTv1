@@ -7,7 +7,13 @@ const path = require('path');
 
 // Initialize Express app
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: 'https://jordan702.github.io',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  credentials: false,
+};
+
+app.use(cors(corsOptions));
 
 // Middleware to parse JSON
 app.use(express.json({ limit: '20mb' }));
@@ -18,6 +24,8 @@ const upload = multer({
   dest: 'uploads/',
   limits: { fileSize: 20 * 1024 * 1024 } // Allow up to 20MB
 });
+
+app.options('*', cors(corsOptions));
 
 // Import and use the /api/verify submission route
 const submitRoute = require('./routes/submit');
