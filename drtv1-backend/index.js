@@ -41,7 +41,15 @@ app.use('/api/verify', submitRoute);
 app.get('/', (req, res) => {
   res.send('✅ DRTv1 Backend API is live 🚀');
 });
-
+app.get('/api/dashboard', (req, res) => {
+  try {
+    const logPath = path.resolve(__dirname, 'logs/submissions.json');
+    const logs = fs.existsSync(logPath) ? JSON.parse(fs.readFileSync(logPath)) : [];
+    res.json(logs);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load dashboard data', details: err.message });
+  }
+});
 // Global error handler (optional)
 app.use((err, req, res, next) => {
   console.error('🌐 Global Error:', err);
