@@ -12,7 +12,7 @@ const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 const signer = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 const contract = new ethers.Contract(process.env.DRT_CONTRACT_ADDRESS, DRT_ABI, signer);
 
-// Async startup logs for debugging
+// Startup Debug Info
 (async () => {
   try {
     console.log("✅ Loaded contract from:", process.env.DRT_CONTRACT_ADDRESS);
@@ -48,7 +48,8 @@ async function verifyAndMint(req, res) {
       return res.status(500).json({ error: 'OCR failed', details: ocrErr.message });
     }
 
-    const prompt = `Estimate the real-world contribution value (USD) based on this description: ${description}\n\n${extractedText}`;
+    const prompt = `Given this description and extracted text, return a single number (no symbols, no commentary). Description: "${description}"\n\nExtracted OCR: "${extractedText}"`;
+
     let content;
     try {
       console.log('📤 Sending prompt to OpenAI...');
@@ -61,7 +62,10 @@ async function verifyAndMint(req, res) {
     }
 
     let valueEstimate = parseFloat(content.trim());
-    if (isNaN(valueEstimate)) valueEstimate = 0;
+    if (isNaN(valueEstimate) || valueEstimate < 0) {
+      console.warn('⚠️ Invalid or negative value. Defaulting to 0.');
+      valueEstimate = 0;
+    }
 
     const tokensToMint = Math.min((valueEstimate * 1000) / 100, 100); // Cap at 100 DRT
     const mintAmount = ethers.parseUnits(tokensToMint.toString(), 18);
@@ -76,7 +80,8 @@ async function verifyAndMint(req, res) {
 
       return res.json({
         message: `✅ Minted ${tokensToMint} DRT to ${walletAddress}`,
-        txHash: tx.hash
+        txHash: tx.hash,
+        // openAiResponse: content // Optional: Show this to the user for transparency
       });
     } catch (mintErr) {
       console.error('❌ Minting failed:', mintErr);
@@ -91,4 +96,5 @@ async function verifyAndMint(req, res) {
     });
   }
 }
+
 module.exports = { verifyAndMint };
