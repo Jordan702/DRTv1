@@ -54,11 +54,17 @@ async function verifyAndMint(req, res) {
 
     let extractedText = '';
     try {
-      const ocrResult = await Tesseract.recognize(proofPath, 'eng+pol+spa+fra+deu+ita+por+tur+vie');
-      extractedText = ocrResult.data.text;
-      console.log('🧠 Extracted Text (raw):', extractedText.substring(0, 200));
+      try {
+        const ocrResult = await Tesseract.recognize(proofPath, 'eng+pol+spa+fra+deu+ita+por+tur+vie');
+        extractedText = ocrResult.data.text;
+      } catch (multiLangErr) {
+        console.warn('🌐 Multilingual OCR failed. Falling back to English.');
+        const ocrResult = await Tesseract.recognize(proofPath, 'eng');
+        extractedText = ocrResult.data.text;
+      }
+      console.log('🧠 Extracted Text:', extractedText.substring(0, 200));
     } catch (ocrErr) {
-      console.error('❌ OCR Error:', ocrErr);
+      console.error('❌ OCR Error:', ocrErr.message);
       return res.status(500).json({ error: 'OCR failed', details: ocrErr.message });
     }
 
@@ -68,20 +74,20 @@ async function verifyAndMint(req, res) {
       translatedOCR = await evaluateResourcePrompt(translationPrompt);
       console.log('🌐 Translated OCR:', translatedOCR.substring(0, 200));
     } catch (translateErr) {
-      console.error('❌ Translation Error:', translateErr);
+      console.error('❌ Translation Error:', translateErr.message);
       return res.status(500).json({ error: 'Translation failed', details: translateErr.message });
     }
 
     const prompt = `Based on this description and translated contribution proof, return ONLY the estimated USD value of this resource as a number (no symbols or commentary):\n\nDescription: "${description}"\n\nProof: "${translatedOCR}"`;
 
-    let content;
+    let content = '';
     try {
-      console.log('📤 Sending value prompt to OpenAI...');
+      console.log('📤 Sending prompt to OpenAI...');
       content = await evaluateResourcePrompt(prompt);
       console.log('🧠 OpenAI raw response:', content);
       if (!content) throw new Error('No content returned from OpenAI');
     } catch (aiErr) {
-      console.error('❌ OpenAI Error:', aiErr);
+      console.error('❌ OpenAI Error:', aiErr.message);
       return res.status(500).json({ error: 'AI evaluation failed', details: aiErr.message });
     }
 
@@ -104,44 +110,45 @@ async function verifyAndMint(req, res) {
     console.log(`💡 Value Estimate: $${valueEstimate}`);
     console.log(`🪙 Minting ${tokensToMint} DRT to ${walletAddress}...`);
 
+    let tx;
     try {
-      const tx = await contract.mint(walletAddress, mintAmount);
+      tx = await contract.mint(walletAddress, mintAmount);
       await tx.wait();
       console.log(`✅ Minted successfully. TX Hash: ${tx.hash}`);
-
-      const logPath = path.resolve(__dirname, '../logs/submissions.json');
-      const newLogEntry = {
-        walletAddress,
-        valueEstimate,
-        tokensToMint,
-        description,
-        translatedProof: translatedOCR.substring(0, 1000),
-        timestamp: new Date().toISOString(),
-        txHash: tx.hash
-      };
-
-      try {
-        const existingLogs = fs.existsSync(logPath) ? JSON.parse(fs.readFileSync(logPath)) : [];
-        existingLogs.push(newLogEntry);
-        fs.writeFileSync(logPath, JSON.stringify(existingLogs, null, 2));
-        console.log('📝 Submission logged');
-      } catch (logErr) {
-        console.error('❌ Failed to write submission log:', logErr);
-      }
-
-      return res.json({
-        message: `✅ Minted ${tokensToMint} DRT to ${walletAddress}`,
-        txHash: tx.hash,
-        openAiResponse: content
-      });
-
     } catch (mintErr) {
-      console.error('❌ Minting failed:', mintErr);
+      console.error('❌ Minting failed:', mintErr.message);
       return res.status(500).json({ error: 'Blockchain mint failed', details: mintErr.message });
     }
 
+    // Logging the successful mint
+    const logPath = path.resolve(__dirname, '../logs/submissions.json');
+    const newLogEntry = {
+      walletAddress,
+      valueEstimate,
+      tokensToMint,
+      description,
+      translatedProof: translatedOCR.substring(0, 1000),
+      timestamp: new Date().toISOString(),
+      txHash: tx.hash
+    };
+
+    try {
+      const existingLogs = fs.existsSync(logPath) ? JSON.parse(fs.readFileSync(logPath)) : [];
+      existingLogs.push(newLogEntry);
+      fs.writeFileSync(logPath, JSON.stringify(existingLogs, null, 2));
+      console.log('📝 Submission logged');
+    } catch (logErr) {
+      console.error('❌ Failed to write submission log:', logErr.message);
+    }
+
+    return res.json({
+      message: `✅ Minted ${tokensToMint} DRT to ${walletAddress}`,
+      txHash: tx.hash,
+      openAiResponse: content
+    });
+
   } catch (err) {
-    console.error('❌ verifyAndMint FATAL ERROR:', err);
+    console.error('❌ verifyAndMint FATAL ERROR:', err.message || err);
     return res.status(500).json({
       error: 'Submission failed',
       details: err.message || 'Unknown error'
