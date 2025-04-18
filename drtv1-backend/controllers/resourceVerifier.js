@@ -2,7 +2,7 @@ require('dotenv').config({ path: './.env' });
 
 const fs = require('fs');
 const path = require('path');
-const Tesseract = require('tesseract.js');
+const crypto = require('crypto');
 const { ethers } = require('ethers');
 const { evaluateResourcePrompt } = require('../services/openaiService');
 
@@ -52,7 +52,34 @@ async function verifyAndMint(req, res) {
     const proofPath = path.resolve(__dirname, '..', proofFile.path);
     console.log('📎 Proof path:', proofPath);
 
-    // 🔧 TEMP BYPASS for OCR
+    // 🔐 Generate file hash and block duplicates
+    let fileHash;
+    try {
+      const fileBuffer = fs.readFileSync(proofPath);
+      fileHash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
+      console.log('🧬 File Hash:', fileHash);
+    } catch (hashErr) {
+      console.error('❌ Failed to hash uploaded file:', hashErr.message);
+      return res.status(500).json({ error: 'Proof file processing failed', details: hashErr.message });
+    }
+
+    // 🔎 Check if this fileHash was already submitted
+    const logPath = path.resolve(__dirname, '../logs/submissions.json');
+    let existingLogs = [];
+    if (fs.existsSync(logPath)) {
+      try {
+        existingLogs = JSON.parse(fs.readFileSync(logPath));
+        const duplicate = existingLogs.find(entry => entry.fileHash === fileHash);
+        if (duplicate) {
+          return res.status(400).json({ error: 'Duplicate submission detected. This proof has already been used.' });
+        }
+      } catch (logErr) {
+        console.error('❌ Failed to read logs:', logErr.message);
+        return res.status(500).json({ error: 'Server log read error', details: logErr.message });
+      }
+    }
+
+    // 🧠 TEMP BYPASS: Inject dummy text instead of real OCR
     const extractedText = '[TEMP] Proof of teaching English to children in Poland during a summer volunteer program.';
     console.log('🧠 [TEMP] Injected extracted text:', extractedText);
 
@@ -92,7 +119,9 @@ async function verifyAndMint(req, res) {
       valueEstimate = 0;
     }
 
-    const tokensToMint = Math.min((valueEstimate * 1000) / 100, 100);
+    // 💎 Ultra-Rare Ratio: 1 DRT per $1,000,000
+    const DOLLAR_TO_DRT_RATIO = 1_000_000;
+    const tokensToMint = Math.min(valueEstimate / DOLLAR_TO_DRT_RATIO, 100);
     const mintAmount = ethers.parseUnits(tokensToMint.toString(), 18);
 
     console.log(`💡 Value Estimate: $${valueEstimate}`);
@@ -108,20 +137,19 @@ async function verifyAndMint(req, res) {
       return res.status(500).json({ error: 'Blockchain mint failed', details: mintErr.message });
     }
 
-    // Logging the successful mint
-    const logPath = path.resolve(__dirname, '../logs/submissions.json');
+    // ✅ Log successful submission
     const newLogEntry = {
       walletAddress,
       valueEstimate,
       tokensToMint,
       description,
       translatedProof: translatedOCR.substring(0, 1000),
+      fileHash,
       timestamp: new Date().toISOString(),
       txHash: tx.hash
     };
 
     try {
-      const existingLogs = fs.existsSync(logPath) ? JSON.parse(fs.readFileSync(logPath)) : [];
       existingLogs.push(newLogEntry);
       fs.writeFileSync(logPath, JSON.stringify(existingLogs, null, 2));
       console.log('📝 Submission logged');
@@ -145,4 +173,5 @@ async function verifyAndMint(req, res) {
 }
 
 module.exports = { verifyAndMint };
+
 
