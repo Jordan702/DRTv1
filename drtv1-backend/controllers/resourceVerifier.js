@@ -39,7 +39,6 @@ async function verifyAndMint(req, res) {
       return res.status(400).json({ error: 'Missing required fields or file.' });
     }
 
-    // Cooldown check
     const now = Date.now();
     if (
       lastSubmissionTime[walletAddress] &&
@@ -55,34 +54,51 @@ async function verifyAndMint(req, res) {
 
     let extractedText = '';
     try {
-      const ocrResult = await Tesseract.recognize(proofPath, 'eng');
+      const ocrResult = await Tesseract.recognize(proofPath, 'eng+pol+spa+fra+deu+ita+por+tur+vie');
       extractedText = ocrResult.data.text;
-      console.log('🧠 Extracted Text:', extractedText.substring(0, 200));
+      console.log('🧠 Extracted Text (raw):', extractedText.substring(0, 200));
     } catch (ocrErr) {
       console.error('❌ OCR Error:', ocrErr);
       return res.status(500).json({ error: 'OCR failed', details: ocrErr.message });
     }
 
-    const prompt = `Given this description and extracted text, return a single number (no symbols, no commentary). Description: "${description}"\n\nExtracted OCR: "${extractedText}"`;
+    let translatedOCR = '';
+    try {
+      const translationPrompt = `Translate the following text to English. Return only the translated version:\n\n"${extractedText}"`;
+      translatedOCR = await evaluateResourcePrompt(translationPrompt);
+      console.log('🌐 Translated OCR:', translatedOCR.substring(0, 200));
+    } catch (translateErr) {
+      console.error('❌ Translation Error:', translateErr);
+      return res.status(500).json({ error: 'Translation failed', details: translateErr.message });
+    }
+
+    const prompt = `Based on this description and translated contribution proof, return ONLY the estimated USD value of this resource as a number (no symbols or commentary):\n\nDescription: "${description}"\n\nProof: "${translatedOCR}"`;
 
     let content;
     try {
-      console.log('📤 Sending prompt to OpenAI...');
+      console.log('📤 Sending value prompt to OpenAI...');
       content = await evaluateResourcePrompt(prompt);
-      console.log('🧠 OpenAI response:', content);
+      console.log('🧠 OpenAI raw response:', content);
       if (!content) throw new Error('No content returned from OpenAI');
     } catch (aiErr) {
       console.error('❌ OpenAI Error:', aiErr);
       return res.status(500).json({ error: 'AI evaluation failed', details: aiErr.message });
     }
 
-    let valueEstimate = parseFloat(content.trim());
+    let valueEstimate = 0;
+    const parsedFloat = parseFloat(content.trim());
+    if (!isNaN(parsedFloat)) {
+      valueEstimate = parsedFloat;
+    } else {
+      const match = content.match(/[-+]?[0-9]*\.?[0-9]+/);
+      if (match) valueEstimate = parseFloat(match[0]);
+    }
     if (isNaN(valueEstimate) || valueEstimate < 0) {
       console.warn('⚠️ Invalid or negative value. Defaulting to 0.');
       valueEstimate = 0;
     }
 
-    const tokensToMint = Math.min((valueEstimate * 1000) / 100, 100); // Cap at 100 DRT
+    const tokensToMint = Math.min((valueEstimate * 1000) / 100, 100);
     const mintAmount = ethers.parseUnits(tokensToMint.toString(), 18);
 
     console.log(`💡 Value Estimate: $${valueEstimate}`);
@@ -93,14 +109,13 @@ async function verifyAndMint(req, res) {
       await tx.wait();
       console.log(`✅ Minted successfully. TX Hash: ${tx.hash}`);
 
-      // Log submission to JSON file
       const logPath = path.resolve(__dirname, '../logs/submissions.json');
       const newLogEntry = {
         walletAddress,
         valueEstimate,
         tokensToMint,
         description,
-        extractedText: extractedText.substring(0, 1000),
+        translatedProof: translatedOCR.substring(0, 1000),
         timestamp: new Date().toISOString(),
         txHash: tx.hash
       };
@@ -119,6 +134,7 @@ async function verifyAndMint(req, res) {
         txHash: tx.hash,
         openAiResponse: content
       });
+
     } catch (mintErr) {
       console.error('❌ Minting failed:', mintErr);
       return res.status(500).json({ error: 'Blockchain mint failed', details: mintErr.message });
