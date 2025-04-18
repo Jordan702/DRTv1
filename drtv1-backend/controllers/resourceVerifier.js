@@ -12,6 +12,10 @@ const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 const signer = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 const contract = new ethers.Contract(process.env.DRT_CONTRACT_ADDRESS, DRT_ABI, signer);
 
+// Track last submission per wallet (in-memory)
+const lastSubmissionTime = {};
+const SUBMISSION_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes
+
 // Startup Debug Info
 (async () => {
   try {
@@ -34,6 +38,17 @@ async function verifyAndMint(req, res) {
     if (!walletAddress || !description || !proofFile) {
       return res.status(400).json({ error: 'Missing required fields or file.' });
     }
+
+    // Cooldown check
+    const now = Date.now();
+    if (
+      lastSubmissionTime[walletAddress] &&
+      now - lastSubmissionTime[walletAddress] < SUBMISSION_COOLDOWN_MS
+    ) {
+      const waitTime = Math.ceil((SUBMISSION_COOLDOWN_MS - (now - lastSubmissionTime[walletAddress])) / 1000);
+      return res.status(429).json({ error: `⏳ Please wait ${waitTime} seconds before submitting again.` });
+    }
+    lastSubmissionTime[walletAddress] = now;
 
     const proofPath = path.resolve(__dirname, '..', proofFile.path);
     console.log('📎 Proof path:', proofPath);
@@ -78,10 +93,31 @@ async function verifyAndMint(req, res) {
       await tx.wait();
       console.log(`✅ Minted successfully. TX Hash: ${tx.hash}`);
 
+      // Log submission to JSON file
+      const logPath = path.resolve(__dirname, '../logs/submissions.json');
+      const newLogEntry = {
+        walletAddress,
+        valueEstimate,
+        tokensToMint,
+        description,
+        extractedText: extractedText.substring(0, 1000),
+        timestamp: new Date().toISOString(),
+        txHash: tx.hash
+      };
+
+      try {
+        const existingLogs = fs.existsSync(logPath) ? JSON.parse(fs.readFileSync(logPath)) : [];
+        existingLogs.push(newLogEntry);
+        fs.writeFileSync(logPath, JSON.stringify(existingLogs, null, 2));
+        console.log('📝 Submission logged');
+      } catch (logErr) {
+        console.error('❌ Failed to write submission log:', logErr);
+      }
+
       return res.json({
         message: `✅ Minted ${tokensToMint} DRT to ${walletAddress}`,
         txHash: tx.hash,
-        // openAiResponse: content // Optional: Show this to the user for transparency
+        openAiResponse: content
       });
     } catch (mintErr) {
       console.error('❌ Minting failed:', mintErr);
@@ -98,3 +134,4 @@ async function verifyAndMint(req, res) {
 }
 
 module.exports = { verifyAndMint };
+
