@@ -15,14 +15,16 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Body parsers
+// Middleware
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
-
-// Serve static files from "public" folder
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Multer setup for uploads (if used by /verify route)
+// Ensure logs directory exists
+const logsDir = path.join(__dirname, 'logs');
+if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir);
+
+// Ensure uploads directory exists (if used)
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
 const upload = multer({ dest: 'uploads/', limits: { fileSize: 20 * 1024 * 1024 } }); // 20MB
@@ -34,7 +36,7 @@ const vaultRoutes = require('./routes/vaultRoutes');
 app.use('/api/verify', submitRoute);
 app.use('/api/vault', vaultRoutes);
 
-// Serve the DRT Redemption HTML directly
+// Serve Redemption HTML
 app.get('/redeem', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/redeem.html'));
 });
@@ -44,14 +46,29 @@ app.get('/', (req, res) => {
   res.send('✅ DRTv1 Backend API is live 🚀');
 });
 
-// Dashboard route for submission logs
+// View submission dashboard
 app.get('/api/dashboard', (req, res) => {
+  const logPath = path.resolve(__dirname, 'logs/submissions.json');
   try {
-    const logPath = path.resolve(__dirname, 'logs/submissions.json');
-    const logs = fs.existsSync(logPath) ? JSON.parse(fs.readFileSync(logPath)) : [];
+    const logs = fs.existsSync(logPath)
+      ? JSON.parse(fs.readFileSync(logPath))
+      : [];
     res.json(logs);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to load dashboard data', details: err.message });
+    res.status(500).json({ error: 'Failed to load submission logs', details: err.message });
+  }
+});
+
+// View redemption logs
+app.get('/api/redemptions', (req, res) => {
+  const logPath = path.resolve(__dirname, 'logs/redemptions.json');
+  try {
+    const logs = fs.existsSync(logPath)
+      ? JSON.parse(fs.readFileSync(logPath))
+      : [];
+    res.json(logs);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to load redemption logs', details: err.message });
   }
 });
 
