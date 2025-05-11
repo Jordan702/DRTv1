@@ -5,9 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { ethers } = require('ethers');
 const { evaluateResourcePrompt } = require('../services/openaiService');
-
 const DRT_ABI = require('../DRT_abi.json');
-
 const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 const signer = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 const contract = new ethers.Contract(process.env.DRT_CONTRACT_ADDRESS, DRT_ABI, signer);
@@ -137,28 +135,15 @@ async function verifyAndMint(req, res) {
       return res.status(500).json({ error: 'Blockchain mint failed', details: mintErr.message });
     }
 
-    // ✅ Log successful submission
-    const newLogEntry = {
-      walletAddress,
-      valueEstimate,
-      tokensToMint,
-      description,
-      translatedProof: translatedOCR.substring(0, 1000),
-      fileHash,
-      timestamp: new Date().toISOString(),
-      txHash: tx.hash
-    };
+    // 🔥 Vault Integration
+    const Vault = require('../contracts/Vault'); // adjust the path if needed
+    const vault = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, signer);
 
-    try {
-      existingLogs.push(newLogEntry);
-      fs.writeFileSync(logPath, JSON.stringify(existingLogs, null, 2));
-      console.log('📝 Submission logged');
-    } catch (logErr) {
-      console.error('❌ Failed to write submission log:', logErr.message);
-    }
+    const ethValue = await getEthValueOfDRT(tokensToMint); // your existing function
+    await vault.mintAndDistributeSeth(drtTokenType, ethValue); // 'drtTokenType' could be 1 or 2
 
     return res.json({
-      message: `✅ Minted ${tokensToMint} DRT to ${walletAddress}`,
+      message: `✅ Minted ${tokensToMint} DRT to ${walletAddress} and processed via Vault`,
       txHash: tx.hash,
       openAiResponse: content
     });
@@ -173,5 +158,6 @@ async function verifyAndMint(req, res) {
 }
 
 module.exports = { verifyAndMint };
+
 
 
