@@ -64,6 +64,28 @@
       margin-top: 0.5rem;
       color: #333;
     }
+    .links {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    .links a {
+      display: block;
+      color: #2e7d32;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      text-decoration: none;
+    }
+    .links code {
+      font-size: 0.9rem;
+      display: block;
+      margin: 0.25rem auto 1rem auto;
+      color: #444;
+    }
+    .seth-logo {
+      display: block;
+      margin: 1.5rem auto 0 auto;
+      width: 100px;
+    }
   </style>
 </head>
 <body>
@@ -71,6 +93,7 @@
     <img src="DRTv1 Logo.png" alt="DRTv1 Logo" class="logo">
     <h1>DRT Redemption Portal</h1>
     <p class="slogan">Evolution Through Contribution</p>
+
     <form id="redeemForm">
       <label for="wallet">Your Wallet Address:</label>
       <input type="text" id="wallet" name="wallet" required>
@@ -80,11 +103,28 @@
 
       <button type="submit">Redeem sETH</button>
     </form>
+
     <div id="status"></div>
     <div id="estimate"></div>
+
+    <div class="links">
+      <a href="https://github.com/Jordan702/DRTv1/raw/main/drtv2-frontend/sETH_Whitepaper.pdf" target="_blank">
+        📄 View the sETH Whitepaper (PDF)
+      </a>
+      <a href="https://jordan702.github.io/DRTv1/" target="_blank">
+        🔙 Return to DRTv1 Landing Page
+      </a>
+      <strong>sETH Token Address:</strong>
+      <code>0x98C29B3A30A118351D56589DD3622b89551e2dA3</code>
+      <strong>DRTv1 Token Address:</strong>
+      <code>0x732715C246A0A887e976c7c1145FbDec3FC646ac</code>
+    </div>
+
+    <img src="sETH Logo.png" alt="sETH Logo" class="seth-logo">
   </div>
 </body>
 </html>
+
 <script>
   const form = document.getElementById('redeemForm');
   const status = document.getElementById('status');
