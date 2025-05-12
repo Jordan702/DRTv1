@@ -1,3 +1,4 @@
+require('dotenv').config({ path: './.env' });
 const { ethers } = require("ethers");
 const fs = require("fs");
 const path = require("path");
