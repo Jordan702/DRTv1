@@ -1,6 +1,6 @@
+require('dotenv').config({ path: './.env' });
 const { ethers } = require('ethers');
 const Twitter = require('twitter-v2'); // install via: npm i twitter-v2
-require('dotenv').config();
 
 ✅ autoTweetBot.js (core logic only, minimal but production-ready)
 const provider = new ethers.WebSocketProvider(process.env.ALCHEMY_WSS);
