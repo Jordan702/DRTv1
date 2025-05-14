@@ -6,24 +6,40 @@ const crypto = require('crypto');
 const { ethers } = require('ethers');
 const { evaluateResourcePrompt } = require('../services/openaiService');
 const DRT_ABI = require('../DRT_abi.json');
+const vaultAbi = require('../abi/Vault.json');
+
 const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 const signer = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 const contract = new ethers.Contract(process.env.DRT_CONTRACT_ADDRESS, DRT_ABI, signer);
+const vault = new ethers.Contract(process.env.VAULT_CONTRACT_ADDRESS, vaultAbi, signer);
 
 // Track last submission per wallet (in-memory)
 const lastSubmissionTime = {};
 const SUBMISSION_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes
 
-// Startup Debug Info
-(async () => {
+// AI-based ETH converter
+async function getEthValueOfDRT_AI(usdAmount) {
+  const ethPrompt = `Return only the amount of ETH equivalent to $${usdAmount} using current real-world exchange rates. Return only the ETH number, no commentary.`;
   try {
-    console.log("✅ Loaded contract from:", process.env.DRT_CONTRACT_ADDRESS);
-    console.log("✅ Contract target address:", contract.target);
-    console.log("✅ Signer address:", await signer.getAddress());
+    const ethEstimate = await evaluateResourcePrompt(ethPrompt);
+    const match = ethEstimate.match(/[-+]?[0-9]*\.?[0-9]+/);
+    return match ? ethers.parseEther(match[0]) : ethers.parseEther("0");
   } catch (err) {
-    console.error("❌ Error during startup logs:", err);
+    console.error("❌ AI ETH Conversion Failed:", err.message);
+    return ethers.parseEther("0");
   }
-})();
+}
+
+// AI-based DRT token type resolver
+async function getTokenTypeFromAI(description) {
+  const tokenPrompt = `Based on the following description, return ONLY the token type: 1 for DRTv1 (direct labor), 2 for DRTv2 (impactful structures, large-scale, legacy projects). Description: "${description}"`;
+  try {
+    const typeResponse = await evaluateResourcePrompt(tokenPrompt);
+    return typeResponse.includes("2") ? 2 : 1;
+  } catch {
+    return 1;
+  }
+}
 
 async function verifyAndMint(req, res) {
   console.log('🛂 verifyAndMint called');
@@ -50,7 +66,6 @@ async function verifyAndMint(req, res) {
     const proofPath = path.resolve(__dirname, '..', proofFile.path);
     console.log('📎 Proof path:', proofPath);
 
-    // 🔐 Generate file hash and block duplicates
     let fileHash;
     try {
       const fileBuffer = fs.readFileSync(proofPath);
@@ -61,7 +76,6 @@ async function verifyAndMint(req, res) {
       return res.status(500).json({ error: 'Proof file processing failed', details: hashErr.message });
     }
 
-    // 🔎 Check if this fileHash was already submitted
     const logPath = path.resolve(__dirname, '../logs/submissions.json');
     let existingLogs = [];
     if (fs.existsSync(logPath)) {
@@ -77,7 +91,6 @@ async function verifyAndMint(req, res) {
       }
     }
 
-    // 🧠 TEMP BYPASS: Inject dummy text instead of real OCR
     const extractedText = '[TEMP] Proof of teaching English to children in Poland during a summer volunteer program.';
     console.log('🧠 [TEMP] Injected extracted text:', extractedText);
 
@@ -117,7 +130,6 @@ async function verifyAndMint(req, res) {
       valueEstimate = 0;
     }
 
-    // 💎 Ultra-Rare Ratio: 1 DRT per $1,000,000
     const DOLLAR_TO_DRT_RATIO = 1_000_000;
     const tokensToMint = Math.min(valueEstimate / DOLLAR_TO_DRT_RATIO, 100);
     const mintAmount = ethers.parseUnits(tokensToMint.toString(), 18);
@@ -135,12 +147,11 @@ async function verifyAndMint(req, res) {
       return res.status(500).json({ error: 'Blockchain mint failed', details: mintErr.message });
     }
 
-    // 🔥 Vault Integration
-    const Vault = require('../contracts/Vault'); // adjust the path if needed
-    const vault = new ethers.Contract(VAULT_ADDRESS, VAULT_ABI, signer);
+    // 🧠 AI-based ETH equivalent + token type
+    const ethValue = await getEthValueOfDRT_AI(valueEstimate);
+    const drtTokenType = await getTokenTypeFromAI(description);
 
-    const ethValue = await getEthValueOfDRT(tokensToMint); // your existing function
-    await vault.mintAndDistributeSeth(drtTokenType, ethValue); // 'drtTokenType' could be 1 or 2
+    await vault.mintAndDistributeSeth(drtTokenType, ethValue);
 
     return res.json({
       message: `✅ Minted ${tokensToMint} DRT to ${walletAddress} and processed via Vault`,
@@ -158,6 +169,3 @@ async function verifyAndMint(req, res) {
 }
 
 module.exports = { verifyAndMint };
-
-
-
