@@ -31,12 +31,12 @@ exports.handleDRTPurchase = async (req, res) => {
   }
 };
 
-exports.redeemSETH = async (req, res) => {
+exports.redeemSeTH = async (req, res) => {
   const { wallet, amount } = req.body;
   const logPath = path.resolve(__dirname, '../logs/redemptions.json');
 
   try {
-    const tx = await vaultContract.redeemSETH(wallet, ethers.parseUnits(amount.toString(), 18));
+    const tx = await vaultContract.redeemSeTH(wallet, ethers.parseUnits(amount.toString(), 18));
     await tx.wait();
 
     const logEntry = {
