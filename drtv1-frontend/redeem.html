@@ -108,10 +108,11 @@
       <strong>DRTv1 Token Address:</strong>
       <code>0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1</code>
   </div>
+
   <script>
     const vaultAddress = "0x76482657Be35288632F0417cB6CD665e4b5bF09C"; // sETHVaultv2
     const vaultABI = [
-      "function redeemForETH(uint256 amount) public",
+      "function redeemForETH(uint256 amount) public"
     ];
 
     async function redeemSETH() {
@@ -124,21 +125,21 @@
       }
 
       try {
-        await ethereum.request({ method: 'eth_requestAccounts' });
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const vault = new ethers.Contract(vaultAddress, vaultABI, signer);
 
         const parsedAmount = ethers.utils.parseUnits(amountInput, 18);
         const tx = await vault.redeemForETH(parsedAmount);
-        status.textContent = `Transaction sent. Waiting for confirmation...`;
+        status.textContent = `⏳ Transaction sent. Waiting for confirmation...`;
         await tx.wait();
         status.textContent = `✅ Redeemed successfully. TX: ${tx.hash}`;
       } catch (err) {
         console.error("Redemption failed:", err);
         status.textContent = `❌ ${err.message}`;
       }
-  }
+    }
   </script>
 </body>
 </html>
