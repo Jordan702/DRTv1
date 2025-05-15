@@ -8,7 +8,7 @@
 			},
 			{
 				"internalType": "address",
-				"name": "_ethReceiver",
+				"name": "initialOwner",
 				"type": "address"
 			}
 		],
@@ -43,6 +43,37 @@
 			{
 				"indexed": true,
 				"internalType": "address",
+				"name": "buyer",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint8",
+				"name": "tokenType",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "ethAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "minted",
+				"type": "uint256"
+			}
+		],
+		"name": "BuyRecorded",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
 				"name": "previousOwner",
 				"type": "address"
 			},
@@ -57,16 +88,40 @@
 		"type": "event"
 	},
 	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint8",
+				"name": "tokenType",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "pool",
+				"type": "address"
+			}
+		],
+		"name": "PoolRegistered",
+		"type": "event"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "user",
+				"name": "buyer",
 				"type": "address"
 			},
 			{
 				"internalType": "uint256",
 				"name": "ethAmount",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint8",
+				"name": "tokenType",
+				"type": "uint8"
 			}
 		],
 		"name": "recordBuy",
@@ -107,6 +162,24 @@
 		"type": "event"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint8",
+				"name": "tokenType",
+				"type": "uint8"
+			},
+			{
+				"internalType": "address",
+				"name": "sETHPool",
+				"type": "address"
+			}
+		],
+		"name": "registerPool",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "renounceOwnership",
 		"outputs": [],
@@ -128,7 +201,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "ethReceiver",
+		"name": "owner",
 		"outputs": [
 			{
 				"internalType": "address",
@@ -140,21 +213,14 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "getBalance",
-		"outputs": [
+		"inputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "uint8",
 				"name": "",
-				"type": "uint256"
+				"type": "uint8"
 			}
 		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "owner",
+		"name": "sETHPoolForToken",
 		"outputs": [
 			{
 				"internalType": "address",
