@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>DRTv1 - Evolution Through Contribution</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DRT sETH Redemption Portal</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -23,23 +23,7 @@
       color: #2e7d32;
       text-align: center;
     }
-    p.slogan {
-      text-align: center;
-      font-style: italic;
-      color: #555;
-      margin-bottom: 2rem;
-    }
-    .logo-row {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin-bottom: 1rem;
-    }
-    .logo {
-      width: 80px;
-      height: auto;
-    }
-    input, textarea, button {
+    input, button {
       width: 100%;
       margin-bottom: 1rem;
       padding: 0.75rem;
@@ -52,122 +36,56 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background-color: #1b5e20;
     }
     #status {
       margin-top: 1rem;
       font-weight: bold;
       text-align: center;
-      color: #00796b;
-    }
-    #estimate {
-      font-size: 1.2rem;
-      text-align: center;
-      margin-top: 0.5rem;
-      color: #333;
-    }
-    .links {
-      text-align: center;
-      margin-top: 2rem;
-    }
-    .links a {
-      display: block;
-      color: #2e7d32;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-      text-decoration: none;
-    }
-    .links code {
-      font-size: 0.9rem;
-      display: block;
-      margin: 0.25rem auto 1rem auto;
-      color: #444;
-      word-wrap: break-word;
-      white-space: normal;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="logo-row">
-      <img src="DRTv1 Logo.png" alt="DRTv1 Logo" class="logo" />
-      <img src="sETH Logo.png" alt="sETH Logo" class="logo" />
-    </div>
-    <h1>DRT Redemption Portal</h1>
-    <p class="slogan">Evolution Through Contribution</p>
+    <h1>Redeem sETH for ETH</h1>
 
-    <form id="redeemForm">
-      <label for="wallet">Your Wallet Address:</label>
-      <input type="text" id="wallet" name="wallet" required />
-
-      <label for="amount">Amount of sETH to Redeem:</label>
-      <input type="number" step="0.00001" id="amount" name="amount" required />
-
-      <button type="submit">Redeem sETH</button>
-    </form>
+    <label for="amount">Amount of sETH to Redeem:</label>
+    <input type="number" step="0.000001" id="amount" required />
+    <button onclick="redeemSETH()">Redeem</button>
 
     <div id="status"></div>
-    <div id="estimate"></div>
-
-    <div class="links">
-      <a href="https://github.com/Jordan702/DRTv1/raw/main/drtv1-frontend/sETH_Whitepaper.pdf" target="_blank">
-        📄 View the sETH Whitepaper (PDF)
-      </a>
-      <a href="https://jordan702.github.io/DRTv1/" target="_blank">
-        🔙 Return to DRTv1 Landing Page
-      </a>
-      <strong>sETH Token Address:</strong>
-      <code>0x98C29B3A30A118351D56589DD3622b89551e2dA3</code>
-      <strong>DRTv1 Token Address:</strong>
-      <code>0x732715C246A0A887e976c7c1145FbDec3FC646ac</code>
-    </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.2/dist/ethers.min.js"></script>
   <script>
-    const form = document.getElementById('redeemForm');
-    const status = document.getElementById('status');
-    const estimate = document.getElementById('estimate');
+    const vaultAddress = "0x76482657Be35288632F0417cB6CD665e4b5bF09C"; // sETHVaultv2
+    const vaultABI = [
+      "function redeemForETH(uint256 amount) public",
+    ];
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      status.textContent = '⏳ Processing redemption...';
-      status.style.color = '#00796b';
-      estimate.textContent = '';
+    async function redeemSETH() {
+      const status = document.getElementById('status');
+      const amountInput = document.getElementById('amount').value;
 
-      const wallet = document.getElementById('wallet').value.trim();
-      const amount = document.getElementById('amount').value.trim();
+      if (!window.ethereum) {
+        return status.textContent = "MetaMask is required to redeem sETH.";
+      }
 
       try {
-        const response = await fetch('https://drtv1-backend.onrender.com/api/vault/redeem', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ wallet, amount })
-        });
+        await ethereum.request({ method: 'eth_requestAccounts' });
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const vault = new ethers.Contract(vaultAddress, vaultABI, signer);
 
-        const result = await response.json();
-
-        if (response.ok) {
-          status.textContent = result.message || '✅ Redemption successful!';
-          status.style.color = 'green';
-
-          if (result.redeemedAmount) {
-            estimate.textContent = `💰 You received: ${result.redeemedAmount} ETH`;
-          }
-        } else {
-          status.textContent = `❌ Error: ${result.error || 'Redemption failed.'}`;
-          status.style.color = 'red';
-        }
+        const parsedAmount = ethers.parseUnits(amountInput, 18);
+        const tx = await vault.redeemForETH(parsedAmount);
+        status.textContent = `Transaction sent. Waiting for confirmation...`;
+        await tx.wait();
+        status.textContent = `✅ Redeemed successfully. TX: ${tx.hash}`;
       } catch (err) {
-        console.error('🚫 Network error:', err);
-        status.textContent = `🚫 Unable to connect: ${err.message || 'Unknown error'}`;
-        status.style.color = 'red';
+        console.error("Redemption failed:", err);
+        status.textContent = `❌ ${err.message}`;
       }
-    });
+    }
   </script>
 </body>
 </html>
