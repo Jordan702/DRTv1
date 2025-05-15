@@ -119,16 +119,17 @@
       const amountInput = document.getElementById('amount').value;
 
       if (!window.ethereum) {
-        return status.textContent = "MetaMask is required to redeem sETH.";
+        status.textContent = "MetaMask is required to redeem sETH.";
+        return;
       }
 
       try {
         await ethereum.request({ method: 'eth_requestAccounts' });
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
         const vault = new ethers.Contract(vaultAddress, vaultABI, signer);
 
-        const parsedAmount = ethers.parseUnits(amountInput, 18);
+        const parsedAmount = ethers.utils.parseUnits(amountInput, 18);
         const tx = await vault.redeemForETH(parsedAmount);
         status.textContent = `Transaction sent. Waiting for confirmation...`;
         await tx.wait();
@@ -137,7 +138,7 @@
         console.error("Redemption failed:", err);
         status.textContent = `❌ ${err.message}`;
       }
-    }
+  }
   </script>
 </body>
 </html>
