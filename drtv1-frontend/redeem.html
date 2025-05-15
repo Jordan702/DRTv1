@@ -2,114 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DRT sETH Redemption Portal</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 2rem;
-      background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
-      color: #333;
-    }
-    .container {
-      max-width: 700px;
-      margin: auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    }
-    h1 {
-      color: #2e7d32;
-      text-align: center;
-    }
-    p.slogan {
-      text-align: center;
-      font-style: italic;
-      color: #555;
-      margin-bottom: 2rem;
-    }
-    .logo-row {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin-bottom: 1rem;
-    }
-    .logo {
-      width: 80px;
-      height: auto;
-    }
-    input, button {
-      width: 100%;
-      margin-bottom: 1rem;
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-    button {
-      background-color: #2e7d32;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    #status {
-      margin-top: 1rem;
-      font-weight: bold;
-      text-align: center;
-    }
-    .links {
-      text-align: center;
-      margin-top: 2rem;
-    }
-    .links a {
-      display: block;
-      color: #2e7d32;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-      text-decoration: none;
-    }
-    .links code {
-      font-size: 0.9rem;
-      display: block;
-      margin: 0.25rem auto 1rem auto;
-      color: #444;
-      word-wrap: break-word;
-      white-space: normal;
-    }
-  </style>
-  <script src="https://cdnjs.cloudfare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+</head>
 <body>
-  <div class="container">
-    <div class="logo-row">
-      <img src="DRTv1 Logo.png" alt="DRTv1 Logo" class="logo" />
-      <img src="sETH Logo.png" alt="sETH Logo" class="logo" />
-    </div>
-    <h1>DRT Redemption Portal</h1>
-    <p class="slogan">Evolution Through Contribution</p>
-    <h1>Redeem sETH for ETH</h1>
-
-    <label for="amount">Amount of sETH to Redeem:</label>
-    <input type="number" step="0.000001" id="amount" required />
-    <button onclick="redeemSETH()">Redeem</button>
-
-    <div id="status"></div>
-  </div>
-  <div class="links">
-      <a href="https://github.com/Jordan702/DRTv1/raw/main/drtv1-frontend/sETH_Whitepaper.pdf" target="_blank">
-        📄 View the sETH Whitepaper (PDF)
-      </a>
-      <a href="https://jordan702.github.io/DRTv1/" target="_blank">
-        🔙 Return to DRTv1 Landing Page
-      </a>
-      <strong>sETH Token Address:</strong>
-      <code>0x98C29B3A30A118351D56589DD3622b89551e2dA3</code>
-      <strong>DRTv1 Token Address:</strong>
-      <code>0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1</code>
-  </div>
+  <h1>Redeem sETH for ETH</h1>
+  <label for="amount">Amount of sETH:</label>
+  <input type="number" id="amount" step="0.000001" />
+  <button onclick="redeemSETH()">Redeem</button>
+  <p id="status"></p>
 
   <script>
-    const vaultAddress = "0x76482657Be35288632F0417cB6CD665e4b5bF09C"; // sETHVaultv2
+    const vaultAddress = "0x76482657Be35288632F0417cB6CD665e4b5bF09C"; // Replace with your verified contract
     const vaultABI = [
       "function redeemForETH(uint256 amount) public"
     ];
@@ -119,7 +23,7 @@
       const amountInput = document.getElementById('amount').value;
 
       if (!window.ethereum) {
-        status.textContent = "MetaMask is required to redeem sETH.";
+        status.textContent = "MetaMask is required.";
         return;
       }
 
@@ -131,12 +35,12 @@
 
         const parsedAmount = ethers.utils.parseUnits(amountInput, 18);
         const tx = await vault.redeemForETH(parsedAmount);
-        status.textContent = `⏳ Transaction sent. Waiting for confirmation...`;
+        status.textContent = "Transaction sent, awaiting confirmation...";
         await tx.wait();
-        status.textContent = `✅ Redeemed successfully. TX: ${tx.hash}`;
+        status.textContent = `✅ Redeemed! TX Hash: ${tx.hash}`;
       } catch (err) {
-        console.error("Redemption failed:", err);
-        status.textContent = `❌ ${err.message}`;
+        console.error(err);
+        status.textContent = `❌ Error: ${err.message}`;
       }
     }
   </script>
