@@ -3,6 +3,6 @@ const router = express.Router();
 const vaultController = require('../controllers/vaultController');
 
 router.post('/purchase', vaultController.handleDRTPurchase);
-router.post('/redeem', vaultController.redeemSETH);
+router.post('/redeem', vaultController.redeemSeTH);
 
 module.exports = router;
