@@ -31,7 +31,7 @@ exports.handleDRTPurchase = async (req, res) => {
   }
 };
 
-exports.redeemSETH = async (req, res) => {
+exports.redeemSeth = async (req, res) => {
   const { wallet, amount } = req.body;
   const logPath = path.resolve(__dirname, '../logs/redemptions.json');
 
