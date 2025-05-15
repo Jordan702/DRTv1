@@ -36,7 +36,7 @@ exports.redeemSeth = async (req, res) => {
   const logPath = path.resolve(__dirname, '../logs/redemptions.json');
 
   try {
-    const tx = await vaultContract.redeemForETH(wallet, ethers.parseUnits(amount.toString(), 18));
+    const tx = await vaultContract.redeemForETH(ethers.parseUnits(amount.toString(), 18));
     await tx.wait();
 
     const logEntry = {
