@@ -1,83 +1,61 @@
+// controllers/drtradeController.js
+
 require('dotenv').config();
 const { ethers } = require('ethers');
-const { evaluateLiquidity } = require('../services/uniswapService.js');
 
-// Initialize provider and wallet using ethers v6 syntax
-const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
-const wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
-
-// Contract addresses and ABIs
-const DRTV1_ADDRESS = '0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1';
-const WETH_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
-const PAIR_ADDRESS = '0xe1c76fbf1b373165822b564c6f3accf78c5a344a';
-const DRTRADE_ADDRESS = '0xD0DC7f8935A661010D56A470eA81572a4a84EED4';
-
-// Standard ERC20 ABI remains the same.
-const ERC20_ABI = [
-  "function approve(address spender, uint256 amount) returns (bool)",
-  "function decimals() view returns (uint8)"
-];
-
-// Updated ABI for a Uniswap V3 pool.
-const PAIR_ABI = [
-  "function slot0() external view returns (uint160 sqrtPriceX96, int24 tick, uint16 observationIndex, uint16 observationCardinality, uint16 observationCardinalityNext, uint8 feeProtocol, bool unlocked)",
-  "function liquidity() external view returns (uint128)",
-  "function token0() external view returns (address)",
-  "function token1() external view returns (address)"
-];
-
-// Trade contract ABI remains unchanged.
+// Addresses and ABI definitions
+const DRTRADE_ADDRESS = "0xD0DC7f8935A661010D56A470eA81572a4a84EED4"; // DRTrade.sol contract address
+// Note: The pool address (DRTv1/WETH) is embedded in the smart contract logic.
+// Example DRTrade ABI (only the liquidity check function and swap functions are included here)
 const DRTRADE_ABI = [
+  // This function should be implemented in your DRTrade.sol.
+  "function checkLiquidity(bool isBuy, uint256 amount) external view returns (bool)",
+  // Swap functions (not used in this snippet but available for trade execution)
   "function swapExactDRTv1ForWETH(uint256 amountIn) external returns (uint256)",
   "function swapExactWETHForDRTv1(uint256 amountIn) external returns (uint256)"
 ];
 
-// Create contract instances
-const drtv1Contract = new ethers.Contract(DRTV1_ADDRESS, ERC20_ABI, wallet);
-const wethContract = new ethers.Contract(WETH_ADDRESS, ERC20_ABI, wallet);
-const pairContract = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
+// Setup a provider and a wallet to interact with the blockchain.
+const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
+const wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
+
+// Create an instance of the DRTrade contract.
 const drTradeContract = new ethers.Contract(DRTRADE_ADDRESS, DRTRADE_ABI, wallet);
 
-// Utility: fetch pool data from a Uniswap V3 pool
-async function getPoolData() {
-  const slot0 = await pairContract.slot0();
-  const currentLiquidity = await pairContract.liquidity();
-  const token0 = await pairContract.token0();
-  const token1 = await pairContract.token1();
-  return { slot0, currentLiquidity, token0, token1 };
-}
-
-// Function: Checks liquidity without executing a trade
+/**
+ * liquidityCheck - checks if the user's requested amount of DRTv1 is available for trade.
+ *
+ * Expected input (via req.body):
+ *   - walletAddress: the user's manual input wallet address (used for logging/recordkeeping)
+ *   - direction: either "buy" or "sell"
+ *   - amount: the DRTv1 token amount (in human-readable format) the user wishes to trade
+ *
+ * If the on-chain liquidity check passes, the endpoint responds with { status: "proceed" }.
+ * Otherwise, it responds with { status: "abort", message: "Insufficient liquidity, please try again later." }.
+ */
 const liquidityCheck = async (req, res) => {
   try {
-    const { direction, amount } = req.body;
-    if (!direction || !amount) {
-      return res.status(400).json({ error: "Direction and amount are required." });
-    }
-    
-    // Retrieve pool data from a Uniswap V3 pool.
-    const { slot0, currentLiquidity, token0, token1 } = await getPoolData();
+    const { walletAddress, direction, amount } = req.body;
 
-    // Convert the human-readable amount into the smallest unit (assume 18 decimals)
+    if (!walletAddress || !direction || !amount) {
+      return res.status(400).json({ error: "Wallet address, direction and amount are required." });
+    }
+
+    // Using ethers, parse the human-readable 'amount' into a BigNumber (assuming 18 decimals).
     const amountBN = ethers.parseUnits(amount, 18);
 
-    // Construct liquidity data for AI evaluation.
-    const liquidityData = {
-      direction,
-      amount: amountBN.toString(),
-      liquidity: currentLiquidity.toString(),
-      sqrtPriceX96: slot0.sqrtPriceX96.toString(),
-      tick: slot0.tick.toString(),
-      token0: token0.toLowerCase(),
-      token1: token1.toLowerCase()
-    };
+    // Determine if the user is buying or selling.
+    // For buying: we expect the pool to have enough DRTv1 tokens available.
+    // For selling: we need to verify that the pool holds enough ETH (routed from WETH).
+    const isBuy = direction.toLowerCase() === 'buy';
 
-    const aiDecision = await evaluateLiquidity(liquidityData);
+    // Perform the trustless liquidity check by invoking the on-chain 'checkLiquidity' function.
+    const isLiquid = await drTradeContract.checkLiquidity(isBuy, amountBN);
 
-    if (aiDecision === 'proceed') {
+    if (isLiquid) {
       return res.status(200).json({ status: "proceed" });
     } else {
-      return res.status(200).json({ status: "abort" });
+      return res.status(200).json({ status: "abort", message: "Insufficient liquidity, please try again later." });
     }
   } catch (error) {
     console.error("Liquidity check error:", error);
@@ -85,31 +63,4 @@ const liquidityCheck = async (req, res) => {
   }
 };
 
-// Function: Executes the trade (swap) if liquidity is sufficient
-const executeTrade = async (req, res) => {
-  try {
-    const { direction, amount } = req.body;
-    if (!direction || !amount) {
-      return res.status(400).json({ error: "Direction and amount are required." });
-    }
-    // Convert the amount to BigNumber using ethers.parseUnits with 18 decimals.
-    const amountBN = ethers.parseUnits(amount, 18);
-    let swapTx;
-    if (direction === 'buy') {
-      // For buying DRTv1 with ETH, use swapExactWETHForDRTv1.
-      swapTx = await drTradeContract.swapExactWETHForDRTv1(amountBN);
-    } else if (direction === 'sell') {
-      // For selling DRTv1 for ETH, use swapExactDRTv1ForWETH.
-      swapTx = await drTradeContract.swapExactDRTv1ForWETH(amountBN);
-    } else {
-      return res.status(400).json({ error: "Invalid trade direction." });
-    }
-    await swapTx.wait();
-    return res.status(200).json({ status: "success", txHash: swapTx.hash });
-  } catch (error) {
-    console.error("Trade execution error:", error);
-    return res.status(500).json({ error: "Trade execution failed", details: error.message });
-  }
-};
-
-module.exports = { liquidityCheck, executeTrade };
+module.exports = { liquidityCheck };
