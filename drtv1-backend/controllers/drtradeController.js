@@ -17,14 +17,21 @@ const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 const wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 
 // Create contract instances
+console.log("🔄 Syncing contract instances...");
 const drTradeContract = new ethers.Contract(DRTRADE_ADDRESS, DRTRADE_ABI, wallet);
 const drTokenContract = new ethers.Contract(DRT_TOKEN_ADDRESS, DRT_ABI, provider);
 const wethTokenContract = new ethers.Contract(WETH_TOKEN_ADDRESS, WETH_ABI, provider);
 
-// Liquidity Cache for trustless checking
+console.log("✅ Synced contracts:");
+console.log("🔹 DRTrade.sol Contract Address:", DRTRADE_ADDRESS);
+console.log("🔹 DRT Token Contract Address:", DRT_TOKEN_ADDRESS);
+console.log("🔹 WETH Token Contract Address:", WETH_TOKEN_ADDRESS);
+console.log("🔹 Liquidity Pool Address:", POOL_ADDRESS);
+
+// Liquidity Cache
 let liquidityCache = { drt: "0", weth: "0" };
 
-// Update liquidity balances periodically
+// Periodic Liquidity Update
 const updateLiquidity = async () => {
   try {
     console.log("🔄 Checking liquidity pool balances...");
@@ -42,30 +49,29 @@ const updateLiquidity = async () => {
   }
 };
 
-// Run updates every 60 seconds
 setInterval(updateLiquidity, 60000);
 
 /**
  * Liquidity Check Function
- * - Ensures that trades can only occur if the requested DRTv1 (for buys) or ETH equivalent (for sells) is available.
  */
 const liquidityCheck = async (req, res) => {
   try {
     const { walletAddress, direction, amount } = req.body;
+    console.log(`🔎 Received request from wallet: ${walletAddress}`);
+    
     const isBuy = direction.toLowerCase() === "buy";
     const amountBN = ethers.parseUnits(amount, 18);
 
-    // Enforce liquidity check before proceeding
     const sufficientLiquidity = isBuy
-      ? liquidityCache.drt >= amountBN // Ensures enough DRTv1 exists for buy orders
-      : liquidityCache.weth >= amountBN; // Ensures enough ETH equivalent exists for sells
+      ? liquidityCache.drt >= amountBN
+      : liquidityCache.weth >= amountBN;
 
     if (!sufficientLiquidity) {
       console.log(`❌ Liquidity insufficient for ${isBuy ? "buy" : "sell"}.`);
-      return res.status(400).json({ error: "❌ Insufficient liquidity for trade." });
+      return res.status(400).json({ error: "❌ Insufficient liquidity." });
     }
 
-    console.log("✅ Liquidity check passed, trade can proceed.");
+    console.log("✅ Liquidity check passed.");
     return res.status(200).json({ status: "proceed" });
   } catch (error) {
     console.error("🚨 Liquidity check error:", error);
@@ -75,15 +81,15 @@ const liquidityCheck = async (req, res) => {
 
 /**
  * Execute Trade Function
- * - Calls the appropriate swap function depending on trade direction.
  */
 const executeTrade = async (req, res) => {
   try {
     const { walletAddress, direction, amount } = req.body;
+    console.log(`🔄 Trade execution request from wallet: ${walletAddress}`);
+    
     const isBuy = direction.toLowerCase() === "buy";
     const amountBN = ethers.parseUnits(amount, 18);
 
-    // Enforce liquidity requirement
     if (!liquidityCheck(req, res)) {
       return res.status(400).json({ error: "❌ Trade aborted due to insufficient liquidity." });
     }
@@ -92,9 +98,9 @@ const executeTrade = async (req, res) => {
     console.log(`🚀 Executing ${isBuy ? "buy" : "sell"} trade...`);
 
     if (isBuy) {
-      tx = await drTradeContract.swapExactWETHForDRTv1(amountBN); // Buy DRTv1
+      tx = await drTradeContract.swapExactWETHForDRTv1(amountBN);
     } else {
-      tx = await drTradeContract.swapExactDRTv1ForWETH(amountBN); // Sell DRTv1 for WETH
+      tx = await drTradeContract.swapExactDRTv1ForWETH(amountBN);
     }
 
     await tx.wait();
