@@ -30,7 +30,7 @@ console.log("🔹 WETH Token Contract Address:", WETH_TOKEN_ADDRESS);
 console.log("🔹 Liquidity Pool Address:", POOL_ADDRESS);
 
 // ✅ Liquidity Cache (Stores balances in both tokens and USD)
-let liquidityCache = { drt: "0", weth: "0", drtUSD: "0", wethUSD: "0" };
+let liquidityCache = { drt: "0", weth: "0", drtUSD: "0", wethUSD: "0", drtWETH: "0" };
 let lastFetchedPrices = null;
 let lastFetchedTime = 0;
 
@@ -38,22 +38,25 @@ let lastFetchedTime = 0;
 const fetchUSDPrices = async () => {
   const now = Date.now();
   
-  // ✅ Avoid requesting API if last fetch was under 2 minutes ago
   if (lastFetchedPrices && now - lastFetchedTime < 120000) {
     return lastFetchedPrices;
   }
 
   try {
     const response = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd");
+    const wethPriceUSD = response.data.weth?.usd || 2500;  // ✅ Fallback WETH price if API fails
+
     lastFetchedPrices = {
-      drt: 1000000, // ✅ Hardcoded DRTv1 price ($1M per token)
-      weth: response.data.weth?.usd || 0, // Fetch real WETH price
+      drtUSD: 1576921230,  // ✅ Hardcoded DRTv1 price ($1.57692123M per token)
+      weth: wethPriceUSD,
+      drtWETH: 1576921230 / wethPriceUSD // ✅ Convert $1.57692123M DRTv1 into WETH dynamically
     };
+
     lastFetchedTime = now;
     return lastFetchedPrices;
   } catch (error) {
-    console.error("❌ Error fetching USD prices: Falling back to last known values.");
-    return lastFetchedPrices || { drt: 1000000, weth: 0 };
+    console.error("❌ Error fetching USD prices: Falling back to static values.");
+    return { drtUSD: 1576921230, weth: 2500, drtWETH: 1576921230 / 2500 }; // ✅ Fallback values
   }
 };
 
@@ -68,8 +71,9 @@ const updateLiquidity = async () => {
     liquidityCache = {
       drt: ethers.formatUnits(poolDRTBalance, 18),
       weth: ethers.formatUnits(poolWETHBalance, 18),
-      drtUSD: (ethers.formatUnits(poolDRTBalance, 18) * usdPrices.drt).toFixed(2),
+      drtUSD: (ethers.formatUnits(poolDRTBalance, 18) * usdPrices.drtUSD).toFixed(2),
       wethUSD: (ethers.formatUnits(poolWETHBalance, 18) * usdPrices.weth).toFixed(2),
+      drtWETH: usdPrices.drtWETH.toFixed(6) // ✅ Store correct WETH equivalent
     };
 
     console.log("✅ Liquidity Pool Updated:", liquidityCache);
@@ -78,10 +82,7 @@ const updateLiquidity = async () => {
   }
 };
 
-// ✅ Run updates every 600 seconds (10 minutes)
-setInterval(updateLiquidity, 600000);
-
-// ✅ Liquidity Check Function (Uses USD-based validation)
+// ✅ Liquidity Check Function (Uses USD/WETH-based validation)
 const liquidityCheck = async (req, res) => {
   try {
     const { walletAddress, direction, amount } = req.body;
@@ -91,23 +92,25 @@ const liquidityCheck = async (req, res) => {
     const amountBN = ethers.parseUnits(amount, 18);
     const usdPrices = await fetchUSDPrices(); // Fetch USD conversion rates
 
-    // Convert user's trade amount to USD
+    // Convert user's trade amount to USD and WETH equivalent
     const userAmountUSD = isBuy 
       ? (ethers.formatUnits(amountBN, 18) * usdPrices.weth).toFixed(2) 
-      : (ethers.formatUnits(amountBN, 18) * usdPrices.drt).toFixed(2);
+      : (ethers.formatUnits(amountBN, 18) * usdPrices.drtUSD).toFixed(2);
+      
+    const userAmountWETH = (ethers.formatUnits(amountBN, 18) * usdPrices.drtWETH).toFixed(6);
 
-    // ✅ Check liquidity based on USD equivalents
+    // ✅ Validate liquidity (Only reject if truly insufficient)
     const sufficientLiquidity = isBuy
-      ? liquidityCache.drtUSD >= userAmountUSD 
-      : liquidityCache.wethUSD >= userAmountUSD;
+      ? parseFloat(liquidityCache.drtUSD) >= parseFloat(userAmountUSD)
+      : parseFloat(liquidityCache.wethUSD) >= parseFloat(userAmountUSD);
 
     if (!sufficientLiquidity) {
       console.log(`❌ Liquidity insufficient for ${isBuy ? "buy" : "sell"}.`);
       return res.status(400).json({ error: "❌ Insufficient liquidity for trade." });
     }
 
-    console.log("✅ Liquidity check passed.", { userAmountUSD });
-    return res.status(200).json({ status: "proceed", userAmountUSD });
+    console.log("✅ Liquidity check passed.", { userAmountUSD, userAmountWETH });
+    return res.status(200).json({ status: "proceed", userAmountUSD, userAmountWETH });
 
   } catch (error) {
     console.error("🚨 Liquidity check error:", error);
@@ -117,38 +120,4 @@ const liquidityCheck = async (req, res) => {
   }
 };
 
-// ✅ Execute Trade Function
-const executeTrade = async (req, res) => {
-  try {
-    const { walletAddress, direction, amount } = req.body;
-    console.log(`🔄 Trade execution request from wallet: ${walletAddress}`);
-
-    const isBuy = direction.toLowerCase() === "buy";
-    const amountBN = ethers.parseUnits(amount, 18);
-
-    // Ensure liquidity before executing trade
-    const liquidityCheckResult = await liquidityCheck(req, res);
-    if (liquidityCheckResult.error) {
-      return res.status(400).json({ error: "❌ Trade aborted due to insufficient liquidity." });
-    }
-
-    let tx;
-    console.log(`🚀 Executing ${isBuy ? "buy" : "sell"} trade...`);
-
-    if (isBuy) {
-      tx = await drTradeContract.swapETHForDRT(amountBN);  // ✅ Correct function for buying
-    } else {
-      tx = await drTradeContract.swapDRTForETH(amountBN);  // ✅ Correct function for selling
-    }
-
-    await tx.wait();
-    console.log("✅ Trade executed successfully! Tx Hash:", tx.hash);
-    return res.status(200).json({ status: "success", txHash: tx.hash });
-
-  } catch (error) {
-    console.error("🚨 Trade execution error:", error);
-    return res.status(500).json({ error: "Trade execution failed", details: error.message });
-  }
-};
-
-module.exports = { liquidityCheck, executeTrade };
+module.exports = { liquidityCheck, updateLiquidity };
