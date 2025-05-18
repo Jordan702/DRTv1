@@ -78,8 +78,8 @@ const updateLiquidity = async () => {
   }
 };
 
-// Run updates every 60 seconds
-setInterval(updateLiquidity, 60000);
+// ✅ Run updates every 600 seconds (10 minutes)
+setInterval(updateLiquidity, 600000);
 
 // ✅ Liquidity Check Function (Uses USD-based validation)
 const liquidityCheck = async (req, res) => {
@@ -108,9 +108,12 @@ const liquidityCheck = async (req, res) => {
 
     console.log("✅ Liquidity check passed.", { userAmountUSD });
     return res.status(200).json({ status: "proceed", userAmountUSD });
+
   } catch (error) {
     console.error("🚨 Liquidity check error:", error);
-    return res.status(500).json({ error: "Liquidity check failed", details: error.message });
+    if (!res.headersSent) {
+      return res.status(500).json({ error: "Liquidity check failed", details: error.message });
+    }
   }
 };
 
@@ -124,7 +127,8 @@ const executeTrade = async (req, res) => {
     const amountBN = ethers.parseUnits(amount, 18);
 
     // Ensure liquidity before executing trade
-    if (!liquidityCheck(req, res)) {
+    const liquidityCheckResult = await liquidityCheck(req, res);
+    if (liquidityCheckResult.error) {
       return res.status(400).json({ error: "❌ Trade aborted due to insufficient liquidity." });
     }
 
@@ -132,14 +136,15 @@ const executeTrade = async (req, res) => {
     console.log(`🚀 Executing ${isBuy ? "buy" : "sell"} trade...`);
 
     if (isBuy) {
-      tx = await drTradeContract.swapExactWETHForDRTv1(amountBN);
+      tx = await drTradeContract.swapETHForDRT(amountBN);  // ✅ Correct function for buying
     } else {
-      tx = await drTradeContract.swapExactDRTv1ForWETH(amountBN);
+      tx = await drTradeContract.swapDRTForETH(amountBN);  // ✅ Correct function for selling
     }
 
     await tx.wait();
     console.log("✅ Trade executed successfully! Tx Hash:", tx.hash);
     return res.status(200).json({ status: "success", txHash: tx.hash });
+
   } catch (error) {
     console.error("🚨 Trade execution error:", error);
     return res.status(500).json({ error: "Trade execution failed", details: error.message });
