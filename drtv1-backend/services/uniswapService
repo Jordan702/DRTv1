@@ -1,11 +1,17 @@
 require('dotenv').config();
 const OpenAI = require('openai');
 
+// Ensure API Key is loaded properly
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error("❌ Missing OpenAI API Key! Make sure your .env file is configured.");
+}
+
+// Initialize OpenAI Client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-async function evaluateLiquidityprompt(prompt) {
+async function evaluateLiquidity(prompt) {
   try {
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -13,7 +19,7 @@ async function evaluateLiquidityprompt(prompt) {
         {
           role: "system",
           content:
-            "You are the trader and you must check to see if there is sufficient liquidity in the DRTv1/ETH liquidity pool before executing a buy or a sell and if there is sufficient liquidity, then execute the transaction, and if there is not sufficient liquidity say insufficient liquidity please try again later.",
+            "You are a trader responsible for checking liquidity in the DRTv1/ETH pool. If liquidity is sufficient, execute the trade. If liquidity is insufficient, respond with 'Insufficient liquidity, please try again later.'",
         },
         { role: "user", content: prompt }
       ],
@@ -21,15 +27,16 @@ async function evaluateLiquidityprompt(prompt) {
       max_tokens: 50,
     });
 
-    const output = completion?.choices?.[0]?.message?.content || '';
-    console.log("✅ OpenAI responded:", output.trim());
+    const output = completion?.choices?.[0]?.message?.content?.trim() || "Error: No response";
+    console.log("✅ OpenAI Response:", output);
     return output;
 
   } catch (error) {
-    console.error("❌ OpenAI API error:", error.message || error);
-    return null;
+    console.error("❌ OpenAI API Error:", error);
+    return "Error: Liquidity check failed.";
   }
 }
+
 module.exports = {
-  evaluateLiquidityprompt,
+  evaluateLiquidity,
 };
