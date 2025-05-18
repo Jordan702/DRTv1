@@ -1,5 +1,3 @@
-// controllers/drtradeController.js
-
 require('dotenv').config();
 const { ethers } = require('ethers');
 
@@ -23,83 +21,54 @@ const drTradeContract = new ethers.Contract(DRTRADE_ADDRESS, DRTRADE_ABI, wallet
 const drTokenContract = new ethers.Contract(DRT_TOKEN_ADDRESS, DRT_ABI, provider);
 const wethTokenContract = new ethers.Contract(WETH_TOKEN_ADDRESS, WETH_ABI, provider);
 
-// Startup Debug Info
-(async () => {
+// Liquidity Cache for trustless checking
+let liquidityCache = { drt: "0", weth: "0" };
+
+// Update liquidity balances periodically
+const updateLiquidity = async () => {
   try {
-    console.log("✅ Loaded DRT token contract from:", DRT_TOKEN_ADDRESS);
-    console.log("✅ Loaded WETH token contract from:", WETH_TOKEN_ADDRESS);
-    console.log("✅ Loaded DRTrade contract from:", DRTRADE_ADDRESS);
-    console.log("✅ DRTv1/WETH Liquidity Pool Address:", POOL_ADDRESS);
-    console.log("✅ Signer address:", await wallet.getAddress());
-  } catch (err) {
-    console.error("❌ Error during startup logs:", err);
+    console.log("🔄 Checking liquidity pool balances...");
+    const poolDRTBalance = await drTokenContract.balanceOf(POOL_ADDRESS);
+    const poolWETHBalance = await wethTokenContract.balanceOf(POOL_ADDRESS);
+
+    liquidityCache = {
+      drt: ethers.formatUnits(poolDRTBalance, 18),
+      weth: ethers.formatUnits(poolWETHBalance, 18),
+    };
+
+    console.log("✅ Liquidity Pool Updated:", liquidityCache);
+  } catch (error) {
+    console.error("❌ Error updating liquidity:", error);
   }
-})();
+};
+
+// Run updates every 10 seconds
+setInterval(updateLiquidity, 10000);
 
 /**
  * Liquidity Check Function
- * - Ensures that the pool and user have sufficient balances before trading.
- * - Calls the on-chain checkLiquidity function.
+ * - Ensures that trades can only occur if the requested DRTv1 (for buys) or ETH equivalent (for sells) is available.
  */
 const liquidityCheck = async (req, res) => {
   try {
     const { walletAddress, direction, amount } = req.body;
-    if (!walletAddress || !direction || !amount) {
-      return res.status(400).json({ error: "Wallet address, direction, and amount are required." });
-    }
-
-    console.log("User provided wallet address:", walletAddress);
-
-    // Convert user input amount into BigNumber format
+    const isBuy = direction.toLowerCase() === "buy";
     const amountBN = ethers.parseUnits(amount, 18);
-    const isBuy = direction.toLowerCase() === 'buy';
 
-    // Fetch balances
-    const poolDRTBalance = await drTokenContract.balanceOf(POOL_ADDRESS);
-    const poolWETHBalance = await wethTokenContract.balanceOf(POOL_ADDRESS);
-    const userDRTBalance = await drTokenContract.balanceOf(walletAddress);
-    const userWETHBalance = await wethTokenContract.balanceOf(walletAddress);
+    // Enforce liquidity check before proceeding
+    const sufficientLiquidity = isBuy
+      ? liquidityCache.drt >= amountBN // Ensures enough DRTv1 exists for buy orders
+      : liquidityCache.weth >= amountBN; // Ensures enough ETH equivalent exists for sells
 
-    // Convert balances to BigNumber
-    const poolDRTBalanceBN = ethers.BigNumber.from(poolDRTBalance);
-    const poolWETHBalanceBN = ethers.BigNumber.from(poolWETHBalance);
-    const userDRTBalanceBN = ethers.BigNumber.from(userDRTBalance);
-    const userWETHBalanceBN = ethers.BigNumber.from(userWETHBalance);
-
-    // Log balances
-    console.log("Pool DRT Balance:", ethers.formatUnits(poolDRTBalanceBN, 18));
-    console.log("Pool WETH Balance:", ethers.formatUnits(poolWETHBalanceBN, 18));
-    console.log("User's DRT Balance:", ethers.formatUnits(userDRTBalanceBN, 18));
-    console.log("User's WETH Balance:", ethers.formatUnits(userWETHBalanceBN, 18));
-
-    // Local balance checks
-    if (isBuy) {
-      if (poolDRTBalanceBN.lt(amountBN)) {
-        return res.status(200).json({ status: "abort", message: "Insufficient DRT in pool for purchase." });
-      }
-      if (userWETHBalanceBN.lt(amountBN)) {
-        return res.status(200).json({ status: "abort", message: "User has insufficient WETH for purchase." });
-      }
-    } else {
-      if (poolWETHBalanceBN.lt(amountBN)) {
-        return res.status(200).json({ status: "abort", message: "Insufficient WETH in pool for sale." });
-      }
-      if (userDRTBalanceBN.lt(amountBN)) {
-        return res.status(200).json({ status: "abort", message: "User has insufficient DRT for sale." });
-      }
+    if (!sufficientLiquidity) {
+      console.log(`❌ Liquidity insufficient for ${isBuy ? "buy" : "sell"}.`);
+      return res.status(400).json({ error: "❌ Insufficient liquidity for trade." });
     }
 
-    // On-chain liquidity check
-    const isLiquid = await drTradeContract.checkLiquidity(isBuy, amountBN);
-    if (isLiquid) {
-      console.log("On-chain liquidity check passed, trade can proceed.");
-      return res.status(200).json({ status: "proceed" });
-    } else {
-      console.log("On-chain liquidity check failed, insufficient liquidity.");
-      return res.status(200).json({ status: "abort", message: "On-chain liquidity check failed." });
-    }
+    console.log("✅ Liquidity check passed, trade can proceed.");
+    return res.status(200).json({ status: "proceed" });
   } catch (error) {
-    console.error("Liquidity check error:", error);
+    console.error("🚨 Liquidity check error:", error);
     return res.status(500).json({ error: "Liquidity check failed", details: error.message });
   }
 };
@@ -111,27 +80,28 @@ const liquidityCheck = async (req, res) => {
 const executeTrade = async (req, res) => {
   try {
     const { walletAddress, direction, amount } = req.body;
-    if (!walletAddress || !direction || !amount) {
-      return res.status(400).json({ error: "Wallet address, direction, and amount are required." });
+    const isBuy = direction.toLowerCase() === "buy";
+    const amountBN = ethers.parseUnits(amount, 18);
+
+    // Enforce liquidity requirement
+    if (!liquidityCheck(req, res)) {
+      return res.status(400).json({ error: "❌ Trade aborted due to insufficient liquidity." });
     }
 
-    const amountBN = ethers.parseUnits(amount, 18);
-    const isBuy = direction.toLowerCase() === 'buy';
     let tx;
+    console.log(`🚀 Executing ${isBuy ? "buy" : "sell"} trade...`);
 
     if (isBuy) {
-      // Swap WETH for DRTv1
-      tx = await drTradeContract.swapExactWETHForDRTv1(amountBN);
+      tx = await drTradeContract.swapExactWETHForDRTv1(amountBN); // Buy DRTv1
     } else {
-      // Swap DRTv1 for WETH
-      tx = await drTradeContract.swapExactDRTv1ForWETH(amountBN);
+      tx = await drTradeContract.swapExactDRTv1ForWETH(amountBN); // Sell DRTv1 for WETH
     }
 
     await tx.wait();
-    console.log("Trade executed successfully. Transaction hash:", tx.hash);
+    console.log("✅ Trade executed successfully! Tx Hash:", tx.hash);
     return res.status(200).json({ status: "success", txHash: tx.hash });
   } catch (error) {
-    console.error("Trade execution error:", error);
+    console.error("🚨 Trade execution error:", error);
     return res.status(500).json({ error: "Trade execution failed", details: error.message });
   }
 };
