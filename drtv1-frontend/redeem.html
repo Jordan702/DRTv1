@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DRT sETH Redemption Portal</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+  <h1>Redeem sETH for ETH</h1>
+  <label for="amount">Amount of sETH:</label>
+  <input type="number" id="amount" step="0.000001" />
+  <button onclick="redeemSETH()">Redeem</button>
+  <p id="status"></p>
+
+  <script>
+    const vaultAddress = "0x76482657Be35288632F0417cB6CD665e4b5bF09C"; // Replace with your verified contract
+    const vaultABI = [
+      "function redeemForETH(uint256 amount) public"
+    ];
+
+    async function redeemSETH() {
+      const status = document.getElementById('status');
+      const amountInput = document.getElementById('amount').value;
+
+      if (!window.ethereum) {
+        status.textContent = "MetaMask is required.";
+        return;
+      }
+
+      try {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const vault = new ethers.Contract(vaultAddress, vaultABI, signer);
+
+        const parsedAmount = ethers.utils.parseUnits(amountInput, 18);
+        const tx = await vault.redeemForETH(parsedAmount);
+        status.textContent = "Transaction sent, awaiting confirmation...";
+        await tx.wait();
+        status.textContent = `✅ Redeemed! TX Hash: ${tx.hash}`;
+      } catch (err) {
+        console.error(err);
+        status.textContent = `❌ Error: ${err.message}`;
+      }
+    }
+  </script>
+</body>
+</html>
