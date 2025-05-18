@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { ethers } = require('ethers');
+const axios = require('axios'); // Import Axios for USD price fetching
 
 // Load contract ABIs from JSON files
 const DRTRADE_ABI = require('../abi/DRTrade_abi.json');
@@ -28,19 +29,37 @@ console.log("🔹 DRT Token Contract Address:", DRT_TOKEN_ADDRESS);
 console.log("🔹 WETH Token Contract Address:", WETH_TOKEN_ADDRESS);
 console.log("🔹 Liquidity Pool Address:", POOL_ADDRESS);
 
-// Liquidity Cache
-let liquidityCache = { drt: "0", weth: "0" };
+// ✅ Liquidity Cache (Stores balances in both tokens and USD)
+let liquidityCache = { drt: "0", weth: "0", drtUSD: "0", wethUSD: "0" };
 
-// Periodic Liquidity Update
+// ✅ Function to fetch real-time USD price of DRTv1 and WETH
+const fetchUSDPrices = async () => {
+  try {
+    const response = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=weth,drtv1&vs_currencies=usd");
+    const prices = response.data;
+    return {
+      drt: prices.drtv1?.usd || 0, 
+      weth: prices.weth?.usd || 0, 
+    };
+  } catch (error) {
+    console.error("❌ Error fetching USD prices:", error);
+    return { drt: 0, weth: 0 }; 
+  }
+};
+
+// ✅ Update liquidity balances with USD equivalents
 const updateLiquidity = async () => {
   try {
     console.log("🔄 Checking liquidity pool balances...");
     const poolDRTBalance = await drTokenContract.balanceOf(POOL_ADDRESS);
     const poolWETHBalance = await wethTokenContract.balanceOf(POOL_ADDRESS);
+    const usdPrices = await fetchUSDPrices(); // Get USD rates
 
     liquidityCache = {
       drt: ethers.formatUnits(poolDRTBalance, 18),
       weth: ethers.formatUnits(poolWETHBalance, 18),
+      drtUSD: (ethers.formatUnits(poolDRTBalance, 18) * usdPrices.drt).toFixed(2),
+      wethUSD: (ethers.formatUnits(poolWETHBalance, 18) * usdPrices.weth).toFixed(2),
     };
 
     console.log("✅ Liquidity Pool Updated:", liquidityCache);
@@ -49,47 +68,52 @@ const updateLiquidity = async () => {
   }
 };
 
+// Run updates every 60 seconds
 setInterval(updateLiquidity, 60000);
 
-/**
- * Liquidity Check Function
- */
+// ✅ Liquidity Check Function (Uses USD-based validation)
 const liquidityCheck = async (req, res) => {
   try {
     const { walletAddress, direction, amount } = req.body;
     console.log(`🔎 Received request from wallet: ${walletAddress}`);
-    
+
     const isBuy = direction.toLowerCase() === "buy";
     const amountBN = ethers.parseUnits(amount, 18);
+    const usdPrices = await fetchUSDPrices(); // Fetch USD conversion rates
 
+    // Convert user's trade amount to USD
+    const userAmountUSD = isBuy 
+      ? (ethers.formatUnits(amountBN, 18) * usdPrices.weth).toFixed(2) 
+      : (ethers.formatUnits(amountBN, 18) * usdPrices.drt).toFixed(2);
+
+    // ✅ Check liquidity based on USD equivalents
     const sufficientLiquidity = isBuy
-      ? liquidityCache.drt >= amountBN
-      : liquidityCache.weth >= amountBN;
+      ? liquidityCache.drtUSD >= userAmountUSD 
+      : liquidityCache.wethUSD >= userAmountUSD;
 
     if (!sufficientLiquidity) {
       console.log(`❌ Liquidity insufficient for ${isBuy ? "buy" : "sell"}.`);
-      return res.status(400).json({ error: "❌ Insufficient liquidity." });
+      return res.status(400).json({ error: "❌ Insufficient liquidity for trade." });
     }
 
-    console.log("✅ Liquidity check passed.");
-    return res.status(200).json({ status: "proceed" });
+    console.log("✅ Liquidity check passed.", { userAmountUSD });
+    return res.status(200).json({ status: "proceed", userAmountUSD });
   } catch (error) {
     console.error("🚨 Liquidity check error:", error);
     return res.status(500).json({ error: "Liquidity check failed", details: error.message });
   }
 };
 
-/**
- * Execute Trade Function
- */
+// ✅ Execute Trade Function
 const executeTrade = async (req, res) => {
   try {
     const { walletAddress, direction, amount } = req.body;
     console.log(`🔄 Trade execution request from wallet: ${walletAddress}`);
-    
+
     const isBuy = direction.toLowerCase() === "buy";
     const amountBN = ethers.parseUnits(amount, 18);
 
+    // Ensure liquidity before executing trade
     if (!liquidityCheck(req, res)) {
       return res.status(400).json({ error: "❌ Trade aborted due to insufficient liquidity." });
     }
