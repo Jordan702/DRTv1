@@ -29,7 +29,10 @@ async function evaluateLiquidity(prompt) {
             'You are a trader responsible for checking liquidity in the DRTv1/ETH pool. ' +
             "If liquidity is sufficient, execute the trade. If liquidity is insufficient, respond with 'Insufficient liquidity, please try again later.'",
         },
-        { role: 'user', content: prompt },
+        {
+          role: 'user',
+          content: typeof prompt === 'string' ? prompt : JSON.stringify(prompt),
+        },
       ],
       temperature: 0.2,
       max_tokens: 50,
@@ -48,5 +51,4 @@ async function evaluateLiquidity(prompt) {
     return 'Error: Liquidity check failed.';
   }
 }
-
 module.exports = { evaluateLiquidity };
