@@ -31,19 +31,29 @@ console.log("🔹 Liquidity Pool Address:", POOL_ADDRESS);
 
 // ✅ Liquidity Cache (Stores balances in both tokens and USD)
 let liquidityCache = { drt: "0", weth: "0", drtUSD: "0", wethUSD: "0" };
+let lastFetchedPrices = null;
+let lastFetchedTime = 0;
 
 // ✅ Function to fetch real-time USD price of DRTv1 and WETH
 const fetchUSDPrices = async () => {
+  const now = Date.now();
+  
+  // ✅ Avoid requesting API if last fetch was under 2 minutes ago
+  if (lastFetchedPrices && now - lastFetchedTime < 120000) {
+    return lastFetchedPrices;
+  }
+
   try {
-    const response = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=weth,drtv1&vs_currencies=usd");
-    const prices = response.data;
-    return {
-      drt: prices.drtv1?.usd || 0, 
-      weth: prices.weth?.usd || 0, 
+    const response = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd");
+    lastFetchedPrices = {
+      drt: 1000000, // ✅ Hardcoded DRTv1 price ($1M per token)
+      weth: response.data.weth?.usd || 0, // Fetch real WETH price
     };
+    lastFetchedTime = now;
+    return lastFetchedPrices;
   } catch (error) {
-    console.error("❌ Error fetching USD prices:", error);
-    return { drtv1: 0, weth: 0 }; 
+    console.error("❌ Error fetching USD prices: Falling back to last known values.");
+    return lastFetchedPrices || { drt: 1000000, weth: 0 };
   }
 };
 
