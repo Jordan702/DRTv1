@@ -6,7 +6,7 @@ const openai = new OpenAI({
 });
 
 async function evaluateLiquidityprompt(prompt) {
-  // Ensure the user's prompt is in string format.
+  // Ensure the prompt is a string.
   const userMessage = typeof prompt === 'string' ? prompt : JSON.stringify(prompt);
 
   try {
@@ -19,14 +19,11 @@ async function evaluateLiquidityprompt(prompt) {
             "You are a trader tasked with assessing liquidity for trades on the DRTv1/WETH pool at address 0xe1c76fbf1b373165822b564c6f3accf78c5a344a. " +
             "The user's input amount represents the number of DRTv1 tokens they wish to trade. " +
             "Evaluate whether the pool has sufficient liquidity such that: " +
-            "if the user intends to buy DRTv1, there is enough ETH (routed through WETH) available for the given DRTv1 amount; " +
-            "if the user intends to sell DRTv1, there is enough DRTv1 in the pool to exchange for the equivalent ETH value. " +
+            "if the user intends to buy DRTv1, there are enough DRTv1 tokens in the pool in exchange for the equivalent ETH value; " +
+            "if the user intends to sell DRTv1, the pool holds enough ETH (routed from WETH) for the equivalent value of the DRTv1 being sold. " +
             "Based on your evaluation, respond concisely with either 'proceed' if liquidity is sufficient, or 'abort' if liquidity is insufficient."
         },
-        {
-          role: "user",
-          content: userMessage
-        },
+        { role: "user", content: userMessage }
       ],
       temperature: 0.2,
       max_tokens: 50,
