@@ -89,7 +89,6 @@
         try {
           const response = await fetch("https://drtv1-backend.onrender.com/api/liquidity");
           const data = await response.json();
-
           if (response.ok) {
             document.getElementById("liquidity").innerText = `💰 Pool Liquidity: DRTv1: ${data.drt} | WETH: ${data.weth}`;
           } else {
@@ -100,9 +99,11 @@
         }
       }
 
-      setInterval(fetchLiquidity, 10000); // Auto-fetch liquidity every 10 seconds
+      // Auto-fetch liquidity every 10 seconds
+      fetchLiquidity();
+      setInterval(fetchLiquidity, 10000);
 
-      document.getElementById("checkLiquidityButton").onclick = async function() {
+      document.getElementById("checkLiquidityButton").addEventListener("click", async function() {
         const amount = document.getElementById("drtAmount").value.trim();
         const tradeDirection = document.getElementById("tradeDirection").value;
 
@@ -113,7 +114,7 @@
 
         try {
           const payload = { walletAddress: userWalletAddress, direction: tradeDirection, amount: amount };
-          const response = await fetch("https://drtv1-backend.onrender.com/api/swap", {
+          const response = await fetch("https://drtv1-backend.onrender.com/api/swap/liquidity-check", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
@@ -132,9 +133,9 @@
           logStatus("🚫 Error checking liquidity: " + err.message);
           document.getElementById("executeTradeButton").disabled = true;
         }
-      };
+      });
 
-      document.getElementById("executeTradeButton").onclick = async function() {
+      document.getElementById("executeTradeButton").addEventListener("click", async function() {
         const amount = document.getElementById("drtAmount").value.trim();
         const tradeDirection = document.getElementById("tradeDirection").value;
 
@@ -142,7 +143,7 @@
 
         try {
           const payload = { walletAddress: userWalletAddress, direction: tradeDirection, amount: amount };
-          const response = await fetch("https://drtv1-backend.onrender.com/api/swap/execute", {
+          const response = await fetch("https://drtv1-backend.onrender.com/api/swap/execute-trade", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
@@ -150,7 +151,7 @@
 
           const result = await response.json();
 
-          if (response.ok && result.status === "success") {
+          if (response.ok && result.status === "trade executed successfully") {
             logStatus("✅ Trade executed successfully! Tx Hash: " + result.txHash);
           } else {
             logStatus("❌ Trade execution failed: " + (result.error || "Unknown error."));
@@ -158,7 +159,7 @@
         } catch (err) {
           logStatus("🚫 Error executing trade: " + err.message);
         }
-      };
+      });
 
       function logStatus(message) {
         document.getElementById("status").innerText = message;
