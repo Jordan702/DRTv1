@@ -6,7 +6,7 @@ const path = require("path");
 const fs = require("fs");
 
 // Import routes
-const drtradeRoutes = require("./routes/drtradeRoute"); // Trade routes, including liquidity check and execution
+const drtradeRoutes = require("./routes/drtradeRoute"); // Trade routes (liquidity check & execution)
 const submitRoute = require("./routes/submit");
 const vaultRoutes = require("./routes/vaultRoutes");
 const transactionsRoute = require("./routes/transactions");
@@ -38,16 +38,16 @@ const upload = multer({
   limits: { fileSize: 20 * 1024 * 1024 }, // 20MB limit
 });
 
-// Mount routes
+// ✅ Mount API routes
 app.use("/api/transactions", transactionsRoute);
-app.use("/api/swap", drtradeRoutes); // Trade endpoints for liquidity check and trade execution
+app.use("/api/swap", drtradeRoutes); // Trade endpoints
 app.use("/api/verify", submitRoute);
 app.use("/api/vault", vaultRoutes);
 
-// ✅ Add Liquidity Data API Route
+// ✅ Liquidity Data API Route
 app.get("/api/liquidity", async (req, res) => {
   try {
-    if (!global.liquidityCache) {
+    if (!global.liquidityCache || Object.keys(global.liquidityCache).length === 0) {
       return res.status(500).json({ error: "❌ Liquidity data unavailable." });
     }
     return res.status(200).json(global.liquidityCache);
@@ -57,27 +57,25 @@ app.get("/api/liquidity", async (req, res) => {
   }
 });
 
-// Serve static frontend files from the ../drtv1-frontend directory
+// ✅ Serve static frontend files
 const frontendPath = path.resolve(__dirname, "../drtv1-frontend");
 app.use(express.static(frontendPath));
 
-// Serve drtrade.html for the /approve or /swap routes (frontend UI)
+// ✅ Serve frontend UI pages
 app.get(["/approve", "/swap"], (req, res) => {
   res.sendFile(path.join(frontendPath, "drtrade.html"));
 });
 
-// Health check endpoint
+// ✅ Health check endpoint
 app.get("/health", (req, res) => {
   res.send("✅ DRTv1 Backend API is live 🚀");
 });
 
-// Endpoint to view submission dashboard logs
+// ✅ Dashboard & Logs API routes
 app.get("/api/dashboard", (req, res) => {
   const logPath = path.resolve(__dirname, "logs/submissions.json");
   try {
-    const logs = fs.existsSync(logPath)
-      ? JSON.parse(fs.readFileSync(logPath))
-      : [];
+    const logs = fs.existsSync(logPath) ? JSON.parse(fs.readFileSync(logPath)) : [];
     res.json(logs);
   } catch (err) {
     res.status(500).json({
@@ -87,13 +85,10 @@ app.get("/api/dashboard", (req, res) => {
   }
 });
 
-// Endpoint to view redemption logs
 app.get("/api/redemptions", (req, res) => {
   const logPath = path.resolve(__dirname, "logs/redemptions.json");
   try {
-    const logs = fs.existsSync(logPath)
-      ? JSON.parse(fs.readFileSync(logPath))
-      : [];
+    const logs = fs.existsSync(logPath) ? JSON.parse(fs.readFileSync(logPath)) : [];
     res.json(logs);
   } catch (err) {
     res.status(500).json({
@@ -103,13 +98,13 @@ app.get("/api/redemptions", (req, res) => {
   }
 });
 
-// Global error handler middleware
+// ✅ Global error handler middleware
 app.use((err, req, res, next) => {
   console.error("🌐 Global Error:", err);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
-// Start the server
+// ✅ Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ DRTv1 backend running on port ${PORT}`);
