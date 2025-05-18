@@ -1,113 +1,137 @@
 require('dotenv').config();
 const { ethers } = require('ethers');
-const { evaluateLiquidity } = require('../services/uniswapService.js');
+const axios = require('axios'); // Import Axios for USD price fetching
 
-// Initialize provider and wallet using ethers v6 syntax
+// Load contract ABIs from JSON files
+const DRTRADE_ABI = require('../abi/DRTrade_abi.json');
+const DRT_ABI = require('../abi/DRT_abi.json');
+const WETH_ABI = require('../abi/WETH_abi.json');
+
+// Contract addresses
+const DRTRADE_ADDRESS = process.env.DRTRADE_CONTRACT_ADDRESS || "0xD0DC7f8935A661010D56A470eA81572a4a84EED4";
+const DRT_TOKEN_ADDRESS = process.env.DRT_CONTRACT_ADDRESS || "0xYourDRTTokenAddress"; // Update this
+const WETH_TOKEN_ADDRESS = process.env.WETH_CONTRACT_ADDRESS || "0xYourWETHTokenAddress"; // Update this
+const POOL_ADDRESS = "0xe1c76fbf1b373165822b564c6f3accf78c5a344a"; // DRTv1/WETH Liquidity Pool address
+
+// Setup provider and wallet
 const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 const wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 
-// Contract addresses and ABIs
-const DRTV1_ADDRESS = '0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1';
-const WETH_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
-const PAIR_ADDRESS = '0xe1c76fbf1b373165822b564c6f3accf78c5a344a';
-const DRTRADE_ADDRESS = '0xD0DC7f8935A661010D56A470eA81572a4a84EED4';
-
-// Standard ERC20 ABI remains the same.
-const ERC20_ABI = [
-  "function approve(address spender, uint256 amount) returns (bool)",
-  "function decimals() view returns (uint8)"
-];
-
-// Updated ABI for a Uniswap V3 pool.
-const PAIR_ABI = [
-  "function slot0() external view returns (uint160 sqrtPriceX96, int24 tick, uint16 observationIndex, uint16 observationCardinality, uint16 observationCardinalityNext, uint8 feeProtocol, bool unlocked)",
-  "function liquidity() external view returns (uint128)",
-  "function token0() external view returns (address)",
-  "function token1() external view returns (address)"
-];
-
-// Trade contract ABI remains unchanged.
-const DRTRADE_ABI = [
-  "function swapExactDRTv1ForWETH(uint256 amountIn) external returns (uint256)",
-  "function swapExactWETHForDRTv1(uint256 amountIn) external returns (uint256)"
-];
-
 // Create contract instances
-const drtv1Contract = new ethers.Contract(DRTV1_ADDRESS, ERC20_ABI, wallet);
-const wethContract = new ethers.Contract(WETH_ADDRESS, ERC20_ABI, wallet);
-const pairContract = new ethers.Contract(PAIR_ADDRESS, PAIR_ABI, provider);
+console.log("🔄 Syncing contract instances...");
 const drTradeContract = new ethers.Contract(DRTRADE_ADDRESS, DRTRADE_ABI, wallet);
+const drTokenContract = new ethers.Contract(DRT_TOKEN_ADDRESS, DRT_ABI, provider);
+const wethTokenContract = new ethers.Contract(WETH_TOKEN_ADDRESS, WETH_ABI, provider);
 
-// Utility: fetch pool data from a Uniswap V3 pool
-async function getPoolData() {
-  const slot0 = await pairContract.slot0();
-  const currentLiquidity = await pairContract.liquidity();
-  const token0 = await pairContract.token0();
-  const token1 = await pairContract.token1();
-  return { slot0, currentLiquidity, token0, token1 };
-}
+console.log("✅ Synced contracts:");
+console.log("🔹 DRTrade.sol Contract Address:", DRTRADE_ADDRESS);
+console.log("🔹 DRT Token Contract Address:", DRT_TOKEN_ADDRESS);
+console.log("🔹 WETH Token Contract Address:", WETH_TOKEN_ADDRESS);
+console.log("🔹 Liquidity Pool Address:", POOL_ADDRESS);
 
-// Function: Checks liquidity without executing a trade
-const liquidityCheck = async (req, res) => {
+// ✅ Liquidity Cache (Stores balances in both tokens and USD)
+let liquidityCache = { drt: "0", weth: "0", drtUSD: "0", wethUSD: "0" };
+
+// ✅ Function to fetch real-time USD price of DRTv1 and WETH
+const fetchUSDPrices = async () => {
   try {
-    const { direction, amount } = req.body;
-    if (!direction || !amount) {
-      return res.status(400).json({ error: "Direction and amount are required." });
-    }
-    
-    // Retrieve pool data from a Uniswap V3 pool.
-    const { slot0, currentLiquidity, token0, token1 } = await getPoolData();
+    const response = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=weth,drtv1&vs_currencies=usd");
+    const prices = response.data;
+    return {
+      drt: prices.drtv1?.usd || 0, 
+      weth: prices.weth?.usd || 0, 
+    };
+  } catch (error) {
+    console.error("❌ Error fetching USD prices:", error);
+    return { drt: 0, weth: 0 }; 
+  }
+};
 
-    // Convert the human-readable amount into the smallest unit (assume 18 decimals)
-    const amountBN = ethers.parseUnits(amount, 18);
+// ✅ Update liquidity balances with USD equivalents
+const updateLiquidity = async () => {
+  try {
+    console.log("🔄 Checking liquidity pool balances...");
+    const poolDRTBalance = await drTokenContract.balanceOf(POOL_ADDRESS);
+    const poolWETHBalance = await wethTokenContract.balanceOf(POOL_ADDRESS);
+    const usdPrices = await fetchUSDPrices(); // Get USD rates
 
-    // Construct liquidity data for AI evaluation.
-    const liquidityData = {
-      direction,
-      amount: amountBN.toString(),
-      liquidity: currentLiquidity.toString(),
-      sqrtPriceX96: slot0.sqrtPriceX96.toString(),
-      tick: slot0.tick.toString(),
-      token0: token0.toLowerCase(),
-      token1: token1.toLowerCase()
+    liquidityCache = {
+      drt: ethers.formatUnits(poolDRTBalance, 18),
+      weth: ethers.formatUnits(poolWETHBalance, 18),
+      drtUSD: (ethers.formatUnits(poolDRTBalance, 18) * usdPrices.drt).toFixed(2),
+      wethUSD: (ethers.formatUnits(poolWETHBalance, 18) * usdPrices.weth).toFixed(2),
     };
 
-    const aiDecision = await evaluateLiquidity(liquidityData);
-
-    if (aiDecision === 'proceed') {
-      return res.status(200).json({ status: "proceed" });
-    } else {
-      return res.status(200).json({ status: "abort" });
-    }
+    console.log("✅ Liquidity Pool Updated:", liquidityCache);
   } catch (error) {
-    console.error("Liquidity check error:", error);
+    console.error("❌ Error updating liquidity:", error);
+  }
+};
+
+// Run updates every 60 seconds
+setInterval(updateLiquidity, 60000);
+
+// ✅ Liquidity Check Function (Uses USD-based validation)
+const liquidityCheck = async (req, res) => {
+  try {
+    const { walletAddress, direction, amount } = req.body;
+    console.log(`🔎 Received request from wallet: ${walletAddress}`);
+
+    const isBuy = direction.toLowerCase() === "buy";
+    const amountBN = ethers.parseUnits(amount, 18);
+    const usdPrices = await fetchUSDPrices(); // Fetch USD conversion rates
+
+    // Convert user's trade amount to USD
+    const userAmountUSD = isBuy 
+      ? (ethers.formatUnits(amountBN, 18) * usdPrices.weth).toFixed(2) 
+      : (ethers.formatUnits(amountBN, 18) * usdPrices.drt).toFixed(2);
+
+    // ✅ Check liquidity based on USD equivalents
+    const sufficientLiquidity = isBuy
+      ? liquidityCache.drtUSD >= userAmountUSD 
+      : liquidityCache.wethUSD >= userAmountUSD;
+
+    if (!sufficientLiquidity) {
+      console.log(`❌ Liquidity insufficient for ${isBuy ? "buy" : "sell"}.`);
+      return res.status(400).json({ error: "❌ Insufficient liquidity for trade." });
+    }
+
+    console.log("✅ Liquidity check passed.", { userAmountUSD });
+    return res.status(200).json({ status: "proceed", userAmountUSD });
+  } catch (error) {
+    console.error("🚨 Liquidity check error:", error);
     return res.status(500).json({ error: "Liquidity check failed", details: error.message });
   }
 };
 
-// Function: Executes the trade (swap) if liquidity is sufficient
+// ✅ Execute Trade Function
 const executeTrade = async (req, res) => {
   try {
-    const { direction, amount } = req.body;
-    if (!direction || !amount) {
-      return res.status(400).json({ error: "Direction and amount are required." });
-    }
-    // Convert the amount to BigNumber using ethers.parseUnits with 18 decimals.
+    const { walletAddress, direction, amount } = req.body;
+    console.log(`🔄 Trade execution request from wallet: ${walletAddress}`);
+
+    const isBuy = direction.toLowerCase() === "buy";
     const amountBN = ethers.parseUnits(amount, 18);
-    let swapTx;
-    if (direction === 'buy') {
-      // For buying DRTv1 with ETH, use swapExactWETHForDRTv1.
-      swapTx = await drTradeContract.swapExactWETHForDRTv1(amountBN);
-    } else if (direction === 'sell') {
-      // For selling DRTv1 for ETH, use swapExactDRTv1ForWETH.
-      swapTx = await drTradeContract.swapExactDRTv1ForWETH(amountBN);
-    } else {
-      return res.status(400).json({ error: "Invalid trade direction." });
+
+    // Ensure liquidity before executing trade
+    if (!liquidityCheck(req, res)) {
+      return res.status(400).json({ error: "❌ Trade aborted due to insufficient liquidity." });
     }
-    await swapTx.wait();
-    return res.status(200).json({ status: "success", txHash: swapTx.hash });
+
+    let tx;
+    console.log(`🚀 Executing ${isBuy ? "buy" : "sell"} trade...`);
+
+    if (isBuy) {
+      tx = await drTradeContract.swapExactWETHForDRTv1(amountBN);
+    } else {
+      tx = await drTradeContract.swapExactDRTv1ForWETH(amountBN);
+    }
+
+    await tx.wait();
+    console.log("✅ Trade executed successfully! Tx Hash:", tx.hash);
+    return res.status(200).json({ status: "success", txHash: tx.hash });
   } catch (error) {
-    console.error("Trade execution error:", error);
+    console.error("🚨 Trade execution error:", error);
     return res.status(500).json({ error: "Trade execution failed", details: error.message });
   }
 };

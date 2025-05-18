@@ -1,50 +1,41 @@
 require('dotenv').config();
-const openaiModule = require("openai");
+const OpenAI = require('openai');
 
-// Use a fallback in case the module uses a default export.
-const Configuration = openaiModule.Configuration || (openaiModule.default && openaiModule.default.Configuration);
-const OpenAIApi = openaiModule.OpenAIApi || (openaiModule.default && openaiModule.default.OpenAIApi);
-
-if (!Configuration || !OpenAIApi) {
-  throw new Error("Failed to load OpenAI Configuration or OpenAIApi constructors.");
-}
-
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
-const evaluateLiquidity = async (liquidityData) => {
-  // For Uniswap V3 pools, we pass the pool liquidity and slot0 values (sqrtPriceX96 and tick)
-  const prompt = `
-Given the following Uniswap V3 pool data:
-- Direction: ${liquidityData.direction}
-- Amount: ${liquidityData.amount}
-- Pool Liquidity: ${liquidityData.liquidity}
-- sqrtPriceX96: ${liquidityData.sqrtPriceX96}
-- Tick: ${liquidityData.tick}
+async function evaluateLiquidityprompt(prompt) {
+  // Ensure the prompt is a string.
+  const userMessage = typeof prompt === 'string' ? prompt : JSON.stringify(prompt);
 
-Based on this data, should the swap proceed? Respond with "proceed" or "abort".
-  `;
-  
   try {
-    const response = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: prompt,
-      max_tokens: 10,
-      temperature: 0,
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a trader tasked with assessing liquidity for trades on the DRTv1/WETH pool at address 0xe1c76fbf1b373165822b564c6f3accf78c5a344a. " +
+            "The user's input amount represents the number of DRTv1 tokens they wish to trade. " +
+            "Evaluate whether the pool has sufficient liquidity such that: " +
+            "if the user intends to buy DRTv1, there are enough DRTv1 tokens in the pool in exchange for the equivalent ETH value; " +
+            "if the user intends to sell DRTv1, the pool holds enough ETH (routed from WETH) for the equivalent value of the DRTv1 being sold. " +
+            "Based on your evaluation, respond concisely with either 'proceed' if liquidity is sufficient, or 'abort' if liquidity is insufficient."
+        },
+        { role: "user", content: userMessage }
+      ],
+      temperature: 0.2,
+      max_tokens: 50,
     });
 
-    if (response.data.choices && response.data.choices.length > 0) {
-      return response.data.choices[0].text.trim().toLowerCase();
-    } else {
-      console.error("No completion choices received.");
-      return "abort";
-    }
+    const output = completion?.choices?.[0]?.message?.content?.trim() || '';
+    console.log("✅ OpenAI API responded:", output);
+    return output;
   } catch (error) {
-    console.error("Error evaluating liquidity:", error);
-    return "abort";
+    console.error("❌ OpenAI API Error:", error.message || error);
+    return null;
   }
-};
+}
 
-module.exports = { evaluateLiquidity };
+module.exports = { evaluateLiquidityprompt };
