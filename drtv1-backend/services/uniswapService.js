@@ -1,10 +1,16 @@
 require('dotenv').config();
 const openaiModule = require("openai");
-const Configuration = openaiModule.Configuration;
-const OpenAIApi = openaiModule.OpenAIApi;
 
-const configuration = new Configuration({ 
-  apiKey: process.env.OPENAI_API_KEY 
+// Use a fallback in case the module uses a default export.
+const Configuration = openaiModule.Configuration || (openaiModule.default && openaiModule.default.Configuration);
+const OpenAIApi = openaiModule.OpenAIApi || (openaiModule.default && openaiModule.default.OpenAIApi);
+
+if (!Configuration || !OpenAIApi) {
+  throw new Error("Failed to load OpenAI Configuration or OpenAIApi constructors.");
+}
+
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
@@ -26,7 +32,7 @@ Based on this data, should the swap proceed? Respond with "proceed" or "abort".
       model: "text-davinci-003",
       prompt: prompt,
       max_tokens: 10,
-      temperature: 0
+      temperature: 0,
     });
 
     if (response.data.choices && response.data.choices.length > 0) {
