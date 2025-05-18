@@ -125,4 +125,5 @@ const liquidityCheck = async (req, res) => {
 };
 
 // ✅ Export functions
-module.exports = { liquidityCheck, updateLiquidity };
+module.exports = { liquidityCheck, updateLiquidity, executeTrade };
+
