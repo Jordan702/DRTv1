@@ -4,37 +4,32 @@ const OpenAI = require('openai');
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const evaluateLiquidity = async (liquidityData) => {
-  // For Uniswap V3 pools, we pass the pool liquidity and slot0 values (sqrtPriceX96 and tick)
-  const prompt = `
-Given the following Uniswap V3 pool data:
-- Direction: ${liquidityData.direction}
-- Amount: ${liquidityData.amount}
-- Pool Liquidity: ${liquidityData.liquidity}
-- sqrtPriceX96: ${liquidityData.sqrtPriceX96}
-- Tick: ${liquidityData.tick}
 
-Based on this data, should the swap proceed? Respond with "proceed" or "abort".
-  `;
-  
+async function evaluateLiquidityprompt(prompt) {
   try {
-    const response = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: prompt,
-      max_tokens: 10,
-      temperature: 0,
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are the trader and you must check to see if there is sufficient liquidity in the DRTv1/ETH liquidity pool before executing a buy or a sell and if there is sufficient liquidity, then execute the transaction, and if there is not sufficient liquidity say insufficient liquidity please try again later.",
+        },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.2,
+      max_tokens: 50,
     });
 
-    if (response.data.choices && response.data.choices.length > 0) {
-      return response.data.choices[0].text.trim().toLowerCase();
-    } else {
-      console.error("No completion choices received.");
-      return "abort";
-    }
-  } catch (error) {
-    console.error("Error evaluating liquidity:", error);
-    return "abort";
-  }
-};
+    const output = completion?.choices?.[0]?.message?.content || '';
+    console.log("✅ OpenAI responded:", output.trim());
+    return output;
 
-module.exports = { evaluateLiquidity };
+  } catch (error) {
+    console.error("❌ OpenAI API error:", error.message || error);
+    return null;
+  }
+}
+module.exports = {
+  evaluateLiquidityprompt,
+};
