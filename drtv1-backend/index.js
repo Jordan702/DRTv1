@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Import routes
-const drtradeRoutes = require('./routes/drtradeRoute'); // Ensure this file exists and exports the expected router
+const drtradeRoutes = require('./routes/drtradeRoute'); // Trade routes, including liquidity check and execution
 const submitRoute = require('./routes/submit');
 const vaultRoutes = require('./routes/vaultRoutes');
 const transactionsRoute = require('./routes/transactions');
@@ -40,7 +40,7 @@ const upload = multer({
 
 // Mount routes
 app.use('/api/transactions', transactionsRoute);
-app.use('/api/swap', drtradeRoutes); // Trade routes are available under /api/swap
+app.use('/api/swap', drtradeRoutes); // Trade endpoints for liquidity check and trade execution
 app.use('/api/verify', submitRoute);
 app.use('/api/vault', vaultRoutes);
 
@@ -48,7 +48,7 @@ app.use('/api/vault', vaultRoutes);
 const frontendPath = path.resolve(__dirname, '../drtv1-frontend');
 app.use(express.static(frontendPath));
 
-// Serve drtrade.html for specific routes (allows using /approve or /swap for the frontend)
+// Serve drtrade.html for the /approve or /swap routes (frontend UI)
 app.get(['/approve', '/swap'], (req, res) => {
   res.sendFile(path.join(frontendPath, 'drtrade.html'));
 });
@@ -58,7 +58,7 @@ app.get('/health', (req, res) => {
   res.send('✅ DRTv1 Backend API is live 🚀');
 });
 
-// View submission dashboard logs
+// Endpoint to view submission dashboard logs
 app.get('/api/dashboard', (req, res) => {
   const logPath = path.resolve(__dirname, 'logs/submissions.json');
   try {
@@ -74,7 +74,7 @@ app.get('/api/dashboard', (req, res) => {
   }
 });
 
-// View redemption logs
+// Endpoint to view redemption logs
 app.get('/api/redemptions', (req, res) => {
   const logPath = path.resolve(__dirname, 'logs/redemptions.json');
   try {
