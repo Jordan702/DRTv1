@@ -4,7 +4,26 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+
+// Fallback import for the OpenAI API constructors
+const openaiModule = require('openai');
+const Configuration = openaiModule.Configuration || (openaiModule.default && openaiModule.default.Configuration);
+const OpenAIApi = openaiModule.OpenAIApi || (openaiModule.default && openaiModule.default.OpenAIApi);
+
+if (!Configuration || !OpenAIApi) {
+  throw new Error("Failed to load OpenAI API constructors.");
+}
+
+// Initialize OpenAI client
+const openai = new OpenAIApi(new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+}));
+
+// Import routes
 const drtradeRoutes = require('./routes/drtradeRoute'); // Ensure this file exists and exports the expected router
+const submitRoute = require('./routes/submit');
+const vaultRoutes = require('./routes/vaultRoutes');
+const transactionsRoute = require('./routes/transactions');
 
 const app = express();
 
@@ -32,11 +51,6 @@ const upload = multer({
   dest: 'uploads/',
   limits: { fileSize: 20 * 1024 * 1024 }, // 20MB limit
 });
-
-// Import additional routes for submissions, vault, and transactions
-const submitRoute = require('./routes/submit');
-const vaultRoutes = require('./routes/vaultRoutes');
-const transactionsRoute = require('./routes/transactions');
 
 // Mount routes
 app.use('/api/transactions', transactionsRoute);
