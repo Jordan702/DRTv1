@@ -26,8 +26,8 @@ async function evaluateLiquidity(prompt) {
         {
           role: 'system',
           content:
-            'You are a trader responsible for checking liquidity in the DRTv1/ETH pool. ' +
-            "If liquidity is sufficient, execute the trade. If liquidity is insufficient, respond with 'Insufficient liquidity, please try again later.'",
+            'You are a trader responsible for checking liquidity in the DRTv1/ETH pool 0xe1c76fbf1b373165822b564c6f3accf78c5a344a. ' +
+            "If liquidity has enough value to facilitate the requested buy and or sell amount in either tokens, execute the trade. If it is insufficient, respond with 'Insufficient liquidity, please try again later.'",
         },
         {
           role: 'user',
