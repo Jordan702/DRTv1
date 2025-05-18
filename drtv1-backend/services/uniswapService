@@ -1,19 +1,9 @@
 require('dotenv').config();
-const openaiModule = require("openai");
+const OpenAI = require('openai');
 
-// Use a fallback in case the module uses a default export.
-const Configuration = openaiModule.Configuration || (openaiModule.default && openaiModule.default.Configuration);
-const OpenAIApi = openaiModule.OpenAIApi || (openaiModule.default && openaiModule.default.OpenAIApi);
-
-if (!Configuration || !OpenAIApi) {
-  throw new Error("Failed to load OpenAI Configuration or OpenAIApi constructors.");
-}
-
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
-
 const evaluateLiquidity = async (liquidityData) => {
   // For Uniswap V3 pools, we pass the pool liquidity and slot0 values (sqrtPriceX96 and tick)
   const prompt = `
