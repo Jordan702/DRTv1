@@ -42,8 +42,8 @@ const updateLiquidity = async () => {
   }
 };
 
-// Run updates every 10 seconds
-setInterval(updateLiquidity, 10000);
+// Run updates every 60 seconds
+setInterval(updateLiquidity, 60000);
 
 /**
  * Liquidity Check Function
