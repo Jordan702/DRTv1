@@ -3,59 +3,108 @@
 require('dotenv').config();
 const { ethers } = require('ethers');
 
-// Addresses and ABI definitions
-const DRTRADE_ADDRESS = "0xD0DC7f8935A661010D56A470eA81572a4a84EED4"; // DRTrade.sol contract address
-// Note: The pool address (DRTv1/WETH) is embedded in the smart contract logic.
-// Example DRTrade ABI (only the liquidity check function and swap functions are included here)
-const DRTRADE_ABI = [
-  // This function should be implemented in your DRTrade.sol.
-  "function checkLiquidity(bool isBuy, uint256 amount) external view returns (bool)",
-  // Swap functions (not used in this snippet but available for trade execution)
-  "function swapExactDRTv1ForWETH(uint256 amountIn) external returns (uint256)",
-  "function swapExactWETHForDRTv1(uint256 amountIn) external returns (uint256)"
-];
+// Load contract ABIs from JSON files (located in root/drtv1-backend/abi/)
+const DRTRADE_ABI = require('../abi/DRTrade_abi.json');
+const DRT_ABI = require('../abi/DRT_abi.json');
+const WETH_ABI = require('../abi/WETH_abi.json');
 
-// Setup a provider and a wallet to interact with the blockchain.
+// Contract addresses (from environment variables or fallback defaults)
+const DRTRADE_ADDRESS = process.env.DRTRADE_CONTRACT_ADDRESS || "0xD0DC7f8935A661010D56A470eA81572a4a84EED4";
+const DRT_TOKEN_ADDRESS = process.env.DRT_CONTRACT_ADDRESS || "0xYourDRTTokenAddress"; // Replace with your actual DRTv1 token address
+const WETH_TOKEN_ADDRESS = process.env.WETH_CONTRACT_ADDRESS || "0xYourWETHTokenAddress"; // Replace with your actual WETH address
+const POOL_ADDRESS = "0xe1c76fbf1b373165822b564c6f3accf78c5a344a"; // DRTv1/WETH Liquidity Pool address
+
+// Setup provider and wallet
 const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 const wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 
-// Create an instance of the DRTrade contract.
+// Create contract instances:
 const drTradeContract = new ethers.Contract(DRTRADE_ADDRESS, DRTRADE_ABI, wallet);
+const drTokenContract = new ethers.Contract(DRT_TOKEN_ADDRESS, DRT_ABI, provider);
+const wethTokenContract = new ethers.Contract(WETH_TOKEN_ADDRESS, WETH_ABI, provider);
+
+// Startup Debug Info
+(async () => {
+  try {
+    console.log("✅ Loaded DRT token contract from:", DRT_TOKEN_ADDRESS);
+    console.log("✅ Loaded WETH token contract from:", WETH_TOKEN_ADDRESS);
+    console.log("✅ Loaded DRTrade contract from:", DRTRADE_ADDRESS);
+    console.log("✅ DRTv1/WETH Liquidity Pool Address:", POOL_ADDRESS);
+    console.log("✅ Signer address:", await wallet.getAddress());
+  } catch (err) {
+    console.error("❌ Error during startup logs:", err);
+  }
+})();
 
 /**
- * liquidityCheck - checks if the user's requested amount of DRTv1 is available for trade.
+ * liquidityCheck - checks whether the user's requested amount of DRTv1 is available for trade.
  *
- * Expected input (via req.body):
- *   - walletAddress: the user's manual input wallet address (used for logging/recordkeeping)
- *   - direction: either "buy" or "sell"
- *   - amount: the DRTv1 token amount (in human-readable format) the user wishes to trade
+ * Expected input via req.body:
+ *   - walletAddress: User's manually entered wallet address.
+ *   - direction: "buy" or "sell".
+ *   - amount: The DRTv1 token amount (human readable, e.g. "10.0") the user wishes to trade.
  *
- * If the on-chain liquidity check passes, the endpoint responds with { status: "proceed" }.
- * Otherwise, it responds with { status: "abort", message: "Insufficient liquidity, please try again later." }.
+ * This function logs:
+ *   - The user-provided wallet address.
+ *   - The pool's DRT and WETH balances (using the on-chain contracts).
+ *   - The user's DRT and WETH balances.
+ *
+ * Local balance checks:
+ *   - If buying: verifies that the pool has enough DRT AND the user has sufficient WETH.
+ *   - If selling: verifies that the pool has enough WETH AND the user has sufficient DRT.
+ *
+ * Finally, it calls the on-chain `checkLiquidity` function on the DRTrade.sol contract.
  */
 const liquidityCheck = async (req, res) => {
   try {
     const { walletAddress, direction, amount } = req.body;
-
     if (!walletAddress || !direction || !amount) {
       return res.status(400).json({ error: "Wallet address, direction and amount are required." });
     }
-
-    // Using ethers, parse the human-readable 'amount' into a BigNumber (assuming 18 decimals).
+    
+    console.log("User provided wallet address:", walletAddress);
+    
+    // Parse the human-readable amount into a BigNumber (assuming 18 decimals)
     const amountBN = ethers.parseUnits(amount, 18);
-
-    // Determine if the user is buying or selling.
-    // For buying: we expect the pool to have enough DRTv1 tokens available.
-    // For selling: we need to verify that the pool holds enough ETH (routed from WETH).
     const isBuy = direction.toLowerCase() === 'buy';
-
-    // Perform the trustless liquidity check by invoking the on-chain 'checkLiquidity' function.
+    
+    // Retrieve and log pool balances
+    const poolDRTBalance = await drTokenContract.balanceOf(POOL_ADDRESS);
+    const poolWETHBalance = await wethTokenContract.balanceOf(POOL_ADDRESS);
+    console.log("Pool DRT Balance:", ethers.formatUnits(poolDRTBalance, 18));
+    console.log("Pool WETH Balance:", ethers.formatUnits(poolWETHBalance, 18));
+    
+    // Retrieve and log user's balances
+    const userDRTBalance = await drTokenContract.balanceOf(walletAddress);
+    const userWETHBalance = await wethTokenContract.balanceOf(walletAddress);
+    console.log("User's DRT Balance:", ethers.formatUnits(userDRTBalance, 18));
+    console.log("User's WETH Balance:", ethers.formatUnits(userWETHBalance, 18));
+    
+    // Local checks before calling the on-chain liquidity function.
+    if (isBuy) {
+      if (poolDRTBalance.lt(amountBN)) {
+        return res.status(200).json({ status: "abort", message: "Insufficient DRT in pool for purchase." });
+      }
+      if (userWETHBalance.lt(amountBN)) { 
+        return res.status(200).json({ status: "abort", message: "User has insufficient WETH for purchase." });
+      }
+    } else {
+      if (poolWETHBalance.lt(amountBN)) {
+        return res.status(200).json({ status: "abort", message: "Insufficient WETH in pool for sale." });
+      }
+      if (userDRTBalance.lt(amountBN)) {
+        return res.status(200).json({ status: "abort", message: "User has insufficient DRT for sale." });
+      }
+    }
+    
+    // Perform on-chain liquidity check.
     const isLiquid = await drTradeContract.checkLiquidity(isBuy, amountBN);
-
     if (isLiquid) {
+      console.log("On-chain check passed, liquidity is sufficient for trade.");
       return res.status(200).json({ status: "proceed" });
     } else {
-      return res.status(200).json({ status: "abort", message: "Insufficient liquidity, please try again later." });
+      console.log("On-chain check failed, insufficient liquidity.");
+      return res.status(200).json({ status: "abort", message: "On-chain liquidity check failed." });
     }
   } catch (error) {
     console.error("Liquidity check error:", error);
@@ -63,4 +112,41 @@ const liquidityCheck = async (req, res) => {
   }
 };
 
-module.exports = { liquidityCheck };
+/**
+ * executeTrade - Executes the trade by calling the appropriate function on the DRTrade.sol contract.
+ *
+ * Expected input via req.body:
+ *   - walletAddress: User's wallet address (for logging/recordkeeping)
+ *   - direction: "buy" or "sell"
+ *   - amount: The DRTv1 token amount (human-readable) to trade.
+ *
+ * Depending on the direction, it calls the corresponding swap function.
+ */
+const executeTrade = async (req, res) => {
+  try {
+    const { walletAddress, direction, amount } = req.body;
+    if (!walletAddress || !direction || !amount) {
+      return res.status(400).json({ error: "Wallet address, direction and amount are required." });
+    }
+    const amountBN = ethers.parseUnits(amount, 18);
+    const isBuy = direction.toLowerCase() === 'buy';
+    let tx;
+    
+    if (isBuy) {
+      // For buying DRTv1, swap WETH for DRTv1.
+      tx = await drTradeContract.swapExactWETHForDRTv1(amountBN);
+    } else {
+      // For selling DRTv1, swap DRTv1 for WETH.
+      tx = await drTradeContract.swapExactDRTv1ForWETH(amountBN);
+    }
+    
+    await tx.wait();
+    console.log("Trade executed successfully. Transaction hash:", tx.hash);
+    return res.status(200).json({ status: "success", txHash: tx.hash });
+  } catch (error) {
+    console.error("Trade execution error:", error);
+    return res.status(500).json({ error: "Trade execution failed", details: error.message });
+  }
+};
+
+module.exports = { liquidityCheck, executeTrade };
