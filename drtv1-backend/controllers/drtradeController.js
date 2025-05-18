@@ -35,15 +35,15 @@ let liquidityCache = { drt: "0", weth: "0", drtUSD: "0", wethUSD: "0" };
 // ✅ Function to fetch real-time USD price of DRTv1 and WETH
 const fetchUSDPrices = async () => {
   try {
-    const response = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=weth,drt&vs_currencies=usd");
+    const response = await axios.get("https://api.coingecko.com/api/v3/simple/price?ids=weth,drtv1&vs_currencies=usd");
     const prices = response.data;
     return {
-      drt: prices.drt?.usd || 0, 
+      drt: prices.drtv1?.usd || 0, 
       weth: prices.weth?.usd || 0, 
     };
   } catch (error) {
     console.error("❌ Error fetching USD prices:", error);
-    return { drt: 0, weth: 0 }; 
+    return { drtv1: 0, weth: 0 }; 
   }
 };
 
