@@ -61,41 +61,65 @@ const liquidityCheck = async (req, res) => {
     if (!walletAddress || !direction || !amount) {
       return res.status(400).json({ error: "Wallet address, direction and amount are required." });
     }
-    
+
     console.log("User provided wallet address:", walletAddress);
-    
-    // Parse the human-readable amount into a BigNumber (assuming 18 decimals)
+
+    // Convert the user input amount to BigNumber (assuming 18 decimals)
     const amountBN = ethers.parseUnits(amount, 18);
     const isBuy = direction.toLowerCase() === 'buy';
-    
-    // Retrieve and log pool balances
+
+    // Fetch pool balances and convert them explicitly to BigNumber
     const poolDRTBalance = await drTokenContract.balanceOf(POOL_ADDRESS);
     const poolWETHBalance = await wethTokenContract.balanceOf(POOL_ADDRESS);
-    console.log("Pool DRT Balance:", ethers.formatUnits(poolDRTBalance, 18));
-    console.log("Pool WETH Balance:", ethers.formatUnits(poolWETHBalance, 18));
     
-    // Retrieve and log user's balances
+    const poolDRTBalanceBN = ethers.BigNumber.from(poolDRTBalance.toString());
+    const poolWETHBalanceBN = ethers.BigNumber.from(poolWETHBalance.toString());
+
+    console.log("Pool DRT Balance:", ethers.formatUnits(poolDRTBalanceBN, 18));
+    console.log("Pool WETH Balance:", ethers.formatUnits(poolWETHBalanceBN, 18));
+
+    // Fetch user's balances and convert them explicitly to BigNumber
     const userDRTBalance = await drTokenContract.balanceOf(walletAddress);
     const userWETHBalance = await wethTokenContract.balanceOf(walletAddress);
-    console.log("User's DRT Balance:", ethers.formatUnits(userDRTBalance, 18));
-    console.log("User's WETH Balance:", ethers.formatUnits(userWETHBalance, 18));
-    
-    // Local checks before calling the on-chain liquidity function.
+
+    const userDRTBalanceBN = ethers.BigNumber.from(userDRTBalance.toString());
+    const userWETHBalanceBN = ethers.BigNumber.from(userWETHBalance.toString());
+
+    console.log("User's DRT Balance:", ethers.formatUnits(userDRTBalanceBN, 18));
+    console.log("User's WETH Balance:", ethers.formatUnits(userWETHBalanceBN, 18));
+
+    // **Local balance checks before calling the on-chain liquidity function**
     if (isBuy) {
-      if (poolDRTBalance.lt(amountBN)) {
+      if (poolDRTBalanceBN.lt(amountBN)) {
         return res.status(200).json({ status: "abort", message: "Insufficient DRT in pool for purchase." });
       }
-      if (userWETHBalance.lt(amountBN)) { 
+      if (userWETHBalanceBN.lt(amountBN)) {
         return res.status(200).json({ status: "abort", message: "User has insufficient WETH for purchase." });
       }
     } else {
-      if (poolWETHBalance.lt(amountBN)) {
+      if (poolWETHBalanceBN.lt(amountBN)) {
         return res.status(200).json({ status: "abort", message: "Insufficient WETH in pool for sale." });
       }
-      if (userDRTBalance.lt(amountBN)) {
+      if (userDRTBalanceBN.lt(amountBN)) {
         return res.status(200).json({ status: "abort", message: "User has insufficient DRT for sale." });
       }
     }
+
+    // **On-chain liquidity check**
+    const isLiquid = await drTradeContract.checkLiquidity(isBuy, amountBN);
+    if (isLiquid) {
+      console.log("On-chain liquidity check passed, trade can proceed.");
+      return res.status(200).json({ status: "proceed" });
+    } else {
+      console.log("On-chain liquidity check failed, insufficient liquidity.");
+      return res.status(200).json({ status: "abort", message: "On-chain liquidity check failed." });
+    }
+  } catch (error) {
+    console.error("Liquidity check error:", error);
+    return res.status(500).json({ error: "Liquidity check failed", details: error.message });
+  }
+};
+
     
     // Perform on-chain liquidity check.
     const isLiquid = await drTradeContract.checkLiquidity(isBuy, amountBN);
