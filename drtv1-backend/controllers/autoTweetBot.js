@@ -1,32 +1,26 @@
-require('dotenv').config({ path: './.env' });
-const { ethers } = require('ethers');
-const Twitter = require('twitter-v2'); // install via: npm i twitter-v2
+const { ethers } = require("ethers");
+const { TwitterApi } = require("twitter-api-v2");
+require("dotenv").config();
 
-✅ autoTweetBot.js (core logic only, minimal but production-ready)
-const provider = new ethers.WebSocketProvider(process.env.MAINNET_RPC_URL);
-const wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
-
-const contractAddress = '0x25bFf7F3E52E98d8fF37bee5C41Aedf85Ad901e7';
-const abi = [  // minimal ABI
-  "event TweetQueued(string message, uint256 timestamp)",
-  "function confirm(string msg_, string txRef) external"
-];
-const contract = new ethers.Contract(contractAddress, abi, wallet);
-
-const twitter = new Twitter({
-  access_token_key: process.env.TWITTER_TOKEN,
-  access_token_secret: process.env.TWITTER_SECRET,
-  bearer_token: process.env.TWITTER_BEARER,
+const twitterClient = new TwitterApi({
+  appKey: process.env.TWITTER_API_KEY,
+  appSecret: process.env.TWITTER_API_SECRET,
+  accessToken: process.env.TWITTER_ACCESS_TOKEN,
+  accessSecret: process.env.TWITTER_ACCESS_SECRET,
 });
 
-contract.on('TweetQueued', async (msg, ts) => {
-  console.log(`📡 TweetQueued: ${msg}`);
+const provider = new ethers.providers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
+const contractAddress = process.env.CONTRACT_ADDRESS;
+
+const abi = ["event Tweet(string message)"];
+const contract = new ethers.Contract(contractAddress, abi, provider);
+
+contract.on("Tweet", async (message) => {
+  const tweet = message.trim().slice(0, 280); // Safe tweet length
   try {
-    const res = await twitter.post('tweets', { text: msg });
-    const tweetId = res?.data?.id;
-    console.log(`✅ Tweet sent: https://x.com/DRTv1Official${tweetId}`);
-    await contract.confirm(msg, tweetId.toString());
-  } catch (e) {
-    console.error('❌ Tweet failed:', e);
+    const { data } = await twitterClient.v2.tweet(tweet);
+    console.log("✅ Tweet posted:", data.id);
+  } catch (err) {
+    console.error("❌ Failed to tweet:", err);
   }
 });
