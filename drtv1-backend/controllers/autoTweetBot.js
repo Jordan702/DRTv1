@@ -24,7 +24,7 @@ contract.on('TweetQueued', async (msg, ts) => {
   try {
     const res = await twitter.post('tweets', { text: msg });
     const tweetId = res?.data?.id;
-    console.log(`✅ Tweet sent: https://x.com/DRTv1Official/compose/post${tweetId}`);
+    console.log(`✅ Tweet sent: https://x.com/DRTv1Official/status${tweetId}`);
     await contract.confirm(msg, tweetId.toString());
   } catch (e) {
     console.error('❌ Tweet failed:', e);
