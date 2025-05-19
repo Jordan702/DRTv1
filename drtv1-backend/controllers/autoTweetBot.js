@@ -1,7 +1,14 @@
+const fs = require("fs");
+const path = require("path");
 const { ethers } = require("ethers");
 const { TwitterApi } = require("twitter-api-v2");
 require("dotenv").config();
 
+// Load ABI from correct path
+const abiPath = path.resolve(__dirname, "../abi/AutoTweet_abi.json");
+const abi = JSON.parse(fs.readFileSync(abiPath, "utf8"));
+
+// Initialize Twitter client
 const twitterClient = new TwitterApi({
   appKey: process.env.TWITTER_API_KEY,
   appSecret: process.env.TWITTER_API_SECRET,
@@ -9,18 +16,19 @@ const twitterClient = new TwitterApi({
   accessSecret: process.env.TWITTER_ACCESS_SECRET,
 });
 
-const provider = new ethers.providers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
-const contractAddress = process.env.CONTRACT_ADDRESS;
+// Ethers.js setup
+const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+const contract = new ethers.Contract(process.env.CONTRACT_ADDRESS, abi, provider);
 
-const abi = ["event Tweet(string message)"];
-const contract = new ethers.Contract(contractAddress, abi, provider);
-
+// Listen for Tweet events from AutoTweet.sol
 contract.on("Tweet", async (message) => {
-  const tweet = message.trim().slice(0, 280); // Safe tweet length
+  const tweet = message.trim().slice(0, 280);
+  console.log("📡 New on-chain message:", tweet);
+
   try {
     const { data } = await twitterClient.v2.tweet(tweet);
-    console.log("✅ Tweet posted:", data.id);
+    console.log("✅ Tweeted:", data.id);
   } catch (err) {
-    console.error("❌ Failed to tweet:", err);
+    console.error("❌ Twitter post failed:", err);
   }
 });
