@@ -3,10 +3,10 @@ const { ethers } = require('ethers');
 const Twitter = require('twitter-v2'); // install via: npm i twitter-v2
 
 ✅ autoTweetBot.js (core logic only, minimal but production-ready)
-const provider = new ethers.WebSocketProvider(process.env.ALCHEMY_WSS);
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+const provider = new ethers.WebSocketProvider(process.env.MAINNET_RPC_URL);
+const wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 
-const contractAddress = '0xYourAutoTweetAddress';
+const contractAddress = '0x25bFf7F3E52E98d8fF37bee5C41Aedf85Ad901e7';
 const abi = [  // minimal ABI
   "event TweetQueued(string message, uint256 timestamp)",
   "function confirm(string msg_, string txRef) external"
@@ -24,7 +24,7 @@ contract.on('TweetQueued', async (msg, ts) => {
   try {
     const res = await twitter.post('tweets', { text: msg });
     const tweetId = res?.data?.id;
-    console.log(`✅ Tweet sent: https://twitter.com/yourhandle/status/${tweetId}`);
+    console.log(`✅ Tweet sent: https://twitter.com/DRTv1Official/status/${tweetId}`);
     await contract.confirm(msg, tweetId.toString());
   } catch (e) {
     console.error('❌ Tweet failed:', e);
