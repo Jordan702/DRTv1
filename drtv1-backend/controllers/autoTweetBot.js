@@ -17,7 +17,7 @@ const twitterClient = new TwitterApi({
 });
 
 // Ethers.js setup
-const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+const provider = new ethers.providers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 const contract = new ethers.Contract(process.env.CONTRACT_ADDRESS, abi, provider);
 
 // Listen for Tweet events from AutoTweet.sol
