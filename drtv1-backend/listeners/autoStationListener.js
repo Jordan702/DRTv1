@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const contractAddress = "YOUR_CONTRACT_ADDRESS";
 const contractABI = require("../../contracts/AutoStation.json");
-const provider = new ethers.WebSocketProvider(process.env.WS_PROVIDER_URL);
+const provider = new ethers.WebSocketProvider(process.env.MAINNET_RPC_URL);
 const contract = new ethers.Contract(contractAddress, contractABI, provider);
 
 contract.on("Broadcast", async (channel, user, message) => {
