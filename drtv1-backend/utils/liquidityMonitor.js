@@ -32,8 +32,8 @@ const updateLiquidity = async () => {
   }
 };
 
-// Schedule updates every 10 seconds
-setInterval(updateLiquidity, 10000);
+// Schedule updates every 1000 seconds
+setInterval(updateLiquidity, 1000000);
 
 // Function to check liquidity before executing a trade
 const checkLiquidity = (amount, isBuy) => {
