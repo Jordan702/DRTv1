@@ -4,7 +4,7 @@ const { generateTweet } = require("../services/openai");
 const { postTweet } = require("../services/socialmedia");
 require("dotenv").config();
 
-const provider = new ethers.WebSocketProvider(process.env.WS_PROVIDER_URL);
+const provider = new ethers.WebSocketProvider(process.env.MAINNET_RPC_URL);
 
 provider.on("pending", async (txHash) => {
   try {
