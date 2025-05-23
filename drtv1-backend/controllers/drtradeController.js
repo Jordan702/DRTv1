@@ -127,9 +127,39 @@ const liquidityCheck = async (req, res) => {
 const executeTrade = async (req, res) => {
   try {
     console.log("🔎 Trade execution requested.");
-    // Your trade execution logic goes here.
-    // For now, simply mimic a successful trade response.
-    return res.status(200).json({ status: "trade executed successfully" });
+
+    const { walletAddress, direction, amount } = req.body;
+    const isBuy = direction.toLowerCase() === "buy";
+
+    // Validate request parameters
+    if (!walletAddress || !direction || !amount) {
+      return res.status(400).json({ error: "❌ Missing trade parameters." });
+    }
+
+    // Convert trade amount to BigNumber format
+    const amountBN = ethers.parseUnits(amount, 18);
+
+    // Ensure liquidity is sufficient before proceeding
+    const liquidityCheckResponse = await liquidityCheck(req, res);
+    if (liquidityCheckResponse.status !== "proceed") {
+      return res.status(400).json({ error: "❌ Trade cannot proceed due to insufficient liquidity." });
+    }
+
+    // Prepare contract interaction
+    const tradeContract = new ethers.Contract(DRTRADE_ADDRESS, DRTRADE_ABI, wallet);
+
+    let tradeTx;
+    if (isBuy) {
+      tradeTx = await tradeContract.buyDRT(amountBN, { from: walletAddress });
+    } else {
+      tradeTx = await tradeContract.sellDRT(amountBN, { from: walletAddress });
+    }
+
+    // Wait for transaction confirmation
+    const receipt = await tradeTx.wait();
+
+    console.log("✅ Trade executed successfully:", receipt);
+    return res.status(200).json({ status: "Trade executed successfully", txHash: receipt.transactionHash });
   } catch (error) {
     console.error("🚨 Trade execution error:", error);
     return res.status(500).json({ error: "Trade execution failed", details: error.message });
