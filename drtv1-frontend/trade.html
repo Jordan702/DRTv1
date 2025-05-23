@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-<header>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DRT Vault UI</title>
   <style>
     body {
@@ -55,24 +55,46 @@
       height: 400px;
       margin-top: 2rem;
     }
-   </style>
+    input, button {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      width: 200px;
+      display: block;
+    }
+    button {
+      background-color: #222;
+      color: #fff;
+      border: 1px solid #555;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
     <h1>DRTv1</h1>
-    <img src="DRTv1 Logo.png" alt="DRTv1 Logo" class="logo">
+    <img src="DRTv1 Logo.png" alt="DRTv1 Logo" class="logo" />
     <h2>Decentralized Resource Token – Evolution Through Contribution</h2>
   </header>
-<body>
-  <h1>DRTv1 Trading</h1>
-  <button onclick="connectWallet()">Connect Wallet</button>
-  <p id="walletAddress"></p>
 
-  <input type="text" id="buyAmount" placeholder="ETH to spend">
-  <button onclick="buy()">Buy DRTv1</button>
+  <section>
+    <h1>DRTv1 Trading</h1>
+    <button onclick="connectWallet()">Connect Wallet</button>
+    <p id="walletAddress"></p>
 
-  <input type="text" id="sellAmount" placeholder="DRTv1 to sell">
-  <button onclick="sell()">Sell DRTv1</button>
-  <button onclick="fetchBalances()">Get Balances</button>
+    <input type="text" id="buyAmount" placeholder="ETH to spend" />
+    <button onclick="buy()">Buy DRTv1</button>
 
-  <p id="status"></p>
+    <input type="text" id="sellAmount" placeholder="DRTv1 to sell" />
+    <button onclick="sell()">Sell DRTv1</button>
+
+    <button onclick="fetchBalances()">Get Balances</button>
+
+    <p id="status"></p>
+  </section>
 
   <script>
     let wallet;
@@ -83,43 +105,77 @@
         wallet = accounts[0];
         document.getElementById('walletAddress').innerText = `Connected: ${wallet}`;
       } else {
-        alert('Install MetaMask');
+        alert('Please install MetaMask to use this dApp');
       }
     }
 
     async function buy() {
-      const ethAmount = document.getElementById("buyAmount").value;
+      if (!wallet) return alert("Connect wallet first");
+
+      const ethAmount = parseFloat(document.getElementById("buyAmount").value);
+      if (isNaN(ethAmount) || ethAmount <= 0) {
+        return alert("Enter a valid ETH amount");
+      }
+
+      document.getElementById("status").innerText = "Processing buy transaction...";
+
       const res = await fetch("https://drtv1-backend.onrender.com/api/trade/buyDRTv1", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userAddress: wallet, ethAmount }),
       });
+
       const data = await res.json();
-      document.getElementById("status").innerText = data.success ? `Tx: ${data.txHash}` : data.error;
+      if (data.success) {
+        document.getElementById("status").innerHTML =
+          `✅ Buy Tx: <a href="https://etherscan.io/tx/${data.txHash}" target="_blank">${data.txHash}</a>`;
+      } else {
+        document.getElementById("status").innerText = `❌ ${data.error || "Buy failed"}`;
+      }
     }
 
     async function sell() {
-      const tokenAmount = document.getElementById("sellAmount").value;
+      if (!wallet) return alert("Connect wallet first");
+
+      const tokenAmount = parseFloat(document.getElementById("sellAmount").value);
+      if (isNaN(tokenAmount) || tokenAmount <= 0) {
+        return alert("Enter a valid DRTv1 amount");
+      }
+
+      document.getElementById("status").innerText = "Processing sell transaction...";
+
       const res = await fetch("https://drtv1-backend.onrender.com/api/trade/sellDRTv1", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userAddress: wallet, tokenAmount }),
       });
+
       const data = await res.json();
-      document.getElementById("status").innerText = data.success ? `Tx: ${data.txHash}` : data.error;
+      if (data.success) {
+        document.getElementById("status").innerHTML =
+          `✅ Sell Tx: <a href="https://etherscan.io/tx/${data.txHash}" target="_blank">${data.txHash}</a>`;
+      } else {
+        document.getElementById("status").innerText = `❌ ${data.error || "Sell failed"}`;
+      }
     }
 
     async function fetchBalances() {
+      if (!wallet) return alert("Connect wallet first");
+
+      document.getElementById("status").innerText = "Fetching balances...";
+
       const res = await fetch(`https://drtv1-backend.onrender.com/api/balance/${wallet}`);
       const data = await res.json();
+
       if (data.success) {
         const { eth, sETH, dRTv1, dRTv2 } = data.balances;
-        document.getElementById("status").innerText = 
+        document.getElementById("status").innerText =
           `ETH: ${eth}\nsETH: ${sETH}\ndRTv1: ${dRTv1}\ndRTv2: ${dRTv2}`;
       } else {
-        document.getElementById("status").innerText = `Error: ${data.error}`;
+        document.getElementById("status").innerText = `❌ Error: ${data.error}`;
       }
     }
   </script>
+
 </body>
 </html>
