@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { ethers, provider } = require('../utils/web3');
 const tokenAbi = require('../abi/ERC20.json'); // Standard ERC20 ABI
 
