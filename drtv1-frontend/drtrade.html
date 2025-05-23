@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DRTrade DEX - Trade</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.0.0/dist/ethers.umd.min.js"></script>
-
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -82,10 +81,12 @@
     <script>
       let userWalletAddress = '';
 
+      // Listen for wallet address entry
       document.getElementById("walletAddressInput").addEventListener("input", (event) => {
         userWalletAddress = event.target.value.trim();
       });
 
+      // Fetch liquidity data from backend
       async function fetchLiquidity() {
         try {
           const response = await fetch("https://drtv1-backend.onrender.com/api/liquidity");
@@ -100,10 +101,11 @@
         }
       }
 
-      // Auto-fetch liquidity every 1000 seconds
-      setInterval(updateLiquidity, 1000000);
+      // Auto-fetch liquidity every 1000 seconds and fetch initially on page load
+      setInterval(fetchLiquidity, 1000000);
+      fetchLiquidity();
 
-
+      // Check liquidity before trade execution
       document.getElementById("checkLiquidityButton").addEventListener("click", async function() {
         const amount = document.getElementById("drtAmount").value.trim();
         const tradeDirection = document.getElementById("tradeDirection").value;
@@ -120,7 +122,6 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
-
           const result = await response.json();
 
           if (response.ok && result.status === "proceed") {
@@ -136,6 +137,7 @@
         }
       });
 
+      // Execute trade when button is clicked
       document.getElementById("executeTradeButton").addEventListener("click", async function() {
         const amount = document.getElementById("drtAmount").value.trim();
         const tradeDirection = document.getElementById("tradeDirection").value;
@@ -149,7 +151,6 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
-
           const result = await response.json();
 
           if (response.ok && result.status === "trade executed successfully") {
@@ -162,6 +163,7 @@
         }
       });
 
+      // Utility function to update status messages
       function logStatus(message) {
         document.getElementById("status").innerText = message;
       }
