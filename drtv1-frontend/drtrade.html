@@ -100,7 +100,9 @@
         }
       }
 
-      // Auto-fetch liquidity every 10 seconds
+      // Auto-fetch liquidity every 1000 seconds
+      setInterval(updateLiquidity, 1000000);
+
 
       document.getElementById("checkLiquidityButton").addEventListener("click", async function() {
         const amount = document.getElementById("drtAmount").value.trim();
