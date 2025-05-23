@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DRT Vault UI</title>
+</head>
+<body>
+  <h1>DRTv1 Trading</h1>
+  <button onclick="connectWallet()">Connect Wallet</button>
+  <p id="walletAddress"></p>
+
+  <input type="text" id="buyAmount" placeholder="ETH to spend">
+  <button onclick="buy()">Buy DRTv1</button>
+
+  <input type="text" id="sellAmount" placeholder="DRTv1 to sell">
+  <button onclick="sell()">Sell DRTv1</button>
+  <button onclick="fetchBalances()">Get Balances</button>
+
+  <p id="status"></p>
+
+  <script>
+    let wallet;
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        wallet = accounts[0];
+        document.getElementById('walletAddress').innerText = `Connected: ${wallet}`;
+      } else {
+        alert('Install MetaMask');
+      }
+    }
+
+    async function buy() {
+      const ethAmount = document.getElementById("buyAmount").value;
+      const res = await fetch("http://localhost:3000/api/trade/buyDRTv1", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userAddress: wallet, ethAmount }),
+      });
+      const data = await res.json();
+      document.getElementById("status").innerText = data.success ? `Tx: ${data.txHash}` : data.error;
+    }
+
+    async function sell() {
+      const tokenAmount = document.getElementById("sellAmount").value;
+      const res = await fetch("http://localhost:3000/api/trade/sellDRTv1", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userAddress: wallet, tokenAmount }),
+      });
+      const data = await res.json();
+      document.getElementById("status").innerText = data.success ? `Tx: ${data.txHash}` : data.error;
+    }
+
+    async function fetchBalances() {
+      const res = await fetch(`http://localhost:3000/api/balance/${wallet}`);
+      const data = await res.json();
+      if (data.success) {
+        const { eth, sETH, dRTv1, dRTv2 } = data.balances;
+        document.getElementById("status").innerText = 
+          `ETH: ${eth}\nsETH: ${sETH}\ndRTv1: ${dRTv1}\ndRTv2: ${dRTv2}`;
+      } else {
+        document.getElementById("status").innerText = `Error: ${data.error}`;
+      }
+    }
+  </script>
+</body>
+</html>
