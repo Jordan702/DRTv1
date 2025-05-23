@@ -89,7 +89,7 @@
 
     async function buy() {
       const ethAmount = document.getElementById("buyAmount").value;
-      const res = await fetch("http://localhost:3000/api/trade/buyDRTv1", {
+      const res = await fetch("https://drtv1-backend.onrender.com/api/trade/buyDRTv1", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userAddress: wallet, ethAmount }),
@@ -100,7 +100,7 @@
 
     async function sell() {
       const tokenAmount = document.getElementById("sellAmount").value;
-      const res = await fetch("http://localhost:3000/api/trade/sellDRTv1", {
+      const res = await fetch("https://drtv1-backend.onrender.com/api/trade/sellDRTv1", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userAddress: wallet, tokenAmount }),
@@ -110,7 +110,7 @@
     }
 
     async function fetchBalances() {
-      const res = await fetch(`http://localhost:3000/api/balance/${wallet}`);
+      const res = await fetch(`https://drtv1-backend.onrender.com/api/balance/${wallet}`);
       const data = await res.json();
       if (data.success) {
         const { eth, sETH, dRTv1, dRTv2 } = data.balances;
