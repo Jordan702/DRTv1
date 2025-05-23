@@ -1,0 +1,335 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amountETH",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "minDRTv1",
+				"type": "uint256"
+			}
+		],
+		"name": "buyDRTv1",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amountETH",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "minDRTv2",
+				"type": "uint256"
+			}
+		],
+		"name": "buyDRTv2",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_swapRouter",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_poolManager",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_sETHToken",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_dRTv1Token",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_dRTv2Token",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "buyer",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amountETH",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amountDRTv1",
+				"type": "uint256"
+			}
+		],
+		"name": "DRTv1Bought",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "seller",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amountDRTv1",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amountETH",
+				"type": "uint256"
+			}
+		],
+		"name": "DRTv1Sold",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "buyer",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amountETH",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amountDRTv2",
+				"type": "uint256"
+			}
+		],
+		"name": "DRTv2Bought",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "seller",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amountDRTv2",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amountETH",
+				"type": "uint256"
+			}
+		],
+		"name": "DRTv2Sold",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amountDRTv1",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "minETH",
+				"type": "uint256"
+			}
+		],
+		"name": "sellDRTv1",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "amountDRTv2",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "minETH",
+				"type": "uint256"
+			}
+		],
+		"name": "sellDRTv2",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "drtv1SETHFee",
+		"outputs": [
+			{
+				"internalType": "uint24",
+				"name": "",
+				"type": "uint24"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "dRTv1Token",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "drtv2SETHFee",
+		"outputs": [
+			{
+				"internalType": "uint24",
+				"name": "",
+				"type": "uint24"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "dRTv2Token",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "ethSETHFee",
+		"outputs": [
+			{
+				"internalType": "uint24",
+				"name": "",
+				"type": "uint24"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "MINT_MULTIPLIER",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "poolManager",
+		"outputs": [
+			{
+				"internalType": "contract ILiquidityPoolManager",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "sETHToken",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "swapRouter",
+		"outputs": [
+			{
+				"internalType": "contract ISwapRouter",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
