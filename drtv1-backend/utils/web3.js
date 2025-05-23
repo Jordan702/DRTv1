@@ -1,6 +1,6 @@
 require("dotenv").config();
 const { ethers } = require('ethers');
-const vaultAbi = require('../abi/DRTVaultV3.json');
+const vaultAbi = require('../abi/DRTVaultV3_abi.json');
 
 const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
