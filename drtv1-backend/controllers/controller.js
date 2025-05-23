@@ -1,4 +1,5 @@
 // controller.js
+require('dotenv').config({ path: './.env' });
 const Web3 = require('web3');
 const abi = require('./abi/DRTSwapRouter_abi.json'); // export contract ABI here
 
