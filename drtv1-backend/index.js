@@ -10,6 +10,8 @@ const drtradeRoutes = require("./routes/drtradeRoute"); // Trade routes (liquidi
 const submitRoute = require("./routes/submit");
 const vaultRoutes = require("./routes/vaultRoutes");
 const transactionsRoute = require("./routes/transactions");
+const tradeRoutes = require('./routes/tradeRoutes');
+const balanceRoutes = require('./routes/balanceRoutes');
 
 const app = express();
 
@@ -43,6 +45,8 @@ app.use("/api/transactions", transactionsRoute);
 app.use("/api/swap", drtradeRoutes); // Trade endpoints
 app.use("/api/verify", submitRoute);
 app.use("/api/vault", vaultRoutes);
+app.use('/api/trade', tradeRoutes);
+app.use('/api/balance', balanceRoutes);
 
 // ✅ Liquidity Data API Route
 app.get("/api/liquidity", async (req, res) => {
