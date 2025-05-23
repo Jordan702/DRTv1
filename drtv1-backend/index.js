@@ -5,13 +5,13 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// Import routes
-const drtradeRoutes = require("./routes/drtradeRoute"); // Trade routes (liquidity check & execution)
+// Import routes (make sure these files exist and export valid Express routers)
+const drtradeRoutes = require("./routes/drtradeRoute"); // Trade endpoints (liquidity check & execution)
 const submitRoute = require("./routes/submit");
 const vaultRoutes = require("./routes/vaultRoutes");
 const transactionsRoute = require("./routes/transactions");
-const tradeRoutes = require('./routes/tradeRoutes');
-const balanceRoutes = require('./routes/balanceRoutes');
+const tradeRoutes = require("./routes/tradeRoutes");
+const balanceRoutes = require("./routes/balanceRoutes");
 
 const app = express();
 
@@ -29,7 +29,9 @@ app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
 // Ensure logs and uploads directories exist
 const ensureDirectoryExists = (dir) => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
 };
 
 ensureDirectoryExists(path.join(__dirname, "logs"));
@@ -37,16 +39,16 @@ ensureDirectoryExists(path.join(__dirname, "uploads"));
 
 const upload = multer({
   dest: "uploads/",
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB limit
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB file size limit
 });
 
 // ✅ Mount API routes
 app.use("/api/transactions", transactionsRoute);
-app.use("/api/swap", drtradeRoutes); // Trade endpoints
+app.use("/api/swap", drtradeRoutes); // endpoints for liquidity check & execution trade
 app.use("/api/verify", submitRoute);
 app.use("/api/vault", vaultRoutes);
-app.use('/api/trade', tradeRoutes);
-app.use('/api/balance', balanceRoutes);
+app.use("/api/trade", tradeRoutes);
+app.use("/api/balance", balanceRoutes);
 
 // ✅ Liquidity Data API Route
 app.get("/api/liquidity", async (req, res) => {
@@ -65,7 +67,7 @@ app.get("/api/liquidity", async (req, res) => {
 const frontendPath = path.resolve(__dirname, "../drtv1-frontend");
 app.use(express.static(frontendPath));
 
-// ✅ Serve frontend UI pages
+// ✅ Serve frontend UI pages for specific routes
 app.get(["/approve", "/swap"], (req, res) => {
   res.sendFile(path.join(frontendPath, "drtrade.html"));
 });
