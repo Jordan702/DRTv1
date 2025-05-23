@@ -112,8 +112,8 @@
     async function buy() {
       if (!wallet) return alert("Connect wallet first");
 
-      const ethAmount = parseFloat(document.getElementById("buyAmount").value);
-      if (isNaN(ethAmount) || ethAmount <= 0) {
+      const ethAmount = document.getElementById("buyAmount").value.trim();
+      if (!ethAmount || isNaN(ethAmount) || parseFloat(ethAmount) <= 0) {
         return alert("Enter a valid ETH amount");
       }
 
@@ -122,7 +122,7 @@
       const res = await fetch("https://drtv1-backend.onrender.com/api/trade/buyDRTv1", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userAddress: wallet, ethAmount }),
+        body: JSON.stringify({ userAddress: wallet, ethAmount }), // send as string
       });
 
       const data = await res.json();
@@ -137,8 +137,8 @@
     async function sell() {
       if (!wallet) return alert("Connect wallet first");
 
-      const tokenAmount = parseFloat(document.getElementById("sellAmount").value);
-      if (isNaN(tokenAmount) || tokenAmount <= 0) {
+      const tokenAmount = document.getElementById("sellAmount").value.trim();
+      if (!tokenAmount || isNaN(tokenAmount) || parseFloat(tokenAmount) <= 0) {
         return alert("Enter a valid DRTv1 amount");
       }
 
@@ -147,7 +147,7 @@
       const res = await fetch("https://drtv1-backend.onrender.com/api/trade/sellDRTv1", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userAddress: wallet, tokenAmount }),
+        body: JSON.stringify({ userAddress: wallet, tokenAmount }), // send as string
       });
 
       const data = await res.json();
