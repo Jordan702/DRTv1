@@ -1,28 +1,27 @@
-REMIX DEFAULT WORKSPACE
 
-Remix default workspace is present when:
-i. Remix loads for the very first time 
-ii. A new workspace is created with 'Default' template
-iii. There are no files existing in the File Explorer
+DRT Ecosystem Evidence Package
 
-This workspace contains 3 directories:
+Structure:
 
-1. 'contracts': Holds three contracts with increasing levels of complexity.
-2. 'scripts': Contains four typescript files to deploy a contract. It is explained below.
-3. 'tests': Contains one Solidity test file for 'Ballot' contract & one JS test file for 'Storage' contract.
+I. Core Documentation
+- DRT_Ecosystem_Due_Diligence_With_Logos.pdf
+- DRT_Ecosystem_ProofLedger_FullAudit.pdf
+- Gmail - Follow-Up_DRTv1_DRTv2.pdf
 
-SCRIPTS
+II. Data_and_Logs/
+- DRT_Ecosystem_Complete_Transaction_Hash_Index.csv
+- DRT_Liquidity_Pool_Tracking.csv
+- DRT_Swap_Log_Proof.pdf
+- DRT_Founder_Interaction_Log.csv
 
-The 'scripts' folder has four typescript files which help to deploy the 'Storage' contract using 'web3.js' and 'ethers.js' libraries.
+III. Visual_Proofs/
+- DRT_Ecosystem_Visual_Proof_Appendix.pdf
+- DRT_Price_Correlation_Matrix.png
+- DRT_Impermanent_Loss_Simulation.png
+- DRT_SwapRouter_Price_Stabilization.png
 
-For the deployment of any other contract, just update the contract name from 'Storage' to the desired contract and provide constructor arguments accordingly 
-in the file `deploy_with_ethers.ts` or  `deploy_with_web3.ts`
+IV. Smart_Contracts/
+(Optional: Include raw contract source code here.)
 
-In the 'tests' folder there is a script containing Mocha-Chai unit tests for 'Storage' contract.
-
-To run a script, right click on file name in the file explorer and click 'Run'. Remember, Solidity file must already be compiled.
-Output from script will appear in remix terminal.
-
-Please note, require/import is supported in a limited manner for Remix supported modules.
-For now, modules supported by Remix are ethers, web3, swarmgw, chai, multihashes, remix and hardhat only for hardhat.ethers object/plugin.
-For unsupported modules, an error like this will be thrown: '<module_name> module require is not supported by Remix IDE' will be shown.
+Instructions:
+Start by reading DRT_Ecosystem_Due_Diligence_With_Logos.pdf. Then consult the audit and logs for deeper verification.
