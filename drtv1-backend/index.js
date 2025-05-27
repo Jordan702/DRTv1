@@ -91,14 +91,14 @@ app.get("/api/dashboard", (req, res) => {
   }
 });
 
-app.get("/api/redemptions", (req, res) => {
-  const logPath = path.resolve(__dirname, "logs/redemptions.json");
+app.get("/api/swap", (req, res) => {
+  const logPath = path.resolve(__dirname, "logs/swap.json");
   try {
     const logs = fs.existsSync(logPath) ? JSON.parse(fs.readFileSync(logPath)) : [];
     res.json(logs);
   } catch (err) {
     res.status(500).json({
-      error: "Failed to load redemption logs",
+      error: "Failed to load swap logs",
       details: err.message,
     });
   }
