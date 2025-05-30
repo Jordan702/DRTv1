@@ -75,28 +75,56 @@
       { pair: "sETH / DRTv2", address: "0xcf16af815808bd58b19403237c1a819684e6ac84" }
     ];
 
+    async function getTokenDecimals(address, provider) {
+      const erc20 = new ethers.Contract(address, ["function decimals() view returns (uint8)"], provider);
+      return await erc20.decimals();
+    }
+
     async function loadPools() {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const poolTable = document.getElementById('poolTable');
 
       for (let pool of POOLS) {
-        let price = "Fetching...";
+        let priceDisplay = "Loading...";
         try {
-          const contract = new ethers.Contract(pool.address, ["function slot0() view returns (uint160 sqrtPriceX96, int24, uint16, uint16, uint16, uint8, bool)", "function token0() view returns (address)", "function token1() view returns (address)"], provider);
-          const slot0 = await contract.slot0();
-          const sqrtPriceX96 = slot0[0];
-          const priceFormatted = (sqrtPriceX96 / (2 ** 96)) ** 2;
-          price = priceFormatted.toFixed(8);
+          const contract = new ethers.Contract(
+            pool.address,
+            [
+              "function slot0() view returns (uint160 sqrtPriceX96, int24, uint16, uint16, uint16, uint8, bool)",
+              "function token0() view returns (address)",
+              "function token1() view returns (address)"
+            ],
+            provider
+          );
+
+          const [sqrtPriceX96, , , , , , ] = await contract.slot0();
+          const token0 = await contract.token0();
+          const token1 = await contract.token1();
+
+          const [dec0, dec1] = await Promise.all([
+            getTokenDecimals(token0, provider),
+            getTokenDecimals(token1, provider)
+          ]);
+
+          const ratio = sqrtPriceX96 / (2 ** 96);
+          let price = (ratio ** 2);
+
+          // Assume ETH is always token1 (denominator)
+          if (token0.toLowerCase() > token1.toLowerCase()) {
+            price = 1 / price;
+          }
+
+          priceDisplay = price.toFixed(8);
         } catch (err) {
-          console.error("Error fetching slot0 for", pool.pair, err);
-          price = "Error";
+          console.error("Error loading pool data for", pool.pair, err);
+          priceDisplay = "Error";
         }
 
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${pool.pair}</td>
           <td><a href="https://etherscan.io/address/${pool.address}" target="_blank">${pool.address}</a></td>
-          <td>${price}</td>
+          <td>${priceDisplay}</td>
         `;
         poolTable.appendChild(row);
       }
