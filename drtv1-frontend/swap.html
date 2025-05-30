@@ -26,12 +26,13 @@
   <h1>DRT Liquidity Pools & Swap Portal</h1>
 
   <div class="section">
-    <h2>Liquidity Pools</h2>
+    <h2>Liquidity Pools (Live Data)</h2>
     <table>
       <thead>
         <tr>
           <th>Token Pair</th>
           <th>Pool Address</th>
+          <th>Current Price (ETH)</th>
         </tr>
       </thead>
       <tbody id="poolTable"></tbody>
@@ -65,25 +66,40 @@
   </div>
 
   <script>
-    async function loadPools() {
-      const pools = [
-        { pair: "DRTv1 / ETH", address: "0xe1c76fbf1b373165822b564c6f3accf78c5a344a" },
-        { pair: "DRTv2 / ETH", address: "0x732715C246A0A887e976c7c1145FbDec3FC646ac" },
-        { pair: "DRTv1 / DRTv2", address: "0x6e5A733D0BA2F3Ec150aC6e5DC08be8C58BED41d" },
-        { pair: "sETH / ETH", address: "0x60446ef0d652d9ca6c6a379945ac9096521da29a" },
-        { pair: "sETH / DRTv1", address: "0xeb86279439b667ca70fd1bda7460cd8f92ae5e35" },
-        { pair: "sETH / DRTv2", address: "0xcf16af815808bd58b19403237c1a819684e6ac84" }
-      ];
+    const POOLS = [
+      { pair: "DRTv1 / ETH", address: "0xe1c76fbf1b373165822b564c6f3accf78c5a344a" },
+      { pair: "DRTv2 / ETH", address: "0x732715C246A0A887e976c7c1145FbDec3FC646ac" },
+      { pair: "DRTv1 / DRTv2", address: "0x6e5A733D0BA2F3Ec150aC6e5DC08be8C58BED41d" },
+      { pair: "sETH / ETH", address: "0x60446ef0d652d9ca6c6a379945ac9096521da29a" },
+      { pair: "sETH / DRTv1", address: "0xeb86279439b667ca70fd1bda7460cd8f92ae5e35" },
+      { pair: "sETH / DRTv2", address: "0xcf16af815808bd58b19403237c1a819684e6ac84" }
+    ];
 
+    async function loadPools() {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
       const poolTable = document.getElementById('poolTable');
-      pools.forEach(pool => {
+
+      for (let pool of POOLS) {
+        let price = "Fetching...";
+        try {
+          const contract = new ethers.Contract(pool.address, ["function slot0() view returns (uint160 sqrtPriceX96, int24, uint16, uint16, uint16, uint8, bool)", "function token0() view returns (address)", "function token1() view returns (address)"], provider);
+          const slot0 = await contract.slot0();
+          const sqrtPriceX96 = slot0[0];
+          const priceFormatted = (sqrtPriceX96 / (2 ** 96)) ** 2;
+          price = priceFormatted.toFixed(8);
+        } catch (err) {
+          console.error("Error fetching slot0 for", pool.pair, err);
+          price = "Error";
+        }
+
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${pool.pair}</td>
           <td><a href="https://etherscan.io/address/${pool.address}" target="_blank">${pool.address}</a></td>
+          <td>${price}</td>
         `;
         poolTable.appendChild(row);
-      });
+      }
     }
 
     let web3;
