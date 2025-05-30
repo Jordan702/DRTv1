@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DRT Swap Portal</title>
+  <title>DRT Liquidity Pools & Swap Portal</title>
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .section { margin-bottom: 30px; }
+    body { font-family: Arial, sans-serif; background: #111; color: #eee; padding: 20px; }
+    h1, h2 { color: #4efcbf; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #444; padding: 12px; text-align: left; }
+    th { background-color: #333; }
+    tr:nth-child(even) { background-color: #222; }
+    .section { margin-top: 40px; }
     button { padding: 10px 20px; cursor: pointer; }
     .status { margin-top: 10px; font-weight: bold; }
     .success { color: green; }
@@ -17,7 +23,20 @@
 </head>
 <body>
   <img src="./DRTv1 Logo.png" alt="DRT Logo" style="height: 60px; margin-bottom: 20px;" />
-  <h1>DRT Swap Portal</h1>
+  <h1>DRT Liquidity Pools & Swap Portal</h1>
+
+  <div class="section">
+    <h2>Liquidity Pools</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Token Pair</th>
+          <th>Pool Address</th>
+        </tr>
+      </thead>
+      <tbody id="poolTable"></tbody>
+    </table>
+  </div>
 
   <div class="section">
     <h2>Connect Wallet</h2>
@@ -46,12 +65,34 @@
   </div>
 
   <script>
+    async function loadPools() {
+      const pools = [
+        { pair: "DRTv1 / ETH", address: "0xe1c76fbf1b373165822b564c6f3accf78c5a344a" },
+        { pair: "DRTv2 / ETH", address: "0x732715C246A0A887e976c7c1145FbDec3FC646ac" },
+        { pair: "DRTv1 / DRTv2", address: "0x6e5A733D0BA2F3Ec150aC6e5DC08be8C58BED41d" },
+        { pair: "sETH / ETH", address: "0x60446ef0d652d9ca6c6a379945ac9096521da29a" },
+        { pair: "sETH / DRTv1", address: "0xeb86279439b667ca70fd1bda7460cd8f92ae5e35" },
+        { pair: "sETH / DRTv2", address: "0xcf16af815808bd58b19403237c1a819684e6ac84" }
+      ];
+
+      const poolTable = document.getElementById('poolTable');
+      pools.forEach(pool => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${pool.pair}</td>
+          <td><a href="https://etherscan.io/address/${pool.address}" target="_blank">${pool.address}</a></td>
+        `;
+        poolTable.appendChild(row);
+      });
+    }
+
     let web3;
     let contract;
     const contractAddress = '0xFDEc4fAB69a8d87E9F20F0dE75C6B3b8A15E774b';
     let contractABI = [];
 
     window.onload = async () => {
+      await loadPools();
       try {
         const response = await fetch('./DRTSwapRouter_abi.json');
         contractABI = await response.json();
