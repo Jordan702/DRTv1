@@ -26,16 +26,22 @@
   <h1>DRT Liquidity Pools & Swap Portal</h1>
 
   <div class="section">
-    <h2>Liquidity Pools (Live Data)</h2>
+    <h2>Liquidity Pools (Etherscan Links)</h2>
     <table>
       <thead>
         <tr>
           <th>Token Pair</th>
           <th>Pool Address</th>
-          <th>Current Price (ETH)</th>
         </tr>
       </thead>
-      <tbody id="poolTable"></tbody>
+      <tbody>
+        <tr><td>DRTv1 / ETH</td><td><a href="https://etherscan.io/address/0xe1c76fbf1b373165822b564c6f3accf78c5a344a" target="_blank">0xe1c7...344a</a></td></tr>
+        <tr><td>DRTv2 / ETH</td><td><a href="https://etherscan.io/address/0x732715C246A0A887e976c7c1145FbDec3FC646ac" target="_blank">0x7327...46ac</a></td></tr>
+        <tr><td>DRTv1 / DRTv2</td><td><a href="https://etherscan.io/address/0x6e5A733D0BA2F3Ec150aC6e5DC08be8C58BED41d" target="_blank">0x6e5A...41d</a></td></tr>
+        <tr><td>sETH / ETH</td><td><a href="https://etherscan.io/address/0x60446ef0d652d9ca6c6a379945ac9096521da29a" target="_blank">0x6044...29a</a></td></tr>
+        <tr><td>sETH / DRTv1</td><td><a href="https://etherscan.io/address/0xeb86279439b667ca70fd1bda7460cd8f92ae5e35" target="_blank">0xeb86...5e35</a></td></tr>
+        <tr><td>sETH / DRTv2</td><td><a href="https://etherscan.io/address/0xcf16af815808bd58b19403237c1a819684e6ac84" target="_blank">0xcf16...ac84</a></td></tr>
+      </tbody>
     </table>
   </div>
 
@@ -66,77 +72,12 @@
   </div>
 
   <script>
-    const POOLS = [
-      { pair: "DRTv1 / ETH", address: "0xe1c76fbf1b373165822b564c6f3accf78c5a344a" },
-      { pair: "DRTv2 / ETH", address: "0x732715C246A0A887e976c7c1145FbDec3FC646ac" },
-      { pair: "DRTv1 / DRTv2", address: "0x6e5A733D0BA2F3Ec150aC6e5DC08be8C58BED41d" },
-      { pair: "sETH / ETH", address: "0x60446ef0d652d9ca6c6a379945ac9096521da29a" },
-      { pair: "sETH / DRTv1", address: "0xeb86279439b667ca70fd1bda7460cd8f92ae5e35" },
-      { pair: "sETH / DRTv2", address: "0xcf16af815808bd58b19403237c1a819684e6ac84" }
-    ];
-
-    async function getTokenDecimals(address, provider) {
-      const erc20 = new ethers.Contract(address, ["function decimals() view returns (uint8)"], provider);
-      return await erc20.decimals();
-    }
-
-    async function loadPools() {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const poolTable = document.getElementById('poolTable');
-
-      for (let pool of POOLS) {
-        let priceDisplay = "Loading...";
-        try {
-          const contract = new ethers.Contract(
-            pool.address,
-            [
-              "function slot0() view returns (uint160 sqrtPriceX96, int24, uint16, uint16, uint16, uint8, bool)",
-              "function token0() view returns (address)",
-              "function token1() view returns (address)"
-            ],
-            provider
-          );
-
-          const [sqrtPriceX96, , , , , , ] = await contract.slot0();
-          const token0 = await contract.token0();
-          const token1 = await contract.token1();
-
-          const [dec0, dec1] = await Promise.all([
-            getTokenDecimals(token0, provider),
-            getTokenDecimals(token1, provider)
-          ]);
-
-          const ratio = sqrtPriceX96 / (2 ** 96);
-          let price = (ratio ** 2);
-
-          // Assume ETH is always token1 (denominator)
-          if (token0.toLowerCase() > token1.toLowerCase()) {
-            price = 1 / price;
-          }
-
-          priceDisplay = price.toFixed(8);
-        } catch (err) {
-          console.error("Error loading pool data for", pool.pair, err);
-          priceDisplay = "Error";
-        }
-
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${pool.pair}</td>
-          <td><a href="https://etherscan.io/address/${pool.address}" target="_blank">${pool.address}</a></td>
-          <td>${priceDisplay}</td>
-        `;
-        poolTable.appendChild(row);
-      }
-    }
-
     let web3;
     let contract;
     const contractAddress = '0xFDEc4fAB69a8d87E9F20F0dE75C6B3b8A15E774b';
     let contractABI = [];
 
     window.onload = async () => {
-      await loadPools();
       try {
         const response = await fetch('./DRTSwapRouter_abi.json');
         contractABI = await response.json();
