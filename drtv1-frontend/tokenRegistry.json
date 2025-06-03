@@ -1,14 +1,122 @@
 [
-  { "name": "Uniswap", "symbol": "UNI", "address": "0xUniswap", "ipfs_cid": "QmUni", "drt_bridge": "DRTv1", "founder": "Hayden Adams" },
-  { "name": "Chainlink", "symbol": "LINK", "address": "0xChainlink", "ipfs_cid": "QmLink", "drt_bridge": "DRTv2", "founder": "Sergey Nazarov" },
-  { "name": "Aave", "symbol": "AAVE", "address": "0xAave", "ipfs_cid": "QmAave", "drt_bridge": "DRTv1", "founder": "Stani Kulechov" },
-  { "name": "The Graph", "symbol": "GRT", "address": "0xGraph", "ipfs_cid": "QmGraph", "drt_bridge": "DRTv1", "founder": "Yaniv Tal" },
-  { "name": "Balancer", "symbol": "BAL", "address": "0xBalancer", "ipfs_cid": "QmBal", "drt_bridge": "DRTv2", "founder": "Fernando Martinelli" },
-  { "name": "Synthetix", "symbol": "SNX", "address": "0xSynthetix", "ipfs_cid": "QmSnx", "drt_bridge": "DRTv1", "founder": "Kain Warwick" },
-  { "name": "Maker", "symbol": "MKR", "address": "0xMaker", "ipfs_cid": "QmMkr", "drt_bridge": "DRTv2", "founder": "Rune Christensen" },
-  { "name": "Lido DAO", "symbol": "LDO", "address": "0xLido", "ipfs_cid": "QmLido", "drt_bridge": "DRTv2", "founder": "VASILY SHAPOSHNIKOV" },
-  { "name": "0x Protocol", "symbol": "ZRX", "address": "0xZrx", "ipfs_cid": "QmZrx", "drt_bridge": "DRTv1", "founder": "Will Warren" },
-  { "name": "ENS", "symbol": "ENS", "address": "0xEns", "ipfs_cid": "QmEns", "drt_bridge": "DRTv2", "founder": "Nick Johnson" },
-  { "name": "Ocean Protocol", "symbol": "OCEAN", "address": "0xOcean", "ipfs_cid": "QmOcean", "drt_bridge": "DRTv2", "founder": "Trent McConaghy" },
-  { "name": "Biconomy", "symbol": "BICO", "address": "0xBico", "ipfs_cid": "QmBico", "drt_bridge": "DRTv1", "founder": "Ahmed Al-Balaghi" }
+  {
+    "name": "0x",
+    "ticker": "ZRX",
+    "address": "0xe41d2489571d322189246dafa5ebde1f4699f498",
+    "ipfs_cid": "bafybeihs...0x",
+    "founder": "Will Warren",
+    "logo": "0x.bin.webp"
+  },
+  {
+    "name": "Balancer",
+    "ticker": "BAL",
+    "address": "0xba100000625a3754423978a60c9317c58a424e3D",
+    "ipfs_cid": "bafybeihs...bal",
+    "founder": "Fernando Martinelli",
+    "logo": "Balancer.bin.webp"
+  },
+  {
+    "name": "The Graph",
+    "ticker": "GRT",
+    "address": "0xc944e90c64b2c07662a292be6244bdf05cda44a7",
+    "ipfs_cid": "bafybeihs...grt",
+    "founder": "Yaniv Tal",
+    "logo": "Graph_Token.bin.webp"
+  },
+  {
+    "name": "Lido DAO",
+    "ticker": "LDO",
+    "address": "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
+    "ipfs_cid": "bafybeihs...ldo",
+    "founder": "Lido Team",
+    "logo": "Lido_DAO.webp"
+  },
+  {
+    "name": "MakerDAO",
+    "ticker": "MKR",
+    "address": "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2",
+    "ipfs_cid": "bafybeihs...mkr",
+    "founder": "Rune Christensen",
+    "logo": "Mark_Maker.bin.webp"
+  },
+  {
+    "name": "Synthetix",
+    "ticker": "SNX",
+    "address": "0xc011a72400e58ecd99ee497cf89e3775d4bd732f",
+    "ipfs_cid": "bafybeihs...snx",
+    "founder": "Kain Warwick",
+    "logo": "SNX.webp"
+  },
+  {
+    "name": "Aave",
+    "ticker": "AAVE",
+    "address": "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
+    "ipfs_cid": "bafybeihs...aave",
+    "founder": "Stani Kulechov",
+    "logo": "aave-token-round.bin.webp"
+  },
+  {
+    "name": "Biconomy",
+    "ticker": "BICO",
+    "address": "0xf17e65822b568b3903685a7c9f496cf7656cc6c2",
+    "ipfs_cid": "bafybeihs...bico",
+    "founder": "Ahmed Al-Balaghi",
+    "logo": "biconomy_logo.bin.webp"
+  },
+  {
+    "name": "Chainlink",
+    "ticker": "LINK",
+    "address": "0x514910771af9ca656af840dff83e8264ecf986ca",
+    "ipfs_cid": "bafybeihs...link",
+    "founder": "Sergey Nazarov",
+    "logo": "chainlink-new-logo.png"
+  },
+  {
+    "name": "Ocean Protocol",
+    "ticker": "OCEAN",
+    "address": "0x967da4048cd07ab37855c090aaf366e4ce1b9f48",
+    "ipfs_cid": "bafybeihs...ocean",
+    "founder": "Trent McConaghy",
+    "logo": "ocean-protocol-logo.webp"
+  },
+  {
+    "name": "Ethereum Name Service",
+    "ticker": "ENS",
+    "address": "0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85",
+    "ipfs_cid": "bafybeihs...ens",
+    "founder": "Nick Johnson",
+    "logo": "ENS.bin.webp"
+  },
+  {
+    "name": "Uniswap",
+    "ticker": "UNI",
+    "address": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+    "ipfs_cid": "bafybeihs...uni",
+    "founder": "Hayden Adams",
+    "logo": "image.webp"
+  },
+  {
+    "name": "DRTv1",
+    "ticker": "DRTV1",
+    "address": "0xYourDRTv1AddressHere",
+    "ipfs_cid": "bafybeidrtv1examplecid",
+    "founder": "Jordan Schwartz",
+    "logo": "logo.png"
+  },
+  {
+    "name": "DRTv2",
+    "ticker": "DRTV2",
+    "address": "0x732715C246A0A887e976c7c1145FbDec3FC646ac",
+    "ipfs_cid": "bafybeibdrtv2examplecid",
+    "founder": "Jordan Schwartz",
+    "logo": "DRTv2Logo.png"
+  },
+  {
+    "name": "Synthetic ETH",
+    "ticker": "sETH",
+    "address": "0x60446ef0d652d9ca6c6a379945ac9096521da29a",
+    "ipfs_cid": "bafybeibsethexamplecid",
+    "founder": "DRT Mesh",
+    "logo": "sETH_Logo_200x200.png"
+  }
 ]
