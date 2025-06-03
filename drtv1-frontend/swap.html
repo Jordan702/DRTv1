@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DRT Liquidity Pools & Swap Portal</title>
   <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
@@ -26,6 +26,23 @@
 <body>
   <img src="./DRTv1 Logo.png" alt="DRT Logo" style="height: 60px; margin-bottom: 20px;" />
   <h1>DRT Liquidity Pools & Swap Portal</h1>
+
+  <div class="section">
+    <h2>Registered Mesh Tokens</h2>
+    <table id="registryTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Ticker</th>
+          <th>Address</th>
+          <th>Founder</th>
+          <th>IPFS CID</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <div class="section">
     <h2>Liquidity Pools (Token Info & Etherscan)</h2>
@@ -97,7 +114,33 @@
     const contractAddress = '0xFDEc4fAB69a8d87E9F20F0dE75C6B3b8A15E774b';
     let contractABI = [];
 
+    async function loadRegistry() {
+      try {
+        const res = await fetch('./tokenRegistry.json');
+        const registry = await res.json();
+        const tableBody = document.querySelector("#registryTable tbody");
+
+        registry.sort((a, b) => a.name.localeCompare(b.name));
+
+        registry.forEach((token, index) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td><a href="./tokeninfo.html#${token.name}" target="_blank">${token.name}</a></td>
+            <td>${token.ticker}</td>
+            <td><a href="https://etherscan.io/address/${token.address}" target="_blank">${token.address.slice(0, 6)}...${token.address.slice(-4)}</a></td>
+            <td>${token.founder || 'N/A'}</td>
+            <td>${token.ipfs_cid || 'N/A'}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      } catch (err) {
+        console.error("Failed to load token registry:", err);
+      }
+    }
+
     window.onload = async () => {
+      await loadRegistry();
       try {
         const response = await fetch('./DRTSwapRouter_abi.json');
         contractABI = await response.json();
