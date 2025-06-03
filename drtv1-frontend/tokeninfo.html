@@ -1,0 +1,42 @@
+<!-- tokeninfo.html (Updated with DRTv1, DRTv2, sETH logo support and generic logo fallback) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token Info</title>
+  <style>
+    body { background: #111; color: #eee; font-family: Arial, sans-serif; padding: 20px; }
+    h1 { color: #4efcbf; }
+    .info { margin-top: 20px; }
+    img.logo { width: 50px; height: 50px; margin-right: 10px; vertical-align: middle; border-radius: 8px; background: #fff; }
+  </style>
+</head>
+<body>
+  <h1>Token Details</h1>
+  <div class="info" id="tokenDetails">Loading...</div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const symbol = params.get('token');
+
+    fetch('./tokenRegistry.json')
+      .then(res => res.json())
+      .then(data => {
+        const token = data.find(t => t.symbol.toUpperCase() === symbol.toUpperCase());
+        if (token) {
+          const logoPath = `./logos/${token.symbol.toUpperCase()}.png`;
+          document.getElementById('tokenDetails').innerHTML = `
+            <h2><img class="logo" src="${logoPath}" alt="${token.symbol} logo" onerror="this.src='./logos/default.png'"> ${token.name} (${token.symbol})</h2>
+            <p><strong>Address:</strong> ${token.address}</p>
+            <p><strong>DRT Bridge:</strong> ${token.drt_bridge}</p>
+            <p><strong>IPFS CID:</strong> ${token.ipfs_cid}</p>
+            <p><strong>Founder:</strong> ${token.founder}</p>
+          `;
+        } else {
+          document.getElementById('tokenDetails').innerText = 'Token not found.';
+        }
+      });
+  </script>
+</body>
+</html>
