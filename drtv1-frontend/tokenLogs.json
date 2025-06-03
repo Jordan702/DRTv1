@@ -1,0 +1,8 @@
+[
+  { "timestamp": "2025-07-04T00:00:00Z", "token": "UNI", "paired_with": "AAVE", "bridge": "DRTv1" },
+  { "timestamp": "2025-07-04T00:00:00Z", "token": "LINK", "paired_with": "GRT", "bridge": "DRTv2" },
+  { "timestamp": "2025-07-04T00:00:00Z", "token": "BAL", "paired_with": "LDO", "bridge": "DRTv2" },
+  { "timestamp": "2025-07-04T00:00:00Z", "token": "SNX", "paired_with": "MKR", "bridge": "DRTv1" },
+  { "timestamp": "2025-07-04T00:00:00Z", "token": "OCEAN", "paired_with": "BICO", "bridge": "DRTv1" },
+  { "timestamp": "2025-07-04T00:00:00Z", "token": "ZRX", "paired_with": "ENS", "bridge": "DRTv2" }
+]
