@@ -1,0 +1,14 @@
+[
+  { "name": "Uniswap", "symbol": "UNI", "address": "0xUniswap", "ipfs_cid": "QmUni", "drt_bridge": "DRTv1", "founder": "Hayden Adams" },
+  { "name": "Chainlink", "symbol": "LINK", "address": "0xChainlink", "ipfs_cid": "QmLink", "drt_bridge": "DRTv2", "founder": "Sergey Nazarov" },
+  { "name": "Aave", "symbol": "AAVE", "address": "0xAave", "ipfs_cid": "QmAave", "drt_bridge": "DRTv1", "founder": "Stani Kulechov" },
+  { "name": "The Graph", "symbol": "GRT", "address": "0xGraph", "ipfs_cid": "QmGraph", "drt_bridge": "DRTv1", "founder": "Yaniv Tal" },
+  { "name": "Balancer", "symbol": "BAL", "address": "0xBalancer", "ipfs_cid": "QmBal", "drt_bridge": "DRTv2", "founder": "Fernando Martinelli" },
+  { "name": "Synthetix", "symbol": "SNX", "address": "0xSynthetix", "ipfs_cid": "QmSnx", "drt_bridge": "DRTv1", "founder": "Kain Warwick" },
+  { "name": "Maker", "symbol": "MKR", "address": "0xMaker", "ipfs_cid": "QmMkr", "drt_bridge": "DRTv2", "founder": "Rune Christensen" },
+  { "name": "Lido DAO", "symbol": "LDO", "address": "0xLido", "ipfs_cid": "QmLido", "drt_bridge": "DRTv2", "founder": "VASILY SHAPOSHNIKOV" },
+  { "name": "0x Protocol", "symbol": "ZRX", "address": "0xZrx", "ipfs_cid": "QmZrx", "drt_bridge": "DRTv1", "founder": "Will Warren" },
+  { "name": "ENS", "symbol": "ENS", "address": "0xEns", "ipfs_cid": "QmEns", "drt_bridge": "DRTv2", "founder": "Nick Johnson" },
+  { "name": "Ocean Protocol", "symbol": "OCEAN", "address": "0xOcean", "ipfs_cid": "QmOcean", "drt_bridge": "DRTv2", "founder": "Trent McConaghy" },
+  { "name": "Biconomy", "symbol": "BICO", "address": "0xBico", "ipfs_cid": "QmBico", "drt_bridge": "DRTv1", "founder": "Ahmed Al-Balaghi" }
+]
