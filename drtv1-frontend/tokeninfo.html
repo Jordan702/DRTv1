@@ -1,42 +1,36 @@
-<!-- tokeninfo.html (Updated with DRTv1, DRTv2, sETH logo support and generic logo fallback) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Token Info</title>
+  <title>Token Information</title>
   <style>
-    body { background: #111; color: #eee; font-family: Arial, sans-serif; padding: 20px; }
+    body { background-color: #111; color: #eee; font-family: Arial, sans-serif; padding: 20px; }
     h1 { color: #4efcbf; }
-    .info { margin-top: 20px; }
-    img.logo { width: 50px; height: 50px; margin-right: 10px; vertical-align: middle; border-radius: 8px; background: #fff; }
+    .token { border-bottom: 1px solid #444; padding: 10px 0; display: flex; align-items: center; }
+    .token img { width: 40px; height: 40px; margin-right: 10px; background-color: #fff; border-radius: 50%; }
+    .details { display: flex; flex-direction: column; }
+    .details span { margin: 2px 0; }
   </style>
 </head>
 <body>
-  <h1>Token Details</h1>
-  <div class="info" id="tokenDetails">Loading...</div>
+  <h1>Token Information</h1>
 
-  <script>
-    const params = new URLSearchParams(window.location.search);
-    const symbol = params.get('token');
+  <div class="token"><img src="./logos/logo.png" alt="DRTv1 Logo"><div class="details"><span><strong>Name:</strong> DRTv1</span><span><strong>Ticker:</strong> DRTV1</span></div></div>
+  <div class="token"><img src="./logos/DRTv2Logo.png" alt="DRTv2 Logo"><div class="details"><span><strong>Name:</strong> DRTv2</span><span><strong>Ticker:</strong> DRTV2</span></div></div>
+  <div class="token"><img src="./logos/sETH_Logo_200x200.png" alt="sETH Logo"><div class="details"><span><strong>Name:</strong> Synthetic ETH</span><span><strong>Ticker:</strong> sETH</span></div></div>
+  <div class="token"><img src="./logos/0x.bin.webp" alt="0x Logo"><div class="details"><span><strong>Name:</strong> 0x</span><span><strong>Ticker:</strong> ZRX</span></div></div>
+  <div class="token"><img src="./logos/Balancer.bin.webp" alt="Balancer Logo"><div class="details"><span><strong>Name:</strong> Balancer</span><span><strong>Ticker:</strong> BAL</span></div></div>
+  <div class="token"><img src="./logos/ENS.bin.webp" alt="ENS Logo"><div class="details"><span><strong>Name:</strong> Ethereum Name Service</span><span><strong>Ticker:</strong> ENS</span></div></div>
+  <div class="token"><img src="./logos/Graph_Token.bin.webp" alt="Graph Logo"><div class="details"><span><strong>Name:</strong> The Graph</span><span><strong>Ticker:</strong> GRT</span></div></div>
+  <div class="token"><img src="./logos/Lido_DAO.webp" alt="Lido Logo"><div class="details"><span><strong>Name:</strong> Lido DAO</span><span><strong>Ticker:</strong> LDO</span></div></div>
+  <div class="token"><img src="./logos/Mark_Maker.bin.webp" alt="Maker Logo"><div class="details"><span><strong>Name:</strong> Maker</span><span><strong>Ticker:</strong> MKR</span></div></div>
+  <div class="token"><img src="./logos/SNX.webp" alt="Synthetix Logo"><div class="details"><span><strong>Name:</strong> Synthetix</span><span><strong>Ticker:</strong> SNX</span></div></div>
+  <div class="token"><img src="./logos/aave-token-round.bin.webp" alt="AAVE Logo"><div class="details"><span><strong>Name:</strong> Aave</span><span><strong>Ticker:</strong> AAVE</span></div></div>
+  <div class="token"><img src="./logos/biconomy_logo.bin.webp" alt="Biconomy Logo"><div class="details"><span><strong>Name:</strong> Biconomy</span><span><strong>Ticker:</strong> BICO</span></div></div>
+  <div class="token"><img src="./logos/chainlink-new-logo.png" alt="Chainlink Logo"><div class="details"><span><strong>Name:</strong> Chainlink</span><span><strong>Ticker:</strong> LINK</span></div></div>
+  <div class="token"><img src="./logos/ocean-protocol-logo.webp" alt="Ocean Protocol Logo"><div class="details"><span><strong>Name:</strong> Ocean Protocol</span><span><strong>Ticker:</strong> OCEAN</span></div></div>
+  <div class="token"><img src="./logos/image.webp" alt="Uniswap Logo"><div class="details"><span><strong>Name:</strong> Uniswap</span><span><strong>Ticker:</strong> UNI</span></div></div>
 
-    fetch('./tokenRegistry.json')
-      .then(res => res.json())
-      .then(data => {
-        const token = data.find(t => t.symbol.toUpperCase() === symbol.toUpperCase());
-        if (token) {
-          const logoPath = `./logos/${token.symbol.toUpperCase()}.png`;
-          document.getElementById('tokenDetails').innerHTML = `
-            <h2><img class="logo" src="${logoPath}" alt="${token.symbol} logo" onerror="this.src='./logos/default.png'"> ${token.name} (${token.symbol})</h2>
-            <p><strong>Address:</strong> ${token.address}</p>
-            <p><strong>DRT Bridge:</strong> ${token.drt_bridge}</p>
-            <p><strong>IPFS CID:</strong> ${token.ipfs_cid}</p>
-            <p><strong>Founder:</strong> ${token.founder}</p>
-          `;
-        } else {
-          document.getElementById('tokenDetails').innerText = 'Token not found.';
-        }
-      });
-  </script>
 </body>
 </html>
