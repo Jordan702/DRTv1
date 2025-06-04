@@ -1,36 +1,352 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Token Information</title>
-  <style>
-    body { background-color: #111; color: #eee; font-family: Arial, sans-serif; padding: 20px; }
-    h1 { color: #4efcbf; }
-    .token { border-bottom: 1px solid #444; padding: 10px 0; display: flex; align-items: center; }
-    .token img { width: 40px; height: 40px; margin-right: 10px; background-color: #fff; border-radius: 50%; }
-    .details { display: flex; flex-direction: column; }
-    .details span { margin: 2px 0; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Token Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .token-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .token-card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            width: 150px;
+            text-align: center;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+        }
+        .token-logo {
+            max-width: 100px;
+            max-height: 100px;
+            margin-bottom: 10px;
+        }
+        .token-details h2 {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+        .token-details p {
+            margin: 0;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-  <h1>Token Information</h1>
-
-  <div class="token"><img src="./Logos/logo.png" alt="DRTv1 Logo"><div class="details"><span><strong>Name:</strong> DRTv1</span><span><strong>Ticker:</strong> DRTV1</span></div></div>
-  <div class="token"><img src="./Logos/DRTv2Logo.png" alt="DRTv2 Logo"><div class="details"><span><strong>Name:</strong> DRTv2</span><span><strong>Ticker:</strong> DRTV2</span></div></div>
-  <div class="token"><img src="./Logos/sETH_Logo_200x200.png" alt="sETH Logo"><div class="details"><span><strong>Name:</strong> Synthetic ETH</span><span><strong>Ticker:</strong> sETH</span></div></div>
-  <div class="token"><img src="./Logos/0x.bin.webp" alt="0x Logo"><div class="details"><span><strong>Name:</strong> 0x</span><span><strong>Ticker:</strong> ZRX</span></div></div>
-  <div class="token"><img src="./Logos/Balancer.bin.webp" alt="Balancer Logo"><div class="details"><span><strong>Name:</strong> Balancer</span><span><strong>Ticker:</strong> BAL</span></div></div>
-  <div class="token"><img src="./Logos/ENS.bin.webp" alt="ENS Logo"><div class="details"><span><strong>Name:</strong> Ethereum Name Service</span><span><strong>Ticker:</strong> ENS</span></div></div>
-  <div class="token"><img src="./Logos/Graph_Token.bin.webp" alt="Graph Logo"><div class="details"><span><strong>Name:</strong> The Graph</span><span><strong>Ticker:</strong> GRT</span></div></div>
-  <div class="token"><img src="./Logos/Lido_DAO.webp" alt="Lido Logo"><div class="details"><span><strong>Name:</strong> Lido DAO</span><span><strong>Ticker:</strong> LDO</span></div></div>
-  <div class="token"><img src="./Logos/Mark_Maker.bin.webp" alt="Maker Logo"><div class="details"><span><strong>Name:</strong> Maker</span><span><strong>Ticker:</strong> MKR</span></div></div>
-  <div class="token"><img src="./Logos/SNX.webp" alt="Synthetix Logo"><div class="details"><span><strong>Name:</strong> Synthetix</span><span><strong>Ticker:</strong> SNX</span></div></div>
-  <div class="token"><img src="./Logos/aave-token-round.bin.webp" alt="AAVE Logo"><div class="details"><span><strong>Name:</strong> Aave</span><span><strong>Ticker:</strong> AAVE</span></div></div>
-  <div class="token"><img src="./Logos/biconomy_logo.bin.webp" alt="Biconomy Logo"><div class="details"><span><strong>Name:</strong> Biconomy</span><span><strong>Ticker:</strong> BICO</span></div></div>
-  <div class="token"><img src="./Logos/chainlink-new-logo.png" alt="Chainlink Logo"><div class="details"><span><strong>Name:</strong> Chainlink</span><span><strong>Ticker:</strong> LINK</span></div></div>
-  <div class="token"><img src="./Logos/ocean-protocol-logo.webp" alt="Ocean Protocol Logo"><div class="details"><span><strong>Name:</strong> Ocean Protocol</span><span><strong>Ticker:</strong> OCEAN</span></div></div>
-  <div class="token"><img src="./Logos/image.webp" alt="Uniswap Logo"><div class="details"><span><strong>Name:</strong> Uniswap</span><span><strong>Ticker:</strong> UNI</span></div></div>
-
+    <h1>Token Registry Information</h1>
+    <div class="token-container">
+        <div class="token-card">
+            <img src="./Logos/0x.bin.webp" alt="0x logo" class="token-logo">
+            <div class="token-details">
+                <h2>0x</h2>
+                <p>Ticker: ZRX</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Agro.webp" alt="Agro logo" class="token-logo">
+            <div class="token-details">
+                <h2>Agro</h2>
+                <p>Ticker: AGRO</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Aimedis_Logo_tg.webp" alt="Aimedis logo" class="token-logo">
+            <div class="token-details">
+                <h2>Aimedis</h2>
+                <p>Ticker: AIMEDIS</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Balancer.bin.webp" alt="Balancer logo" class="token-logo">
+            <div class="token-details">
+                <h2>Balancer</h2>
+                <p>Ticker: BAL</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Bitdoctorai.webp" alt="BitDoctorAI logo" class="token-logo">
+            <div class="token-details">
+                <h2>BitDoctorAI</h2>
+                <p>Ticker: BDAI</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/CROB_IMG.webp" alt="CROB logo" class="token-logo">
+            <div class="token-details">
+                <h2>CROB</h2>
+                <p>Ticker: CROB</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/DRTv2Logo.png" alt="DRT v2 logo" class="token-logo">
+            <div class="token-details">
+                <h2>DRT v2</h2>
+                <p>Ticker: DRT</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Deepchain.webp" alt="Deepchain logo" class="token-logo">
+            <div class="token-details">
+                <h2>Deepchain</h2>
+                <p>Ticker: DEC</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/EDU_Logo.bin.webp" alt="EDU Token logo" class="token-logo">
+            <div class="token-details">
+                <h2>EDU Token</h2>
+                <p>Ticker: EDUT</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/ENS.bin.webp" alt="ENS logo" class="token-logo">
+            <div class="token-details">
+                <h2>ENS</h2>
+                <p>Ticker: ENS</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Eco_DS.webp" alt="Eco DS logo" class="token-logo">
+            <div class="token-details">
+                <h2>Eco DS</h2>
+                <p>Ticker: ECOD</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Educare.webp" alt="Educare logo" class="token-logo">
+            <div class="token-details">
+                <h2>Educare</h2>
+                <p>Ticker: LEDU</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Graph_Token.bin.webp" alt="The Graph logo" class="token-logo">
+            <div class="token-details">
+                <h2>The Graph</h2>
+                <p>Ticker: GRT</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/HPO.webp" alt="HPO logo" class="token-logo">
+            <div class="token-details">
+                <h2>HPO</h2>
+                <p>Ticker: HPO</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Klima-Token.bin.webp" alt="Klima DAO logo" class="token-logo">
+            <div class="token-details">
+                <h2>Klima DAO</h2>
+                <p>Ticker: KLIMA</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Learn.webp" alt="Learn Token logo" class="token-logo">
+            <div class="token-details">
+                <h2>Learn Token</h2>
+                <p>Ticker: LEARN</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Lido_DAO.webp" alt="Lido DAO logo" class="token-logo">
+            <div class="token-details">
+                <h2>Lido DAO</h2>
+                <p>Ticker: LDO</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/MAIN_TokenFi_logo_icon.bin.webp" alt="MAIN TokenFi logo" class="token-logo">
+            <div class="token-details">
+                <h2>MAIN TokenFi</h2>
+                <p>Ticker: MAIN</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Mark_Maker.bin.webp" alt="MakerDAO logo" class="token-logo">
+            <div class="token-details">
+                <h2>MakerDAO</h2>
+                <p>Ticker: MKR</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Moros.bin.webp" alt="Moros logo" class="token-logo">
+            <div class="token-details">
+                <h2>Moros</h2>
+                <p>Ticker: MOR</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Muhdo_Hub.bin.webp" alt="Muhdo Hub logo" class="token-logo">
+            <div class="token-details">
+                <h2>Muhdo Hub</h2>
+                <p>Ticker: MUHDO</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/NDC.webp" alt="NewDimensionCoin logo" class="token-logo">
+            <div class="token-details">
+                <h2>NewDimensionCoin</h2>
+                <p>Ticker: NDC</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/SNX.webp" alt="Synthetix logo" class="token-logo">
+            <div class="token-details">
+                <h2>Synthetix</h2>
+                <p>Ticker: SNX</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Saa-ai.webp" alt="SaaS.ai logo" class="token-logo">
+            <div class="token-details">
+                <h2>SaaS.ai</h2>
+                <p>Ticker: SAAS</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Solve.bin.webp" alt="Solve.Care logo" class="token-logo">
+            <div class="token-details">
+                <h2>Solve.Care</h2>
+                <p>Ticker: SOLVE</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Solvex.webp" alt="Solvex Finance logo" class="token-logo">
+            <div class="token-details">
+                <h2>Solvex Finance</h2>
+                <p>Ticker: SOLV</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Study.webp" alt="Studyum logo" class="token-logo">
+            <div class="token-details">
+                <h2>Studyum</h2>
+                <p>Ticker: STUDY</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Tree.webp" alt="Tree Token logo" class="token-logo">
+            <div class="token-details">
+                <h2>Tree Token</h2>
+                <p>Ticker: TREE</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/Zaya ai.webp" alt="Zaya AI logo" class="token-logo">
+            <div class="token-details">
+                <h2>Zaya AI</h2>
+                <p>Ticker: ZAYA</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/aave-token-round.bin.webp" alt="Aave logo" class="token-logo">
+            <div class="token-details">
+                <h2>Aave</h2>
+                <p>Ticker: AAVE</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/biconomy_logo.bin.webp" alt="Biconomy logo" class="token-logo">
+            <div class="token-details">
+                <h2>Biconomy</h2>
+                <p>Ticker: BICO</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/bio.webp" alt="BioPassport logo" class="token-logo">
+            <div class="token-details">
+                <h2>BioPassport</h2>
+                <p>Ticker: BIOT</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/chainlink-new-logo.png" alt="Chainlink logo" class="token-logo">
+            <div class="token-details">
+                <h2>Chainlink</h2>
+                <p>Ticker: LINK</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/cortensor-logo-square-transparent.png" alt="Cortensor logo" class="token-logo">
+            <div class="token-details">
+                <h2>Cortensor</h2>
+                <p>Ticker: CORT</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/dentacoin.bin.webp" alt="Dentacoin logo" class="token-logo">
+            <div class="token-details">
+                <h2>Dentacoin</h2>
+                <p>Ticker: DCN</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/dhn.bin.webp" alt="DHN Token logo" class="token-logo">
+            <div class="token-details">
+                <h2>DHN Token</h2>
+                <p>Ticker: DHN</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/hooked2.bin.webp" alt="Hooked Protocol logo" class="token-logo">
+            <div class="token-details">
+                <h2>Hooked Protocol</h2>
+                <p>Ticker: HOOK</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/image.webp" alt="Imagechain logo" class="token-logo">
+            <div class="token-details">
+                <h2>Imagechain</h2>
+                <p>Ticker: IMG</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/linkednation_256-01.bin.webp" alt="LinkedNation logo" class="token-logo">
+            <div class="token-details">
+                <h2>LinkedNation</h2>
+                <p>Ticker: LKN</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/matryx.webp" alt="Matryx logo" class="token-logo">
+            <div class="token-details">
+                <h2>Matryx</h2>
+                <p>Ticker: MTX</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/ocean-protocol-logo.webp" alt="Ocean Protocol logo" class="token-logo">
+            <div class="token-details">
+                <h2>Ocean Protocol</h2>
+                <p>Ticker: OCEAN</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/patientory.webp" alt="Patientory logo" class="token-logo">
+            <div class="token-details">
+                <h2>Patientory</h2>
+                <p>Ticker: PTOY</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/sETH_Logo_200x200.png" alt="stETH logo" class="token-logo">
+            <div class="token-details">
+                <h2>stETH</h2>
+                <p>Ticker: sETH</p>
+            </div>
+        </div>
+        <div class="token-card">
+            <img src="./Logos/welshareHealth.webp" alt="Welshare Health logo" class="token-logo">
+            <div class="token-details">
+                <h2>Welshare Health</h2>
+                <p>Ticker: WEL</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
