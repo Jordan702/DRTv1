@@ -101,14 +101,14 @@
       try {
         const res = await fetch('./tokenRegistry.json');
         const registry = await res.json();
-        const impactRes = await fetch('./impactindex.json');
+        const impactRes = await fetch('./impact.json');
         const impactIndex = await impactRes.json();
         const tableBody = document.querySelector("#registryTable tbody");
 
         registry.sort((a, b) => a.name.localeCompare(b.name));
 
         registry.forEach((token, index) => {
-          const category = impactIndex[token.ticker]?.category || 'Uncategorized';
+          const category = impact[token.ticker]?.category || 'Uncategorized';
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${index + 1}</td>
