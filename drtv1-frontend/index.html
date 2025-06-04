@@ -1,145 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DRTv1 - Evolution Through Contribution</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DRT Liquidity Pools & Swap Portal</title>
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 2rem;
-      background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
-      color: #333;
-    }
-    .container {
-      max-width: 700px;
-      margin: auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    }
-    h1 {
-      color: #2e7d32;
-      text-align: center;
-    }
-    p.slogan {
-      text-align: center;
-      font-style: italic;
-      color: #555;
-      margin-bottom: 2rem;
-    }
-    .logo {
-      display: block;
-      margin: 0 auto 1rem auto;
-      width: 80px;
-    }
-    input, textarea, button {
-      width: 100%;
-      margin-bottom: 1rem;
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-    button {
-      background-color: #2e7d32;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background-color: #1b5e20;
-    }
-    #status {
-      margin-top: 1rem;
-      font-weight: bold;
-      text-align: center;
-      color: #00796b;
-    }
-    #estimate {
-      font-size: 1.2rem;
-      text-align: center;
-      margin-top: 0.5rem;
-      color: #333;
-    }
+    body { font-family: Arial, sans-serif; background: #111; color: #eee; padding: 20px; }
+    h1, h2 { color: #4efcbf; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #444; padding: 12px; text-align: left; }
+    th { background-color: #333; }
+    tr:nth-child(even) { background-color: #222; }
+    .section { margin-top: 40px; }
+    button { padding: 10px 20px; cursor: pointer; }
+    .status { margin-top: 10px; font-weight: bold; }
+    .success { color: green; }
+    .error { color: red; }
+    .pending { color: orange; }
+    a { color: #4efcbf; text-decoration: none; }
+    a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img src="DRTv1 Logo.png" alt="DRTv1 Logo" class="logo">
-    <h1>DRTv1 Submission Portal</h1>
-    <p class="slogan">"Evolution Through Contribution"</p>
+  <img src="./DRTv1 Logo.png" alt="DRT Logo" style="height: 60px; margin-bottom: 20px;" />
+  <h1>DRT Liquidity Pools & Swap Portal</h1>
 
-    <form id="submissionForm" enctype="multipart/form-data" method="post">
-      <label for="name">Your Name:</label>
-      <input type="text" id="name" name="name" required>
+  <div class="section">
+    <h2>Registered Mesh Tokens</h2>
+    <table id="registryTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Ticker</th>
+          <th>Address</th>
+          <th>Founder</th>
+          <th>IPFS CID</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-      <label for="walletAddress">Wallet Address:</label>
-      <input type="text" id="walletAddress" name="walletAddress" required>
+  <div class="section">
+    <h2>Liquidity Pools (Token Info & Etherscan)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Token Pair</th>
+          <th>Pool Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="./tokeninfo.html#DRTv1" target="_blank">DRTv1</a> / <a href="./tokeninfo.html#ETH" target="_blank">ETH</a></td>
+          <td><a href="https://etherscan.io/address/0xe1c76fbf1b373165822b564c6f3accf78c5a344a" target="_blank">0xe1c7...344a</a></td>
+        </tr>
+        <tr>
+          <td><a href="./tokeninfo.html#DRTv2" target="_blank">DRTv2</a> / <a href="./tokeninfo.html#ETH" target="_blank">ETH</a></td>
+          <td><a href="https://etherscan.io/address/0x732715C246A0A887e976c7c1145FbDec3FC646ac" target="_blank">0x7327...46ac</a></td>
+        </tr>
+        <tr>
+          <td><a href="./tokeninfo.html#DRTv1" target="_blank">DRTv1</a> / <a href="./tokeninfo.html#DRTv2" target="_blank">DRTv2</a></td>
+          <td><a href="https://etherscan.io/address/0x6e5A733D0BA2F3Ec150aC6e5DC08be8C58BED41d" target="_blank">0x6e5A...41d</a></td>
+        </tr>
+        <tr>
+          <td><a href="./tokeninfo.html#sETH" target="_blank">sETH</a> / <a href="./tokeninfo.html#ETH" target="_blank">ETH</a></td>
+          <td><a href="https://etherscan.io/address/0x60446ef0d652d9ca6c6a379945ac9096521da29a" target="_blank">0x6044...29a</a></td>
+        </tr>
+        <tr>
+          <td><a href="./tokeninfo.html#sETH" target="_blank">sETH</a> / <a href="./tokeninfo.html#DRTv1" target="_blank">DRTv1</a></td>
+          <td><a href="https://etherscan.io/address/0xeb86279439b667ca70fd1bda7460cd8f92ae5e35" target="_blank">0xeb86...5e35</a></td>
+        </tr>
+        <tr>
+          <td><a href="./tokeninfo.html#sETH" target="_blank">sETH</a> / <a href="./tokeninfo.html#DRTv2" target="_blank">DRTv2</a></td>
+          <td><a href="https://etherscan.io/address/0xcf16af815808bd58b19403237c1a819684e6ac84" target="_blank">0xcf16...ac84</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-      <label for="description">Description of Contribution:</label>
-      <textarea id="description" name="description" rows="5" required></textarea>
+  <div class="section">
+    <h2>Connect Wallet</h2>
+    <button onclick="connectWallet()">Connect MetaMask</button>
+    <p id="walletAddress"></p>
+  </div>
 
-      <label for="proof">Upload Proof (Image or PDF, Try to keep it under 1MB):</label>
-      <input type="file" id="proofFile" name="proofFile" accept="image/*,application/pdf" required>
+  <div class="section">
+    <h2>Swap DRT to ETH</h2>
+    <label><input type="radio" name="drtFrom" value="false" checked /> DRTv1</label>
+    <label><input type="radio" name="drtFrom" value="true" /> DRTv2</label><br />
+    <input type="number" id="amountDRT" placeholder="Amount of DRT" />
+    <input type="number" id="minETHOut" placeholder="Minimum ETH to receive" />
+    <button onclick="swapDRTforETH()">Swap DRT for ETH</button>
+    <p class="status" id="drtToEthStatus"></p>
+  </div>
 
-      <button type="submit">Submit</button>
-    </form>
-
-    <div id="status"></div>
-    <div id="estimate"></div>
+  <div class="section">
+    <h2>Swap ETH to DRT</h2>
+    <label><input type="radio" name="drtTo" value="false" checked /> DRTv1</label>
+    <label><input type="radio" name="drtTo" value="true" /> DRTv2</label><br />
+    <input type="number" id="ethAmount" placeholder="Amount of ETH" />
+    <input type="number" id="minDRTOut" placeholder="Minimum DRT to receive" />
+    <button onclick="swapETHforDRT()">Swap ETH for DRT</button>
+    <p class="status" id="ethToDrtStatus"></p>
   </div>
 
   <script>
-    const form = document.getElementById('submissionForm');
-    const status = document.getElementById('status');
-    const estimate = document.getElementById('estimate');
+    let web3;
+    let contract;
+    const contractAddress = '0xFDEc4fAB69a8d87E9F20F0dE75C6B3b8A15E774b';
+    let contractABI = [];
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      status.textContent = '⏳ Submitting...';
-      status.style.color = '#00796b';
-      estimate.textContent = '';
+    async function loadRegistry() {
+      try {
+        const res = await fetch('./tokenRegistry.json');
+        const registry = await res.json();
 
-      const formData = new FormData(form);
+        const impactRes = await fetch('./impact.json');
+        const impactIndex = await impactRes.json();
+
+        const tableBody = document.querySelector("#registryTable tbody");
+        registry.sort((a, b) => a.name.localeCompare(b.name));
+
+        registry.forEach((token, index) => {
+          const category = impactIndex[token.ticker]?.category || 'Uncategorized';
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td><a href="./tokeninfo.html#${token.name}" target="_blank">${token.name}</a></td>
+            <td>${token.ticker}</td>
+            <td><a href="https://etherscan.io/address/${token.address}" target="_blank">${token.address.slice(0, 6)}...${token.address.slice(-4)}</a></td>
+            <td>${token.founder || 'N/A'}</td>
+            <td>${token.ipfs_cid || 'N/A'}</td>
+            <td>${category}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      } catch (err) {
+        console.error("Failed to load token registry or impact index:", err);
+      }
+    }
+
+    window.onload = async () => {
+      await loadRegistry();
+      try {
+        const response = await fetch('./DRTSwapRouter_abi.json');
+        contractABI = await response.json();
+        console.log('✅ ABI Loaded');
+      } catch (e) {
+        console.error('❌ Failed to load ABI:', e);
+      }
+    };
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          web3 = new Web3(window.ethereum);
+          const accounts = await web3.eth.getAccounts();
+          document.getElementById("walletAddress").innerText = "Connected: " + accounts[0];
+          contract = new web3.eth.Contract(contractABI, contractAddress);
+        } catch (err) {
+          alert("Wallet connection failed: " + err.message);
+        }
+      } else {
+        alert("Please install MetaMask.");
+      }
+    }
+
+    async function swapDRTforETH() {
+      const status = document.getElementById("drtToEthStatus");
+      status.innerText = "";
+      status.className = "status";
 
       try {
-        const response = await fetch('https://drtv1-backend.onrender.com/api/verify', {
-          method: 'POST',
-          body: formData
-        });
+        const fromV2 = document.querySelector('input[name="drtFrom"]:checked').value === 'true';
+        const amountIn = web3.utils.toWei(document.getElementById("amountDRT").value, "ether");
+        const amountOutMin = web3.utils.toWei(document.getElementById("minETHOut").value, "ether");
+        const accounts = await web3.eth.getAccounts();
 
-        const rawText = await response.text();
-        let result;
-        try {
-          result = JSON.parse(rawText);
-        } catch (jsonErr) {
-          console.error('❌ Failed to parse JSON:', jsonErr);
-          status.textContent = '⚠️ Server error: Unexpected response format.';
-          status.style.color = 'red';
-          return;
+        if (!amountIn || amountIn === "0") {
+          return statusMessage(status, "Invalid DRT amount.", "error");
         }
 
-        if (response.ok) {
-          status.textContent = result.message || '✅ Submitted successfully!';
-          status.style.color = 'green';
+        statusMessage(status, "Sending transaction...", "pending");
 
-          // Optional: Show OpenAI evaluation if exposed by backend
-          if (result.openAiResponse) {
-            estimate.textContent = `🧠 Estimated Contribution Value: $${result.openAiResponse.trim()}`;
-          }
-        } else {
-          status.textContent = `❌ Error: ${result.error || 'An issue occurred.'}`;
-          status.style.color = 'red';
-        }
+        await contract.methods.swapDRTforETH(fromV2, amountIn, amountOutMin)
+          .send({ from: accounts[0] });
+
+        statusMessage(status, "✅ DRT swapped for ETH successfully!", "success");
       } catch (err) {
-        console.error('🚫 Network error:', err);
-        status.textContent = `🚫 Submission failed: ${err.message || 'Unable to connect to backend.'}`;
-        status.style.color = 'red';
+        console.error(err);
+        statusMessage(status, "❌ Swap failed: " + err.message, "error");
       }
-    });
+    }
+
+    async function swapETHforDRT() {
+      const status = document.getElementById("ethToDrtStatus");
+      status.innerText = "";
+      status.className = "status";
+
+      try {
+        const toV2 = document.querySelector('input[name="drtTo"]:checked').value === 'true';
+        const ethAmount = web3.utils.toWei(document.getElementById("ethAmount").value, "ether");
+        const minDRTOut = web3.utils.toWei(document.getElementById("minDRTOut").value, "ether");
+        const accounts = await web3.eth.getAccounts();
+
+        if (!ethAmount || ethAmount === "0") {
+          return statusMessage(status, "Invalid ETH amount.", "error");
+        }
+
+        statusMessage(status, "Sending transaction...", "pending");
+
+        await contract.methods.swapETHforDRT(toV2, minDRTOut)
+          .send({ from: accounts[0], value: ethAmount });
+
+        statusMessage(status, "✅ ETH swapped for DRT successfully!", "success");
+      } catch (err) {
+        console.error(err);
+        statusMessage(status, "❌ Swap failed: " + err.message, "error");
+      }
+    }
+
+    function statusMessage(el, text, type) {
+      el.innerText = text;
+      el.className = `status ${type}`;
+    }
   </script>
 </body>
 </html>
