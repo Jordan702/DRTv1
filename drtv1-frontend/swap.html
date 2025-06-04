@@ -108,7 +108,7 @@
         registry.sort((a, b) => a.name.localeCompare(b.name));
 
         registry.forEach((token, index) => {
-          const category = impact[token.ticker]?.category || 'Uncategorized';
+          const category = impactIndex[token.ticker]?.category || 'Uncategorized';
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${index + 1}</td>
