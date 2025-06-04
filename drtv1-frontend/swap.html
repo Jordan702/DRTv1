@@ -38,74 +38,11 @@
           <th>Address</th>
           <th>Founder</th>
           <th>IPFS CID</th>
+          <th>Category</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
-  </div>
-
-  <div class="section">
-    <h2>Liquidity Pools (Token Info & Etherscan)</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Token Pair</th>
-          <th>Pool Address</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><a href="./tokeninfo.html#DRTv1" target="_blank">DRTv1</a> / <a href="./tokeninfo.html#ETH" target="_blank">ETH</a></td>
-          <td><a href="https://etherscan.io/address/0xe1c76fbf1b373165822b564c6f3accf78c5a344a" target="_blank">0xe1c7...344a</a></td>
-        </tr>
-        <tr>
-          <td><a href="./tokeninfo.html#DRTv2" target="_blank">DRTv2</a> / <a href="./tokeninfo.html#ETH" target="_blank">ETH</a></td>
-          <td><a href="https://etherscan.io/address/0x732715C246A0A887e976c7c1145FbDec3FC646ac" target="_blank">0x7327...46ac</a></td>
-        </tr>
-        <tr>
-          <td><a href="./tokeninfo.html#DRTv1" target="_blank">DRTv1</a> / <a href="./tokeninfo.html#DRTv2" target="_blank">DRTv2</a></td>
-          <td><a href="https://etherscan.io/address/0x6e5A733D0BA2F3Ec150aC6e5DC08be8C58BED41d" target="_blank">0x6e5A...41d</a></td>
-        </tr>
-        <tr>
-          <td><a href="./tokeninfo.html#sETH" target="_blank">sETH</a> / <a href="./tokeninfo.html#ETH" target="_blank">ETH</a></td>
-          <td><a href="https://etherscan.io/address/0x60446ef0d652d9ca6c6a379945ac9096521da29a" target="_blank">0x6044...29a</a></td>
-        </tr>
-        <tr>
-          <td><a href="./tokeninfo.html#sETH" target="_blank">sETH</a> / <a href="./tokeninfo.html#DRTv1" target="_blank">DRTv1</a></td>
-          <td><a href="https://etherscan.io/address/0xeb86279439b667ca70fd1bda7460cd8f92ae5e35" target="_blank">0xeb86...5e35</a></td>
-        </tr>
-        <tr>
-          <td><a href="./tokeninfo.html#sETH" target="_blank">sETH</a> / <a href="./tokeninfo.html#DRTv2" target="_blank">DRTv2</a></td>
-          <td><a href="https://etherscan.io/address/0xcf16af815808bd58b19403237c1a819684e6ac84" target="_blank">0xcf16...ac84</a></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="section">
-    <h2>Connect Wallet</h2>
-    <button onclick="connectWallet()">Connect MetaMask</button>
-    <p id="walletAddress"></p>
-  </div>
-
-  <div class="section">
-    <h2>Swap DRT to ETH</h2>
-    <label><input type="radio" name="drtFrom" value="false" checked /> DRTv1</label>
-    <label><input type="radio" name="drtFrom" value="true" /> DRTv2</label><br />
-    <input type="number" id="amountDRT" placeholder="Amount of DRT" />
-    <input type="number" id="minETHOut" placeholder="Minimum ETH to receive" />
-    <button onclick="swapDRTforETH()">Swap DRT for ETH</button>
-    <p class="status" id="drtToEthStatus"></p>
-  </div>
-
-  <div class="section">
-    <h2>Swap ETH to DRT</h2>
-    <label><input type="radio" name="drtTo" value="false" checked /> DRTv1</label>
-    <label><input type="radio" name="drtTo" value="true" /> DRTv2</label><br />
-    <input type="number" id="ethAmount" placeholder="Amount of ETH" />
-    <input type="number" id="minDRTOut" placeholder="Minimum DRT to receive" />
-    <button onclick="swapETHforDRT()">Swap ETH for DRT</button>
-    <p class="status" id="ethToDrtStatus"></p>
   </div>
 
   <script>
@@ -118,11 +55,14 @@
       try {
         const res = await fetch('./tokenRegistry.json');
         const registry = await res.json();
+        const impactRes = await fetch('./impactindex.json');
+        const impactIndex = await impactRes.json();
         const tableBody = document.querySelector("#registryTable tbody");
 
         registry.sort((a, b) => a.name.localeCompare(b.name));
 
         registry.forEach((token, index) => {
+          const category = impactIndex[token.ticker]?.category || 'Uncategorized';
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${index + 1}</td>
@@ -131,11 +71,12 @@
             <td><a href="https://etherscan.io/address/${token.address}" target="_blank">${token.address.slice(0, 6)}...${token.address.slice(-4)}</a></td>
             <td>${token.founder || 'N/A'}</td>
             <td>${token.ipfs_cid || 'N/A'}</td>
+            <td>${category}</td>
           `;
           tableBody.appendChild(row);
         });
       } catch (err) {
-        console.error("Failed to load token registry:", err);
+        console.error("Failed to load token registry or impact index:", err);
       }
     }
 
@@ -149,81 +90,6 @@
         console.error('❌ Failed to load ABI:', e);
       }
     };
-
-    async function connectWallet() {
-      if (window.ethereum) {
-        try {
-          await window.ethereum.request({ method: 'eth_requestAccounts' });
-          web3 = new Web3(window.ethereum);
-          const accounts = await web3.eth.getAccounts();
-          document.getElementById("walletAddress").innerText = "Connected: " + accounts[0];
-          contract = new web3.eth.Contract(contractABI, contractAddress);
-        } catch (err) {
-          alert("Wallet connection failed: " + err.message);
-        }
-      } else {
-        alert("Please install MetaMask.");
-      }
-    }
-
-    async function swapDRTforETH() {
-      const status = document.getElementById("drtToEthStatus");
-      status.innerText = "";
-      status.className = "status";
-
-      try {
-        const fromV2 = document.querySelector('input[name="drtFrom"]:checked').value === 'true';
-        const amountIn = web3.utils.toWei(document.getElementById("amountDRT").value, "ether");
-        const amountOutMin = web3.utils.toWei(document.getElementById("minETHOut").value, "ether");
-        const accounts = await web3.eth.getAccounts();
-
-        if (!amountIn || amountIn === "0") {
-          return statusMessage(status, "Invalid DRT amount.", "error");
-        }
-
-        statusMessage(status, "Sending transaction...", "pending");
-
-        await contract.methods.swapDRTforETH(fromV2, amountIn, amountOutMin)
-          .send({ from: accounts[0] });
-
-        statusMessage(status, "✅ DRT swapped for ETH successfully!", "success");
-      } catch (err) {
-        console.error(err);
-        statusMessage(status, "❌ Swap failed: " + err.message, "error");
-      }
-    }
-
-    async function swapETHforDRT() {
-      const status = document.getElementById("ethToDrtStatus");
-      status.innerText = "";
-      status.className = "status";
-
-      try {
-        const toV2 = document.querySelector('input[name="drtTo"]:checked').value === 'true';
-        const ethAmount = web3.utils.toWei(document.getElementById("ethAmount").value, "ether");
-        const minDRTOut = web3.utils.toWei(document.getElementById("minDRTOut").value, "ether");
-        const accounts = await web3.eth.getAccounts();
-
-        if (!ethAmount || ethAmount === "0") {
-          return statusMessage(status, "Invalid ETH amount.", "error");
-        }
-
-        statusMessage(status, "Sending transaction...", "pending");
-
-        await contract.methods.swapETHforDRT(toV2, minDRTOut)
-          .send({ from: accounts[0], value: ethAmount });
-
-        statusMessage(status, "✅ ETH swapped for DRT successfully!", "success");
-      } catch (err) {
-        console.error(err);
-        statusMessage(status, "❌ Swap failed: " + err.message, "error");
-      }
-    }
-
-    function statusMessage(el, text, type) {
-      el.innerText = text;
-      el.className = `status ${type}`;
-    }
   </script>
 </body>
 </html>
