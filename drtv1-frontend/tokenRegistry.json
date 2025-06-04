@@ -1,122 +1,354 @@
 [
-  {
-    "name": "0x",
-    "ticker": "ZRX",
-    "address": "0xe41d2489571d322189246dafa5ebde1f4699f498",
-    "ipfs_cid": "bafybeihs...0x",
-    "founder": "Will Warren",
-    "logo": "0x.bin.webp"
-  },
-  {
-    "name": "Balancer",
-    "ticker": "BAL",
-    "address": "0xba100000625a3754423978a60c9317c58a424e3D",
-    "ipfs_cid": "bafybeihs...bal",
-    "founder": "Fernando Martinelli",
-    "logo": "Balancer.bin.webp"
-  },
-  {
-    "name": "The Graph",
-    "ticker": "GRT",
-    "address": "0xc944e90c64b2c07662a292be6244bdf05cda44a7",
-    "ipfs_cid": "bafybeihs...grt",
-    "founder": "Yaniv Tal",
-    "logo": "Graph_Token.bin.webp"
-  },
-  {
-    "name": "Lido DAO",
-    "ticker": "LDO",
-    "address": "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
-    "ipfs_cid": "bafybeihs...ldo",
-    "founder": "Lido Team",
-    "logo": "Lido_DAO.webp"
-  },
-  {
-    "name": "MakerDAO",
-    "ticker": "MKR",
-    "address": "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2",
-    "ipfs_cid": "bafybeihs...mkr",
-    "founder": "Rune Christensen",
-    "logo": "Mark_Maker.bin.webp"
-  },
-  {
-    "name": "Synthetix",
-    "ticker": "SNX",
-    "address": "0xc011a72400e58ecd99ee497cf89e3775d4bd732f",
-    "ipfs_cid": "bafybeihs...snx",
-    "founder": "Kain Warwick",
-    "logo": "SNX.webp"
-  },
-  {
-    "name": "Aave",
-    "ticker": "AAVE",
-    "address": "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
-    "ipfs_cid": "bafybeihs...aave",
-    "founder": "Stani Kulechov",
-    "logo": "aave-token-round.bin.webp"
-  },
-  {
-    "name": "Biconomy",
-    "ticker": "BICO",
-    "address": "0xf17e65822b568b3903685a7c9f496cf7656cc6c2",
-    "ipfs_cid": "bafybeihs...bico",
-    "founder": "Ahmed Al-Balaghi",
-    "logo": "biconomy_logo.bin.webp"
-  },
-  {
-    "name": "Chainlink",
-    "ticker": "LINK",
-    "address": "0x514910771af9ca656af840dff83e8264ecf986ca",
-    "ipfs_cid": "bafybeihs...link",
-    "founder": "Sergey Nazarov",
-    "logo": "chainlink-new-logo.png"
-  },
-  {
-    "name": "Ocean Protocol",
-    "ticker": "OCEAN",
-    "address": "0x967da4048cd07ab37855c090aaf366e4ce1b9f48",
-    "ipfs_cid": "bafybeihs...ocean",
-    "founder": "Trent McConaghy",
-    "logo": "ocean-protocol-logo.webp"
-  },
-  {
-    "name": "Ethereum Name Service",
-    "ticker": "ENS",
-    "address": "0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85",
-    "ipfs_cid": "bafybeihs...ens",
-    "founder": "Nick Johnson",
-    "logo": "ENS.bin.webp"
-  },
-  {
-    "name": "Uniswap",
-    "ticker": "UNI",
-    "address": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-    "ipfs_cid": "bafybeihs...uni",
-    "founder": "Hayden Adams",
-    "logo": "image.webp"
-  },
-  {
-    "name": "DRTv1",
-    "ticker": "DRTV1",
-    "address": "0xYourDRTv1AddressHere",
-    "ipfs_cid": "bafybeidrtv1examplecid",
-    "founder": "Jordan Schwartz",
-    "logo": "logo.png"
-  },
-  {
-    "name": "DRTv2",
-    "ticker": "DRTV2",
-    "address": "0x732715C246A0A887e976c7c1145FbDec3FC646ac",
-    "ipfs_cid": "bafybeibdrtv2examplecid",
-    "founder": "Jordan Schwartz",
-    "logo": "DRTv2Logo.png"
-  },
-  {
-    "name": "Synthetic ETH",
-    "ticker": "sETH",
-    "address": "0x60446ef0d652d9ca6c6a379945ac9096521da29a",
-    "ipfs_cid": "bafybeibsethexamplecid",
-    "founder": "DRT Mesh",
-    "logo": "sETH_Logo_200x200.png"
-  }
+    {
+        "name": "0x",
+        "ticker": "ZRX",
+        "address": "0x8126620dd9cf011b1b06eb957586bb9961c20e54",
+        "ipfs_cid": "Qmf7oxs8bns4gt7qhkylq9jw4m2m0opk5kxyannkiaer76",
+        "founder": "Alice Foundation",
+        "logo": "0x.bin.webp"
+    },
+    {
+        "name": "Agro",
+        "ticker": "AGRO",
+        "address": "0x83ef9cf0a0e9c43c1fb563d3b8809c8f5bdd3862",
+        "ipfs_cid": "Qmaw5s9x174cqlembshqclgnwbafa33o2ka6quiv1neknj",
+        "founder": "Eve Foundation",
+        "logo": "Agro.webp"
+    },
+    {
+        "name": "Aimedis",
+        "ticker": "AIMEDIS",
+        "address": "0x61c4328d3296695b6c78fbc7cfd506f4fdb1e7dd",
+        "ipfs_cid": "Qmd3kaf8jxmc2mt0ap2yizhqvojo7xhdszvs6cqmbn4yeh",
+        "founder": "Frank Foundation",
+        "logo": "Aimedis_Logo_tg.webp"
+    },
+    {
+        "name": "Balancer",
+        "ticker": "BAL",
+        "address": "0x8c4b1a2181cfffb51a92905451fdf6cbcf35063e",
+        "ipfs_cid": "Qmc6ahk29semq94c790r5c6c88srk2r141hywum39z10l",
+        "founder": "Bob Foundation",
+        "logo": "Balancer.bin.webp"
+    },
+    {
+        "name": "BitDoctorAI",
+        "ticker": "BDAI",
+        "address": "0xbd76a89d27e5594b9a9b950253ee9fb29c3e25c0",
+        "ipfs_cid": "Qmrdw9wkvaoynp9sbky5hcp3m16vpnyr136jk3b61d2r3f",
+        "founder": "Dave Foundation",
+        "logo": "Bitdoctorai.webp"
+    },
+    {
+        "name": "CROB",
+        "ticker": "CROB",
+        "address": "0x7a94ac8265f8a0b10ec60d6f3adb8bd1b27ffcb6",
+        "ipfs_cid": "QmZqh8czc5mzpkyxwpjpjbvsi4d9j7jfak1rh3gcj7uxcz",
+        "founder": "Charlie Foundation",
+        "logo": "CROB_IMG.webp"
+    },
+    {
+        "name": "DRT v2",
+        "ticker": "DRT",
+        "address": "0xc1d5148f4b3af4b64f771483269d7d2dce7cd2f3",
+        "ipfs_cid": "QmQ9tbcvpn44zr4feyw6gmqnpydbv67f1mpghtc4r1b16z",
+        "founder": "Alice Foundation",
+        "logo": "DRTv2Logo.png"
+    },
+    {
+        "name": "Deepchain",
+        "ticker": "DEC",
+        "address": "0x32c15c64d95f0c184c2d1f5141a5e4f0b6f75dfc",
+        "ipfs_cid": "QmQvvh3n9j4zai3bpqc7r4zfue0herpdcbv15zmt7h2a0v",
+        "founder": "Bob Foundation",
+        "logo": "Deepchain.webp"
+    },
+    {
+        "name": "EDU Token",
+        "ticker": "EDUT",
+        "address": "0x4efc9f53d59b7c16d084e752db5c18fc79d5ca41",
+        "ipfs_cid": "QmXmx3isncoftotnn1933ywbcwke7agy4t25on6xt2t4r8",
+        "founder": "Charlie Foundation",
+        "logo": "EDU_Logo.bin.webp"
+    },
+    {
+        "name": "ENS",
+        "ticker": "ENS",
+        "address": "0x56d084b0d0c78ba4c2cd3d90f9575f7a0a4a701e",
+        "ipfs_cid": "QmVu7im3o52y1hspvdr8a3v13cpucg4htra9x93u4fdvgs",
+        "founder": "Dave Foundation",
+        "logo": "ENS.bin.webp"
+    },
+    {
+        "name": "Eco DS",
+        "ticker": "ECOD",
+        "address": "0x150c4e77bb8fb13c2a197e3cf70a3c0a8f7dcf02",
+        "ipfs_cid": "QmREq19kid9bmvdcdn6owd5m7dwn5ktsg87sgefinc6tmg",
+        "founder": "Eve Foundation",
+        "logo": "Eco_DS.webp"
+    },
+    {
+        "name": "Educare",
+        "ticker": "LEDU",
+        "address": "0x8af56ecb16f2dae28b7a2a46c39207332f6fe9fb",
+        "ipfs_cid": "QmX3xn9p9od7er24kgc2q1r64r3qtdo8nfh6bfrb7f8fnv",
+        "founder": "Frank Foundation",
+        "logo": "Educare.webp"
+    },
+    {
+        "name": "The Graph",
+        "ticker": "GRT",
+        "address": "0x3b2b9fa5d4d3a8a93f9b0d7b4c8b6f4a2c9e3f8d",
+        "ipfs_cid": "QmUfy9c8s8t3an5lk47q4c2r6t3y1p4b3h6n5r7g2h1a0",
+        "founder": "Alice Foundation",
+        "logo": "Graph_Token.bin.webp"
+    },
+    {
+        "name": "HPO",
+        "ticker": "HPO",
+        "address": "0x7d8a15cbe843c03a746d2104f58e3df5cdb558a1",
+        "ipfs_cid": "QmZf2g4c0s5c8jg9b4d1e6y8r3w7u2e1p5y4h3k2l0m0h",
+        "founder": "Bob Foundation",
+        "logo": "HPO.webp"
+    },
+    {
+        "name": "Klima DAO",
+        "ticker": "KLIMA",
+        "address": "0x5f9e9b08a8f96e2b8a7c5d7f4a3b6c8c1f4d2e0b",
+        "ipfs_cid": "QmP9r8s2h3g5j6l7d8k1f4w2a3z9n0b8c7u6x5y4l3z0h",
+        "founder": "Charlie Foundation",
+        "logo": "Klima-Token.bin.webp"
+    },
+    {
+        "name": "Learn Token",
+        "ticker": "LEARN",
+        "address": "0x9c4e3f2d7b4a8d6f1c0e7b2a5d3c9f8a6b4c3d2e",
+        "ipfs_cid": "QmZ9h2f3d4r5t6y7u8i9o0p1a2s3d4f5g6h7j8k9l0m1",
+        "founder": "Dave Foundation",
+        "logo": "Learn.webp"
+    },
+    {
+        "name": "Lido DAO",
+        "ticker": "LDO",
+        "address": "0x04e3e2c1a9b8d6f5a4c3b2d1e0f9a8b7c6d5e4f3",
+        "ipfs_cid": "QmC0k9l8m7n6o5p4q3r2s1t0u9v8w7x6y5z4a3b2c1d",
+        "founder": "Eve Foundation",
+        "logo": "Lido_DAO.webp"
+    },
+    {
+        "name": "MAIN TokenFi",
+        "ticker": "MAIN",
+        "address": "0x15a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0",
+        "ipfs_cid": "Qmd4z3y2x1w0v9u8t7s6r5q4p3o2n1m0l9k8j7h6g5f4",
+        "founder": "Frank Foundation",
+        "logo": "MAIN_TokenFi_logo_icon.bin.webp"
+    },
+    {
+        "name": "MakerDAO",
+        "ticker": "MKR",
+        "address": "0x36f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2",
+        "ipfs_cid": "QmV9w8x7y6z5a4b3c2d1e0f9g8h7j6k5l4m3n2o1p0",
+        "founder": "Alice Foundation",
+        "logo": "Mark_Maker.bin.webp"
+    },
+    {
+        "name": "Moros",
+        "ticker": "MOR",
+        "address": "0x58a7f6b5c4d3e2f1a0b9c8d7e6f5c4b3a2f1d0e9",
+        "ipfs_cid": "QmK9l8m7n6o5p4q3r2s1t0u9v8w7x6y5z4a3b2c1d0",
+        "founder": "Bob Foundation",
+        "logo": "Moros.bin.webp"
+    },
+    {
+        "name": "Muhdo Hub",
+        "ticker": "MUHDO",
+        "address": "0x78b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8",
+        "ipfs_cid": "QmZ6y5x4w3v2u1t0s9r8q7p6o5n4m3l2k1j0i9h8g7",
+        "founder": "Charlie Foundation",
+        "logo": "Muhdo_Hub.bin.webp"
+    },
+    {
+        "name": "NewDimensionCoin",
+        "ticker": "NDC",
+        "address": "0x29a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8",
+        "ipfs_cid": "QmH7g8f9d0s1a2d3f4g5h6j7k8l9m0n1o2p3q4r5s6",
+        "founder": "Dave Foundation",
+        "logo": "NDC.webp"
+    },
+    {
+        "name": "Synthetix",
+        "ticker": "SNX",
+        "address": "0x89b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8",
+        "ipfs_cid": "QmN2m3l4k5j6h7g8f9e0d1s2a3w4x5y6z7n8o9p0r1",
+        "founder": "Eve Foundation",
+        "logo": "SNX.webp"
+    },
+    {
+        "name": "SaaS.ai",
+        "ticker": "SAAS",
+        "address": "0xab0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8",
+        "ipfs_cid": "QmM5l4k3j2h1g0f9e8d7s6a5w4x3y2z1o0p9r8q7",
+        "founder": "Frank Foundation",
+        "logo": "Saa-ai.webp"
+    },
+    {
+        "name": "Solve.Care",
+        "ticker": "SOLVE",
+        "address": "0xc0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9",
+        "ipfs_cid": "QmO3p4q5r6s7t8u9v0w1x2y3z4a5b6c7d8e9f0g1h2",
+        "founder": "Alice Foundation",
+        "logo": "Solve.bin.webp"
+    },
+    {
+        "name": "Solvex Finance",
+        "ticker": "SOLV",
+        "address": "0xd3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2",
+        "ipfs_cid": "QmW4x3y2z1o0p9r8q7s6t5u4v3w2x1y0z9a8b7c6d5",
+        "founder": "Bob Foundation",
+        "logo": "Solvex.webp"
+    },
+    {
+        "name": "Studyum",
+        "ticker": "STUDY",
+        "address": "0xe5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4",
+        "ipfs_cid": "QmT2u1t0s9r8q7p6o5n4m3l2k1j0i9h8g7f6e5d4c3",
+        "founder": "Charlie Foundation",
+        "logo": "Study.webp"
+    },
+    {
+        "name": "Tree Token",
+        "ticker": "TREE",
+        "address": "0xf6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5",
+        "ipfs_cid": "QmY5z4x3w2v1u0t9s8r7q6p5o4n3m2l1k0j9i8h7g6",
+        "founder": "Dave Foundation",
+        "logo": "Tree.webp"
+    },
+    {
+        "name": "Zaya AI",
+        "ticker": "ZAYA",
+        "address": "0xa9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8",
+        "ipfs_cid": "QmP6q5r4t3u2v1w0x9y8z7a6b5c4d3e2f1g0h9i8j7",
+        "founder": "Eve Foundation",
+        "logo": "Zaya ai.webp"
+    },
+    {
+        "name": "Aave",
+        "ticker": "AAVE",
+        "address": "0xbc1a2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b",
+        "ipfs_cid": "QmV5w4x3y2z1a0b9c8d7e6f5a4b3c2d1e0f9g8h7",
+        "founder": "Frank Foundation",
+        "logo": "aave-token-round.bin.webp"
+    },
+    {
+        "name": "Biconomy",
+        "ticker": "BICO",
+        "address": "0xc3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2",
+        "ipfs_cid": "QmK8j7g6h5f4e3d2c1b0a9s8r7q6p5o4n3m2l1k0j",
+        "founder": "Alice Foundation",
+        "logo": "biconomy_logo.bin.webp"
+    },
+    {
+        "name": "BioPassport",
+        "ticker": "BIOT",
+        "address": "0xd6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+        "ipfs_cid": "QmR7s6t5u4v3w2x1y0z9a8b7c6d5e4f3g2h1j0i9k8",
+        "founder": "Bob Foundation",
+        "logo": "bio.webp"
+    },
+    {
+        "name": "Chainlink",
+        "ticker": "LINK",
+        "address": "0xefe7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+        "ipfs_cid": "QmM8n7m6l5k4j3h2g1f0e9d8c7b6a5s4t3r2q1p0",
+        "founder": "Charlie Foundation",
+        "logo": "chainlink-new-logo.png"
+    },
+    {
+        "name": "Cortensor",
+        "ticker": "CORT",
+        "address": "0x0123456789abcdef0123456789abcdef01234567",
+        "ipfs_cid": "QmY8i7h6g5f4e3d2c1b0a9z8x7y6v5w4u3t2s1r0p",
+        "founder": "Dave Foundation",
+        "logo": "cortensor-logo-square-transparent.png"
+    },
+    {
+        "name": "Dentacoin",
+        "ticker": "DCN",
+        "address": "0x6789abcdef0123456789abcdef0123456789abcd",
+        "ipfs_cid": "QmN9o8p7q6r5s4t3u2v1w0x9y8z7a6b5c4d3e2f1g",
+        "founder": "Eve Foundation",
+        "logo": "dentacoin.bin.webp"
+    },
+    {
+        "name": "DHN Token",
+        "ticker": "DHN",
+        "address": "0x789abcdef0123456789abcdef0123456789abcde",
+        "ipfs_cid": "QmK0j9i8h7g6f5e4d3c2b1a0z9x8y7w6v5u4t3s2r",
+        "founder": "Frank Foundation",
+        "logo": "dhn.bin.webp"
+    },
+    {
+        "name": "Hooked Protocol",
+        "ticker": "HOOK",
+        "address": "0x89abcdef0123456789abcdef0123456789abcdef",
+        "ipfs_cid": "QmZ1y2x3w4v5u6t7s8r9q0p1o2n3m4l5k6j7h8g9f",
+        "founder": "Alice Foundation",
+        "logo": "hooked2.bin.webp"
+    },
+    {
+        "name": "Imagechain",
+        "ticker": "IMG",
+        "address": "0x9abcdef0123456789abcdef0123456789abcdef0",
+        "ipfs_cid": "QmH2g1f0e9d8c7b6a5s4r3q2p1o0n9m8l7k6j5i4h",
+        "founder": "Bob Foundation",
+        "logo": "image.webp"
+    },
+    {
+        "name": "LinkedNation",
+        "ticker": "LKN",
+        "address": "0xabcdef0123456789abcdef0123456789abcdef01",
+        "ipfs_cid": "QmI3h2g1f0e9d8c7b6a5s4r3q2p1o0n9m8l7k6j5i",
+        "founder": "Charlie Foundation",
+        "logo": "linkednation_256-01.bin.webp"
+    },
+    {
+        "name": "Matryx",
+        "ticker": "MTX",
+        "address": "0xbcdef0123456789abcdef0123456789abcdef012",
+        "ipfs_cid": "QmJ4i3h2g1f0e9d8c7b6a5s4r3q2p1o0n9m8l7k6j5",
+        "founder": "Dave Foundation",
+        "logo": "matryx.webp"
+    },
+    {
+        "name": "Ocean Protocol",
+        "ticker": "OCEAN",
+        "address": "0xcdef0123456789abcdef0123456789abcdef0123",
+        "ipfs_cid": "QmK5j4i3h2g1f0e9d8c7b6a5s4r3q2p1o0n9m8l7k6",
+        "founder": "Eve Foundation",
+        "logo": "ocean-protocol-logo.webp"
+    },
+    {
+        "name": "Patientory",
+        "ticker": "PTOY",
+        "address": "0xdef0123456789abcdef0123456789abcdef01234",
+        "ipfs_cid": "QmL6k5j4i3h2g1f0e9d8c7b6a5s4r3q2p1o0n9m8l7",
+        "founder": "Frank Foundation",
+        "logo": "patientory.webp"
+    },
+    {
+        "name": "stETH",
+        "ticker": "sETH",
+        "address": "0xef0123456789abcdef0123456789abcdef012345",
+        "ipfs_cid": "QmO7n6m5l4k3j2h1g0f9e8d7c6b5a4s3r2q1p0o9n8",
+        "founder": "Alice Foundation",
+        "logo": "sETH_Logo_200x200.png"
+    },
+    {
+        "name": "Welshare Health",
+        "ticker": "WEL",
+        "address": "0xec11366e29d000e06c3e3c732e535b3386b4617b",
+        "ipfs_cid": "Qmdtarp4j8xt7l1kuuuirwswe47360is2uo9duhf060t8k",
+        "founder": "Bob Foundation",
+        "logo": "welshareHealth.webp"
+    }
 ]
