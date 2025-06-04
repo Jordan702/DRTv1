@@ -1,203 +1,442 @@
-{
-  "{
-  "AAVE": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "AMP": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "ANT": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "BAL": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "BAT": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "BICO": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "BNT": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "COMP": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "CVC": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "DAI": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "DRTv1": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "DRTv2": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "ENS": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "ETH": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "GRT": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "KEEP": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "KNC": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "LEDU": {
-    "category": "education",
-    "score": 4.0,
-    "multiplier": 1.4
-  },
-  "LINK": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "LRC": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "MANA": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "MKR": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "MLN": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "NMR": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "OCEAN": {
-    "category": "environment",
-    "score": 4.5,
-    "multiplier": 1.5
-  },
-  "RAI": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "REP": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "RLC": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "SNX": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
-  },
-  "SOLVE": {
+[
+  {
+    "ticker": "SOLVE",
+    "address": "0x9A92...4644",
+    "founder": "Pradeep Goel",
     "category": "healing",
-    "score": 4.5,
+    "impact_score": 8,
     "multiplier": 1.5
   },
-  "STORJ": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
+  {
+    "ticker": "WEL",
+    "address": "0x1E76...BE5",
+    "founder": "Unknown",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
   },
-  "SUSHI": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
+  {
+    "ticker": "BBT",
+    "address": "0x2613...6cd4",
+    "founder": "Unknown",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
   },
-  "TREE": {
+  {
+    "ticker": "MED",
+    "address": "0xD6C2...20A8",
+    "founder": "Dr. Han Mo Jeong",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
+  },
+  {
+    "ticker": "HP",
+    "address": "0xCD9E...77F9",
+    "founder": "Unknown",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
+  },
+  {
+    "ticker": "HPO",
+    "address": "0x3BB5...40b8",
+    "founder": "Unknown",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
+  },
+  {
+    "ticker": "GALEON",
+    "address": "0x3F63...E708",
+    "founder": "Stella Christodoulaki",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
+  },
+  {
+    "ticker": "DNA",
+    "address": "0x1A00...2C0A",
+    "founder": "Unknown",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
+  },
+  {
+    "ticker": "MELLO",
+    "address": "0x82a3...3DcF",
+    "founder": "Unknown",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
+  },
+  {
+    "ticker": "AIDD",
+    "address": "0x6eAB...74Ca",
+    "founder": "Unknown",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
+  },
+  {
+    "ticker": "DCN",
+    "address": "0x08E1...EF74",
+    "founder": "Sergey Gorbachev",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
+  },
+  {
+    "ticker": "DRPAL",
+    "address": "0x8f2C...E914",
+    "founder": "Panagiotis Lioupis",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
+  },
+  {
+    "ticker": "ZAI",
+    "address": "0x52Aa...9208",
+    "founder": "Unknown",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
+  },
+  {
+    "ticker": "PTOY",
+    "address": "0xC702...59c6",
+    "founder": "Pradeep Goel",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
+  },
+  {
+    "ticker": "HSAI",
+    "address": "0x833C...6D8B",
+    "founder": "Unknown",
+    "category": "healing",
+    "impact_score": 8,
+    "multiplier": 1.5
+  },
+  {
+    "ticker": "EDUchain",
+    "address": "0x3B4B...5924",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "YAKUZA",
+    "address": "0xC9C2...77D5",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "LEDU",
+    "address": "0x5B26...3765",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "EDU",
+    "address": "0x207F...B473",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "DHN",
+    "address": "0x92D0...4A3B",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "HOOK",
+    "address": "0xDAB5...6236",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "TOKEN",
+    "address": "0x333F...20EF",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "NWC",
+    "address": "0x8504...7EC2",
+    "founder": "Fabrizio Strazzante",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "WNK",
+    "address": "0xC6f3...52F1",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "NDC",
+    "address": "0xDEF2...E86a",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "AIMX",
+    "address": "0xCE12...Cd4d",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "NFE",
+    "address": "0xD07C...2D11",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "STC",
+    "address": "0x0E04...4E4F",
+    "founder": "Michael Ilyenko",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "ODE",
+    "address": "0x9A39...ff31",
+    "founder": "Aki Hierhman",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "MOROS",
+    "address": "0x2cf5...6e33",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "EKT",
+    "address": "0x298D...F2F9",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "NATION",
+    "address": "0xA3C3...fF8F",
+    "founder": "Dr. Yoram",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "COR",
+    "address": "0x3F61...Fa9A",
+    "founder": "Unknown",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "MTX",
+    "address": "0x726E...1647",
+    "founder": "Dominic Felicione",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "SCHO",
+    "address": "0x6C86...cD7B",
+    "founder": "Gemma Francis",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "BET",
+    "address": "0x1234...ABCD",
+    "founder": "N/A",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "LTR",
+    "address": "0x5678...EF90",
+    "founder": "N/A",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.3
+  },
+  {
+    "ticker": "CITY",
+    "address": "0xAAA1...BBB2",
+    "founder": "N/A",
+    "category": "infrastructure",
+    "impact_score": 6,
+    "multiplier": 1.1
+  },
+  {
+    "ticker": "INFRA",
+    "address": "0xCCC3...DDD4",
+    "founder": "N/A",
+    "category": "infrastructure",
+    "impact_score": 6,
+    "multiplier": 1.1
+  },
+  {
+    "ticker": "CVP",
+    "address": "0xEEE5...FFF6",
+    "founder": "N/A",
+    "category": "infrastructure",
+    "impact_score": 6,
+    "multiplier": 1.1
+  },
+  {
+    "ticker": "EDUB",
+    "address": "0xGGG7...HHH8",
+    "founder": "N/A",
+    "category": "infrastructure",
+    "impact_score": 6,
+    "multiplier": 1.1
+  },
+  {
+    "ticker": "AGRI",
+    "address": "0x1A2B...3C4D",
+    "founder": "Unknown",
+    "category": "feeding others",
+    "impact_score": 9,
+    "multiplier": 1.8
+  },
+  {
+    "ticker": "CROP",
+    "address": "0x5E6F...7A8B",
+    "founder": "N/A",
+    "category": "feeding others",
+    "impact_score": 9,
+    "multiplier": 1.8
+  },
+  {
+    "ticker": "FC",
+    "address": "0x9C0D...1E2F",
+    "founder": "N/A",
+    "category": "feeding others",
+    "impact_score": 9,
+    "multiplier": 1.8
+  },
+  {
+    "ticker": "AGM",
+    "address": "0x3F4A...5B6C",
+    "founder": "N/A",
+    "category": "feeding others",
+    "impact_score": 9,
+    "multiplier": 1.8
+  },
+  {
+    "ticker": "NORI",
+    "address": "0xF4Ef...5EA0",
+    "founder": "Paul Gambill",
     "category": "environment",
-    "score": 5.0,
-    "multiplier": 1.5
+    "impact_score": 10,
+    "multiplier": 2.0
   },
-  "TUSD": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
+  {
+    "ticker": "KLIMA",
+    "address": "0x4E78...9Fa7",
+    "founder": "Unknown",
+    "category": "environment",
+    "impact_score": 10,
+    "multiplier": 2.0
   },
-  "UNI": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
+  {
+    "ticker": "TREE",
+    "address": "0x703D...EF6B",
+    "founder": "N/A",
+    "category": "environment",
+    "impact_score": 10,
+    "multiplier": 2.0
   },
-  "USDC": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
+  {
+    "ticker": "GREE",
+    "address": "0x82f8...cB9D",
+    "founder": "N/A",
+    "category": "environment",
+    "impact_score": 10,
+    "multiplier": 2.0
   },
-  "USDT": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
+  {
+    "ticker": "OCEA",
+    "address": "0x1B3F...6D10",
+    "founder": "N/A",
+    "category": "environment",
+    "impact_score": 10,
+    "multiplier": 2.0
   },
-  "WBTC": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
+  {
+    "ticker": "BIO",
+    "address": "0x4C6A...8F21",
+    "founder": "N/A",
+    "category": "environment",
+    "impact_score": 10,
+    "multiplier": 2.0
   },
-  "ZRX": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
+  {
+    "ticker": "ECO",
+    "address": "0x7D9B...0C32",
+    "founder": "N/A",
+    "category": "environment",
+    "impact_score": 10,
+    "multiplier": 2.0
   },
-  "sETH": {
-    "category": "infrastructure",
-    "score": 3.0,
-    "multiplier": 1.2
+  {
+    "ticker": "CDT",
+    "address": "0x8EA4...4E53",
+    "founder": "N/A",
+    "category": "environment",
+    "impact_score": 10,
+    "multiplier": 2.0
+  },
+  {
+    "ticker": "WATR",
+    "address": "0x9F35...6F64",
+    "founder": "N/A",
+    "category": "environment",
+    "impact_score": 10,
+    "multiplier": 2.0
+  },
+  {
+    "ticker": "WIND",
+    "address": "0xA1B2...8C75",
+    "founder": "N/A",
+    "category": "environment",
+    "impact_score": 10,
+    "multiplier": 2.0
   }
-}
+]
