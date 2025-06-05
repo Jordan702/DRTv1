@@ -1,8 +1,356 @@
 [
-  { "timestamp": "2025-07-04T00:00:00Z", "token": "UNI", "paired_with": "AAVE", "bridge": "DRTv1" },
-  { "timestamp": "2025-07-04T00:00:00Z", "token": "LINK", "paired_with": "GRT", "bridge": "DRTv2" },
-  { "timestamp": "2025-07-04T00:00:00Z", "token": "BAL", "paired_with": "LDO", "bridge": "DRTv2" },
-  { "timestamp": "2025-07-04T00:00:00Z", "token": "SNX", "paired_with": "MKR", "bridge": "DRTv1" },
-  { "timestamp": "2025-07-04T00:00:00Z", "token": "OCEAN", "paired_with": "BICO", "bridge": "DRTv1" },
-  { "timestamp": "2025-07-04T00:00:00Z", "token": "ZRX", "paired_with": "ENS", "bridge": "DRTv2" }
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "UNI",
+    "paired_with": "AAVE",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "LINK",
+    "paired_with": "GRT",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "BAL",
+    "paired_with": "LDO",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "SNX",
+    "paired_with": "MKR",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "OCEAN",
+    "paired_with": "BICO",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "ZRX",
+    "paired_with": "ENS",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "ZRX",
+    "paired_with": "AAVE",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "MKR",
+    "paired_with": "SNX",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "AGRICHAIN",
+    "paired_with": "AGROTECHFARM",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "AGROTOKEN",
+    "paired_with": "ARCHWAY",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "BICO",
+    "paired_with": "BIOT",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "BIOTOKEN",
+    "paired_with": "BDAI",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "BRICKBLOCK",
+    "paired_with": "BUILD",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "CAREBIT",
+    "paired_with": "CARECHAIN",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "CLEANWATERCOIN",
+    "paired_with": "CLIMATECOIN",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "CLINTEX",
+    "paired_with": "CORT",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "CROB",
+    "paired_with": "DEC",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "DCN",
+    "paired_with": "DHN",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "DOC",
+    "paired_with": "DRT",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "DRTV1",
+    "paired_with": "ECOD",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "ECOCOIN",
+    "paired_with": "EHARVEST",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "FARMCOIN",
+    "paired_with": "FOODCOIN",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "GREEN",
+    "paired_with": "HEALTHCHAIN",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "HEALTHEREUM",
+    "paired_with": "HEALTHSCI.AI",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "HLTH",
+    "paired_with": "HPO",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "IMG",
+    "paired_with": "LEDU-EDUCATION-ECOSYSTEM",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "LKN",
+    "paired_with": "LYMPO",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "MAIN",
+    "paired_with": "MTX",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "MEDICALTOKENCURRENCY",
+    "paired_with": "MEDISHARES",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "MELLO",
+    "paired_with": "MOR",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "MUHDO",
+    "paired_with": "NDC",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "NORI",
+    "paired_with": "PTOY",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "PROPY",
+    "paired_with": "REALT",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "REGENNETWORK",
+    "paired_with": "REINNO",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "SAAS",
+    "paired_with": "SETHLOGO",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "SMARTLANDS",
+    "paired_with": "SOLVE.BIN(1)",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "SOLV",
+    "paired_with": "sETH",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "TREE",
+    "paired_with": "WEL",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "WEPOWER",
+    "paired_with": "ZAYA",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "AGRIDIGITAL",
+    "paired_with": "AGRO",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "AGUNITY",
+    "paired_with": "CROPCHAIN",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "FOOD",
+    "paired_with": "GRAINCHAIN",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "TE-FOOD",
+    "paired_with": "AIDOC",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "AIMEDIS",
+    "paired_with": "HEALCHAIN",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "HEALTHBANK",
+    "paired_with": "MEDIBLOC",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "MEDICALCHAIN",
+    "paired_with": "SOLVE",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "WELLNESS",
+    "paired_with": "CARBONX",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "EARTHTOKEN",
+    "paired_with": "GREENENERGYTOKEN",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "KLIMA",
+    "paired_with": "MOSSCARBONCREDIT",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "RENEWABLECOIN",
+    "paired_with": "VERDE",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "LINK",
+    "paired_with": "ENS",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "HOOK",
+    "paired_with": "OCEAN",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "GRT",
+    "paired_with": "EDUT",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "LEDU",
+    "paired_with": "LEARN",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "STUDENTCOIN",
+    "paired_with": "STUDY",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "EFFORCE",
+    "paired_with": "ENERGYWEBTOKEN",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "GRID+",
+    "paired_with": "POWERLEDGER",
+    "bridge": "DRTv1"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "SOLARCOIN",
+    "paired_with": "SUNCONTRACT",
+    "bridge": "DRTv2"
+  },
+  {
+    "timestamp": "2025-07-04T00:00:00Z",
+    "token": "SUSTAINABLEENERGYTOKEN",
+    "paired_with": "ZRX",
+    "bridge": "DRTv1"
+  }
 ]
