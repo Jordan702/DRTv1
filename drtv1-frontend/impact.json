@@ -1,442 +1,890 @@
 [
   {
-    "ticker": "SOLVE",
-    "address": "0x9A92...4644",
-    "founder": "Pradeep Goel",
-    "category": "healing",
-    "impact_score": 8,
-    "multiplier": 1.5
+    "ticker": "ZRX",
+    "address": "0x8126620dd9cf011b1b06eb957586bb9961c20e54",
+    "founder": "Alice Foundation",
+    "category": "defi",
+    "impact_score": 7,
+    "multiplier": 1.96
   },
   {
-    "ticker": "WEL",
-    "address": "0x1E76...BE5",
-    "founder": "Unknown",
-    "category": "healing",
+    "ticker": "AAVE",
+    "address": "0xbc1a2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b",
+    "founder": "Frank Foundation",
+    "category": "defi",
     "impact_score": 8,
-    "multiplier": 1.5
+    "multiplier": 1.66
   },
   {
-    "ticker": "BBT",
-    "address": "0x2613...6cd4",
-    "founder": "Unknown",
-    "category": "healing",
+    "ticker": "BAL",
+    "address": "0x8c4b1a2181cfffb51a92905451fdf6cbcf35063e",
+    "founder": "Bob Foundation",
+    "category": "defi",
     "impact_score": 8,
-    "multiplier": 1.5
+    "multiplier": 1.76
   },
   {
-    "ticker": "MED",
-    "address": "0xD6C2...20A8",
-    "founder": "Dr. Han Mo Jeong",
-    "category": "healing",
-    "impact_score": 8,
-    "multiplier": 1.5
+    "ticker": "LDO",
+    "address": "0x04e3e2c1a9b8d6f5a4c3b2d1e0f9a8b7c6d5e4f3",
+    "founder": "Eve Foundation",
+    "category": "defi",
+    "impact_score": 9,
+    "multiplier": 1.74
   },
   {
-    "ticker": "HP",
-    "address": "0xCD9E...77F9",
-    "founder": "Unknown",
-    "category": "healing",
-    "impact_score": 8,
-    "multiplier": 1.5
+    "ticker": "MKR",
+    "address": "0x36f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2",
+    "founder": "Alice Foundation",
+    "category": "defi",
+    "impact_score": 7,
+    "multiplier": 1.67
   },
   {
-    "ticker": "HPO",
-    "address": "0x3BB5...40b8",
-    "founder": "Unknown",
-    "category": "healing",
+    "ticker": "SNX",
+    "address": "0x89b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8",
+    "founder": "Eve Foundation",
+    "category": "defi",
     "impact_score": 8,
-    "multiplier": 1.5
+    "multiplier": 1.67
   },
   {
-    "ticker": "GALEON",
-    "address": "0x3F63...E708",
-    "founder": "Stella Christodoulaki",
-    "category": "healing",
-    "impact_score": 8,
-    "multiplier": 1.5
+    "ticker": "AGRICHAIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 3,
+    "multiplier": 1.14
   },
   {
-    "ticker": "DNA",
-    "address": "0x1A00...2C0A",
-    "founder": "Unknown",
-    "category": "healing",
-    "impact_score": 8,
-    "multiplier": 1.5
+    "ticker": "AGRIDEXDARKLOGO.BIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.16
   },
   {
-    "ticker": "MELLO",
-    "address": "0x82a3...3DcF",
-    "founder": "Unknown",
-    "category": "healing",
-    "impact_score": 8,
-    "multiplier": 1.5
+    "ticker": "AGROTECHFARM",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.25
   },
   {
-    "ticker": "AIDD",
-    "address": "0x6eAB...74Ca",
-    "founder": "Unknown",
-    "category": "healing",
-    "impact_score": 8,
-    "multiplier": 1.5
+    "ticker": "AGROTOKEN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 7,
+    "multiplier": 1.25
+  },
+  {
+    "ticker": "ARCHWAY",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 7,
+    "multiplier": 1.18
+  },
+  {
+    "ticker": "BICO",
+    "address": "0xc3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2",
+    "founder": "Alice Foundation",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.38
+  },
+  {
+    "ticker": "BIOT",
+    "address": "0xd6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+    "founder": "Bob Foundation",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.2
+  },
+  {
+    "ticker": "BIOTOKEN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 7,
+    "multiplier": 1.21
+  },
+  {
+    "ticker": "BDAI",
+    "address": "0xbd76a89d27e5594b9a9b950253ee9fb29c3e25c0",
+    "founder": "Dave Foundation",
+    "category": "other",
+    "impact_score": 3,
+    "multiplier": 1.24
+  },
+  {
+    "ticker": "BRICKBLOCK",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 3,
+    "multiplier": 1.19
+  },
+  {
+    "ticker": "BUILD",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.27
+  },
+  {
+    "ticker": "CAREBIT",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.12
+  },
+  {
+    "ticker": "CARECHAIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 7,
+    "multiplier": 1.28
+  },
+  {
+    "ticker": "CGLOGO.BIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.2
+  },
+  {
+    "ticker": "CLEANWATERCOIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 7,
+    "multiplier": 1.23
+  },
+  {
+    "ticker": "CLIMATECOIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.37
+  },
+  {
+    "ticker": "CLINTEX",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.18
+  },
+  {
+    "ticker": "CORT",
+    "address": "0x0123456789abcdef0123456789abcdef01234567",
+    "founder": "Dave Foundation",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.31
+  },
+  {
+    "ticker": "CORTENSOR-LOGO-SQUARE-TRANS-200X200.BIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.19
+  },
+  {
+    "ticker": "CROB",
+    "address": "0x7a94ac8265f8a0b10ec60d6f3adb8bd1b27ffcb6",
+    "founder": "Charlie Foundation",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.32
+  },
+  {
+    "ticker": "DEC",
+    "address": "0x32c15c64d95f0c184c2d1f5141a5e4f0b6f75dfc",
+    "founder": "Bob Foundation",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.18
   },
   {
     "ticker": "DCN",
-    "address": "0x08E1...EF74",
-    "founder": "Sergey Gorbachev",
-    "category": "healing",
-    "impact_score": 8,
-    "multiplier": 1.5
-  },
-  {
-    "ticker": "DRPAL",
-    "address": "0x8f2C...E914",
-    "founder": "Panagiotis Lioupis",
-    "category": "healing",
-    "impact_score": 8,
-    "multiplier": 1.5
-  },
-  {
-    "ticker": "ZAI",
-    "address": "0x52Aa...9208",
-    "founder": "Unknown",
-    "category": "healing",
-    "impact_score": 8,
-    "multiplier": 1.5
-  },
-  {
-    "ticker": "PTOY",
-    "address": "0xC702...59c6",
-    "founder": "Pradeep Goel",
-    "category": "healing",
-    "impact_score": 8,
-    "multiplier": 1.5
-  },
-  {
-    "ticker": "HSAI",
-    "address": "0x833C...6D8B",
-    "founder": "Unknown",
-    "category": "healing",
-    "impact_score": 8,
-    "multiplier": 1.5
-  },
-  {
-    "ticker": "EDUchain",
-    "address": "0x3B4B...5924",
-    "founder": "Unknown",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
-  },
-  {
-    "ticker": "YAKUZA",
-    "address": "0xC9C2...77D5",
-    "founder": "Unknown",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
-  },
-  {
-    "ticker": "LEDU",
-    "address": "0x5B26...3765",
-    "founder": "Unknown",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
-  },
-  {
-    "ticker": "EDU",
-    "address": "0x207F...B473",
-    "founder": "Unknown",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
+    "address": "0x6789abcdef0123456789abcdef0123456789abcd",
+    "founder": "Eve Foundation",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.33
   },
   {
     "ticker": "DHN",
-    "address": "0x92D0...4A3B",
-    "founder": "Unknown",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
+    "address": "0x789abcdef0123456789abcdef0123456789abcde",
+    "founder": "Frank Foundation",
+    "category": "other",
+    "impact_score": 3,
+    "multiplier": 1.27
   },
   {
-    "ticker": "HOOK",
-    "address": "0xDAB5...6236",
-    "founder": "Unknown",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
+    "ticker": "DOC",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.4
   },
   {
-    "ticker": "TOKEN",
-    "address": "0x333F...20EF",
-    "founder": "Unknown",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
+    "ticker": "DRT",
+    "address": "0xc1d5148f4b3af4b64f771483269d7d2dce7cd2f3",
+    "founder": "Alice Foundation",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.32
   },
   {
-    "ticker": "NWC",
-    "address": "0x8504...7EC2",
-    "founder": "Fabrizio Strazzante",
-    "category": "education",
+    "ticker": "DRTV1",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
     "impact_score": 7,
-    "multiplier": 1.3
+    "multiplier": 1.16
   },
   {
-    "ticker": "WNK",
-    "address": "0xC6f3...52F1",
-    "founder": "Unknown",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
+    "ticker": "ECOD",
+    "address": "0x150c4e77bb8fb13c2a197e3cf70a3c0a8f7dcf02",
+    "founder": "Eve Foundation",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.16
   },
   {
-    "ticker": "NDC",
-    "address": "0xDEF2...E86a",
-    "founder": "Unknown",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
+    "ticker": "ECOCOIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.33
   },
   {
-    "ticker": "AIMX",
-    "address": "0xCE12...Cd4d",
-    "founder": "Unknown",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
+    "ticker": "EHARVEST",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 3,
+    "multiplier": 1.26
   },
   {
-    "ticker": "NFE",
-    "address": "0xD07C...2D11",
-    "founder": "Unknown",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
+    "ticker": "FARMCOIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.27
   },
   {
-    "ticker": "STC",
-    "address": "0x0E04...4E4F",
-    "founder": "Michael Ilyenko",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
+    "ticker": "FOODCOIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.2
   },
   {
-    "ticker": "ODE",
-    "address": "0x9A39...ff31",
-    "founder": "Aki Hierhman",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
+    "ticker": "GREEN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.16
   },
   {
-    "ticker": "MOROS",
-    "address": "0x2cf5...6e33",
-    "founder": "Unknown",
-    "category": "education",
+    "ticker": "HEALTHCHAIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
     "impact_score": 7,
-    "multiplier": 1.3
+    "multiplier": 1.37
   },
   {
-    "ticker": "EKT",
-    "address": "0x298D...F2F9",
-    "founder": "Unknown",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
+    "ticker": "HEALTHEREUM",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 3,
+    "multiplier": 1.32
   },
   {
-    "ticker": "NATION",
-    "address": "0xA3C3...fF8F",
-    "founder": "Dr. Yoram",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
+    "ticker": "HEALTHSCI.AI",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.36
   },
   {
-    "ticker": "COR",
-    "address": "0x3F61...Fa9A",
-    "founder": "Unknown",
-    "category": "education",
+    "ticker": "HLTH",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
     "impact_score": 7,
-    "multiplier": 1.3
+    "multiplier": 1.24
+  },
+  {
+    "ticker": "HPO",
+    "address": "0x7d8a15cbe843c03a746d2104f58e3df5cdb558a1",
+    "founder": "Bob Foundation",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.28
+  },
+  {
+    "ticker": "IMG",
+    "address": "0x9abcdef0123456789abcdef0123456789abcdef0",
+    "founder": "Bob Foundation",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.33
+  },
+  {
+    "ticker": "LEDU-EDUCATION-ECOSYSTEM",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.35
+  },
+  {
+    "ticker": "LKN",
+    "address": "0xabcdef0123456789abcdef0123456789abcdef01",
+    "founder": "Charlie Foundation",
+    "category": "other",
+    "impact_score": 7,
+    "multiplier": 1.28
+  },
+  {
+    "ticker": "LOGO_CG_GALEON.BIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 3,
+    "multiplier": 1.28
+  },
+  {
+    "ticker": "LYMPO",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.37
+  },
+  {
+    "ticker": "MAIN",
+    "address": "0x15a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0",
+    "founder": "Frank Foundation",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.36
   },
   {
     "ticker": "MTX",
-    "address": "0x726E...1647",
-    "founder": "Dominic Felicione",
-    "category": "education",
+    "address": "0xbcdef0123456789abcdef0123456789abcdef012",
+    "founder": "Dave Foundation",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.13
+  },
+  {
+    "ticker": "MEDICALTOKENCURRENCY",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 3,
+    "multiplier": 1.19
+  },
+  {
+    "ticker": "MEDISHARES",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
     "impact_score": 7,
     "multiplier": 1.3
   },
   {
-    "ticker": "SCHO",
-    "address": "0x6C86...cD7B",
-    "founder": "Gemma Francis",
-    "category": "education",
+    "ticker": "MELLO",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.13
+  },
+  {
+    "ticker": "MOR",
+    "address": "0x58a7f6b5c4d3e2f1a0b9c8d7e6f5c4b3a2f1d0e9",
+    "founder": "Bob Foundation",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.39
+  },
+  {
+    "ticker": "MUHDO",
+    "address": "0x78b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8",
+    "founder": "Charlie Foundation",
+    "category": "other",
     "impact_score": 7,
-    "multiplier": 1.3
+    "multiplier": 1.2
   },
   {
-    "ticker": "BET",
-    "address": "0x1234...ABCD",
-    "founder": "N/A",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
-  },
-  {
-    "ticker": "LTR",
-    "address": "0x5678...EF90",
-    "founder": "N/A",
-    "category": "education",
-    "impact_score": 7,
-    "multiplier": 1.3
-  },
-  {
-    "ticker": "CITY",
-    "address": "0xAAA1...BBB2",
-    "founder": "N/A",
-    "category": "infrastructure",
-    "impact_score": 6,
-    "multiplier": 1.1
-  },
-  {
-    "ticker": "INFRA",
-    "address": "0xCCC3...DDD4",
-    "founder": "N/A",
-    "category": "infrastructure",
-    "impact_score": 6,
-    "multiplier": 1.1
-  },
-  {
-    "ticker": "CVP",
-    "address": "0xEEE5...FFF6",
-    "founder": "N/A",
-    "category": "infrastructure",
-    "impact_score": 6,
-    "multiplier": 1.1
-  },
-  {
-    "ticker": "EDUB",
-    "address": "0xGGG7...HHH8",
-    "founder": "N/A",
-    "category": "infrastructure",
-    "impact_score": 6,
-    "multiplier": 1.1
-  },
-  {
-    "ticker": "AGRI",
-    "address": "0x1A2B...3C4D",
-    "founder": "Unknown",
-    "category": "feeding others",
-    "impact_score": 9,
-    "multiplier": 1.8
-  },
-  {
-    "ticker": "CROP",
-    "address": "0x5E6F...7A8B",
-    "founder": "N/A",
-    "category": "feeding others",
-    "impact_score": 9,
-    "multiplier": 1.8
-  },
-  {
-    "ticker": "FC",
-    "address": "0x9C0D...1E2F",
-    "founder": "N/A",
-    "category": "feeding others",
-    "impact_score": 9,
-    "multiplier": 1.8
-  },
-  {
-    "ticker": "AGM",
-    "address": "0x3F4A...5B6C",
-    "founder": "N/A",
-    "category": "feeding others",
-    "impact_score": 9,
-    "multiplier": 1.8
+    "ticker": "NDC",
+    "address": "0x29a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8",
+    "founder": "Dave Foundation",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.23
   },
   {
     "ticker": "NORI",
-    "address": "0xF4Ef...5EA0",
-    "founder": "Paul Gambill",
-    "category": "environment",
-    "impact_score": 10,
-    "multiplier": 2.0
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.11
   },
   {
-    "ticker": "KLIMA",
-    "address": "0x4E78...9Fa7",
-    "founder": "Unknown",
-    "category": "environment",
-    "impact_score": 10,
-    "multiplier": 2.0
+    "ticker": "PTOY",
+    "address": "0xdef0123456789abcdef0123456789abcdef01234",
+    "founder": "Frank Foundation",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.25
+  },
+  {
+    "ticker": "PROPY",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.11
+  },
+  {
+    "ticker": "REALT",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.35
+  },
+  {
+    "ticker": "REGENNETWORK",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.23
+  },
+  {
+    "ticker": "REINNO",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.36
+  },
+  {
+    "ticker": "SAAS",
+    "address": "0xab0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8",
+    "founder": "Frank Foundation",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.19
+  },
+  {
+    "ticker": "SETHLOGO",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.19
+  },
+  {
+    "ticker": "SMARTLANDS",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.37
+  },
+  {
+    "ticker": "SOLVE.BIN(1)",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.27
+  },
+  {
+    "ticker": "SOLV",
+    "address": "0xd3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2",
+    "founder": "Bob Foundation",
+    "category": "other",
+    "impact_score": 3,
+    "multiplier": 1.19
+  },
+  {
+    "ticker": "sETH",
+    "address": "0xef0123456789abcdef0123456789abcdef012345",
+    "founder": "Alice Foundation",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.3
   },
   {
     "ticker": "TREE",
-    "address": "0x703D...EF6B",
-    "founder": "N/A",
-    "category": "environment",
-    "impact_score": 10,
-    "multiplier": 2.0
+    "address": "0xf6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5",
+    "founder": "Dave Foundation",
+    "category": "other",
+    "impact_score": 6,
+    "multiplier": 1.25
   },
   {
-    "ticker": "GREE",
-    "address": "0x82f8...cB9D",
-    "founder": "N/A",
-    "category": "environment",
-    "impact_score": 10,
-    "multiplier": 2.0
+    "ticker": "WEL",
+    "address": "0xec11366e29d000e06c3e3c732e535b3386b4617b",
+    "founder": "Bob Foundation",
+    "category": "other",
+    "impact_score": 3,
+    "multiplier": 1.15
   },
   {
-    "ticker": "OCEA",
-    "address": "0x1B3F...6D10",
-    "founder": "N/A",
-    "category": "environment",
-    "impact_score": 10,
-    "multiplier": 2.0
+    "ticker": "WEPOWER",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "other",
+    "impact_score": 5,
+    "multiplier": 1.35
   },
   {
-    "ticker": "BIO",
-    "address": "0x4C6A...8F21",
-    "founder": "N/A",
-    "category": "environment",
-    "impact_score": 10,
-    "multiplier": 2.0
+    "ticker": "ZAYA",
+    "address": "0xa9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8",
+    "founder": "Eve Foundation",
+    "category": "other",
+    "impact_score": 4,
+    "multiplier": 1.24
   },
   {
-    "ticker": "ECO",
-    "address": "0x7D9B...0C32",
-    "founder": "N/A",
-    "category": "environment",
-    "impact_score": 10,
-    "multiplier": 2.0
+    "ticker": "AGRIDIGITAL",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "supply_chain",
+    "impact_score": 9,
+    "multiplier": 1.67
   },
   {
-    "ticker": "CDT",
-    "address": "0x8EA4...4E53",
-    "founder": "N/A",
-    "category": "environment",
-    "impact_score": 10,
-    "multiplier": 2.0
+    "ticker": "AGRO",
+    "address": "0x83ef9cf0a0e9c43c1fb563d3b8809c8f5bdd3862",
+    "founder": "Eve Foundation",
+    "category": "supply_chain",
+    "impact_score": 6,
+    "multiplier": 1.7
   },
   {
-    "ticker": "WATR",
-    "address": "0x9F35...6F64",
-    "founder": "N/A",
-    "category": "environment",
-    "impact_score": 10,
-    "multiplier": 2.0
+    "ticker": "AGUNITY",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "supply_chain",
+    "impact_score": 8,
+    "multiplier": 1.71
   },
   {
-    "ticker": "WIND",
-    "address": "0xA1B2...8C75",
-    "founder": "N/A",
-    "category": "environment",
+    "ticker": "CROPCHAIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "supply_chain",
+    "impact_score": 7,
+    "multiplier": 1.6
+  },
+  {
+    "ticker": "FOOD",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "supply_chain",
+    "impact_score": 6,
+    "multiplier": 1.74
+  },
+  {
+    "ticker": "GRAINCHAIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "supply_chain",
+    "impact_score": 8,
+    "multiplier": 1.76
+  },
+  {
+    "ticker": "TE-FOOD",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "supply_chain",
+    "impact_score": 8,
+    "multiplier": 1.75
+  },
+  {
+    "ticker": "AIDOC",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "health",
+    "impact_score": 6,
+    "multiplier": 1.57
+  },
+  {
+    "ticker": "AIMEDIS",
+    "address": "0x61c4328d3296695b6c78fbc7cfd506f4fdb1e7dd",
+    "founder": "Frank Foundation",
+    "category": "health",
+    "impact_score": 6,
+    "multiplier": 1.8
+  },
+  {
+    "ticker": "HEALCHAIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "health",
+    "impact_score": 8,
+    "multiplier": 1.56
+  },
+  {
+    "ticker": "HEALTHBANK",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "health",
+    "impact_score": 7,
+    "multiplier": 1.53
+  },
+  {
+    "ticker": "MEDIBLOC",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "health",
+    "impact_score": 8,
+    "multiplier": 1.4
+  },
+  {
+    "ticker": "MEDICALCHAIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "health",
+    "impact_score": 8,
+    "multiplier": 1.45
+  },
+  {
+    "ticker": "SOLVE",
+    "address": "0xc0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9",
+    "founder": "Alice Foundation",
+    "category": "health",
+    "impact_score": 6,
+    "multiplier": 1.74
+  },
+  {
+    "ticker": "WELLNESS",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "health",
+    "impact_score": 9,
+    "multiplier": 1.56
+  },
+  {
+    "ticker": "CARBONX",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "climate",
+    "impact_score": 8,
+    "multiplier": 1.9
+  },
+  {
+    "ticker": "EARTHTOKEN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "climate",
+    "impact_score": 7,
+    "multiplier": 1.81
+  },
+  {
+    "ticker": "GREENENERGYTOKEN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "climate",
     "impact_score": 10,
-    "multiplier": 2.0
+    "multiplier": 1.94
+  },
+  {
+    "ticker": "KLIMA",
+    "address": "0x5f9e9b08a8f96e2b8a7c5d7f4a3b6c8c1f4d2e0b",
+    "founder": "Charlie Foundation",
+    "category": "climate",
+    "impact_score": 10,
+    "multiplier": 1.72
+  },
+  {
+    "ticker": "MOSSCARBONCREDIT",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "climate",
+    "impact_score": 9,
+    "multiplier": 1.9
+  },
+  {
+    "ticker": "RENEWABLECOIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "climate",
+    "impact_score": 8,
+    "multiplier": 1.99
+  },
+  {
+    "ticker": "VERDE",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "climate",
+    "impact_score": 7,
+    "multiplier": 1.9
+  },
+  {
+    "ticker": "LINK",
+    "address": "0xefe7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+    "founder": "Charlie Foundation",
+    "category": "infrastructure",
+    "impact_score": 8,
+    "multiplier": 1.91
+  },
+  {
+    "ticker": "ENS",
+    "address": "0x56d084b0d0c78ba4c2cd3d90f9575f7a0a4a701e",
+    "founder": "Dave Foundation",
+    "category": "infrastructure",
+    "impact_score": 9,
+    "multiplier": 1.85
+  },
+  {
+    "ticker": "HOOK",
+    "address": "0x89abcdef0123456789abcdef0123456789abcdef",
+    "founder": "Alice Foundation",
+    "category": "infrastructure",
+    "impact_score": 8,
+    "multiplier": 1.83
+  },
+  {
+    "ticker": "OCEAN",
+    "address": "0xcdef0123456789abcdef0123456789abcdef0123",
+    "founder": "Eve Foundation",
+    "category": "infrastructure",
+    "impact_score": 7,
+    "multiplier": 1.95
+  },
+  {
+    "ticker": "GRT",
+    "address": "0x3b2b9fa5d4d3a8a93f9b0d7b4c8b6f4a2c9e3f8d",
+    "founder": "Alice Foundation",
+    "category": "infrastructure",
+    "impact_score": 9,
+    "multiplier": 1.82
+  },
+  {
+    "ticker": "EDUT",
+    "address": "0x4efc9f53d59b7c16d084e752db5c18fc79d5ca41",
+    "founder": "Charlie Foundation",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.49
+  },
+  {
+    "ticker": "LEDU",
+    "address": "0x8af56ecb16f2dae28b7a2a46c39207332f6fe9fb",
+    "founder": "Frank Foundation",
+    "category": "education",
+    "impact_score": 5,
+    "multiplier": 1.69
+  },
+  {
+    "ticker": "LEARN",
+    "address": "0x9c4e3f2d7b4a8d6f1c0e7b2a5d3c9f8a6b4c3d2e",
+    "founder": "Dave Foundation",
+    "category": "education",
+    "impact_score": 8,
+    "multiplier": 1.53
+  },
+  {
+    "ticker": "STUDENTCOIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "education",
+    "impact_score": 7,
+    "multiplier": 1.65
+  },
+  {
+    "ticker": "STUDY",
+    "address": "0xe5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4",
+    "founder": "Charlie Foundation",
+    "category": "education",
+    "impact_score": 5,
+    "multiplier": 1.46
+  },
+  {
+    "ticker": "EFFORCE",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "energy",
+    "impact_score": 9,
+    "multiplier": 1.84
+  },
+  {
+    "ticker": "ENERGYWEBTOKEN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "energy",
+    "impact_score": 8,
+    "multiplier": 1.9
+  },
+  {
+    "ticker": "GRID+",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "energy",
+    "impact_score": 9,
+    "multiplier": 1.97
+  },
+  {
+    "ticker": "POWERLEDGER",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "energy",
+    "impact_score": 7,
+    "multiplier": 1.93
+  },
+  {
+    "ticker": "SOLARCOIN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "energy",
+    "impact_score": 10,
+    "multiplier": 1.95
+  },
+  {
+    "ticker": "SUNCONTRACT",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "energy",
+    "impact_score": 10,
+    "multiplier": 1.89
+  },
+  {
+    "ticker": "SUSTAINABLEENERGYTOKEN",
+    "address": "TBD",
+    "founder": "TBD",
+    "category": "energy",
+    "impact_score": 7,
+    "multiplier": 1.91
   }
 ]
