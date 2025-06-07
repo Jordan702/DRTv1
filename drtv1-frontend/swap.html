@@ -2,141 +2,135 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DRT Mesh Swap</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
       background-color: #111;
-      color: #eee;
+      color: #fff;
+      font-family: Arial, sans-serif;
       text-align: center;
-      padding: 2rem;
+      padding: 2em;
     }
-
     h1 {
-      font-size: 2rem;
-      color: #00ffcc;
+      font-size: 2.5em;
+      margin-bottom: 0.2em;
     }
-
-    .info {
-      margin-bottom: 1.5rem;
-      font-size: 1.1rem;
+    p {
+      font-size: 1.1em;
+      margin-bottom: 2em;
     }
-
-    .swap-box {
-      background: #222;
-      padding: 2rem;
-      border-radius: 10px;
-      display: inline-block;
-      min-width: 300px;
+    .category-Food {
+      background-color: #5c4033;
     }
-
-    select, input, button {
-      display: block;
-      width: 100%;
-      margin: 0.5rem 0;
-      padding: 0.5rem;
-      border-radius: 5px;
-      border: none;
+    .category-Climate {
+      background-color: #2e8b57;
     }
-
-    button {
-      background: #00ffcc;
+    .category-Infrastructure {
+      background-color: #8b0000;
+    }
+    .category-Education {
+      background-color: #fff;
       color: #000;
-      font-weight: bold;
-      cursor: pointer;
     }
-
-    #status {
-      margin-top: 1rem;
-      color: #ffa;
-      font-size: 0.9rem;
+    .category-Health {
+      background-color: #4682b4;
+    }
+    .token-card {
+      border-radius: 10px;
+      padding: 1em;
+      margin: 1em auto;
+      max-width: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .token-card:hover {
+      transform: scale(1.02);
+    }
+    .token-logo {
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      margin-right: 1em;
+    }
+    .token-details {
+      flex: 1;
+      text-align: left;
+    }
+    .token-name {
+      font-weight: bold;
+    }
+    .token-meta {
+      font-size: 0.9em;
     }
   </style>
 </head>
 <body>
+  <h1>Welcome to DRT Mesh</h1>
+  <p>Every buy supports global livelihoods. Earn DRT as impact rewards. 100 points = $1 worth of DRT.</p>
 
-  <h1>DRT Mesh Token Exchange</h1>
-  <p class="info">
-    This is a purpose-built, decentralized mesh exchange prioritizing global impact over profit.<br>
-    Every buy helps global livelihood and rewards you through our impact system. 100 points = $1 worth of DRT!
-  </p>
-
-  <div class="swap-box">
-    <button id="connectWallet">Connect Wallet</button>
-
-    <label for="fromToken">From Token</label>
-    <select id="fromToken"><option value="">Loading...</option></select>
-
-    <label for="toToken">To Token</label>
-    <select id="toToken"><option value="">Loading...</option></select>
-
-    <label for="amount">Amount</label>
-    <input type="number" id="amount" placeholder="Enter amount" min="0" />
-
-    <button id="swapButton">Swap</button>
-
-    <p id="status"></p>
-  </div>
+  <div id="token-list"></div>
 
   <script>
-    let account;
-    const provider = window.ethereum;
-    const contractAddress = "0xYourUniversalRouterAddressHere";
-    const contractABI = [ /* Replace with DRTUniversalRouter ABI */ ];
+    const registryUrl = "tokenRegistry.json";
+    const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=",
+          coingeckoSuffix = "&vs_currencies=usd";
 
-    async function connectWallet() {
-      if (!provider) return alert("MetaMask not found");
-      const accounts = await provider.request({ method: 'eth_requestAccounts' });
-      account = accounts[0];
-      document.getElementById("connectWallet").innerText = "Connected: " + account.slice(0, 6) + "...";
+    async function fetchRegistry() {
+      const res = await fetch(registryUrl);
+      return await res.json();
     }
 
-    async function swapTokens() {
-      const from = document.getElementById("fromToken").value;
-      const to = document.getElementById("toToken").value;
-      const amount = document.getElementById("amount").value;
-      const status = document.getElementById("status");
-
-      if (!account || !from || !to || !amount) {
-        status.innerText = "Please fill all fields and connect wallet.";
-        return;
-      }
-
-      try {
-        const web3 = new Web3(provider);
-        const router = new web3.eth.Contract(contractABI, contractAddress);
-        const amountWei = web3.utils.toWei(amount, 'ether');
-
-        status.innerText = "Swapping...";
-
-        const tx = await router.methods.swap(from, to, amountWei).send({ from: account });
-
-        status.innerText = "Swap successful! Tx: " + tx.transactionHash;
-      } catch (err) {
-        console.error(err);
-        status.innerText = "Swap failed. Check console.";
-      }
+    async function fetchPrices(ids) {
+      const res = await fetch(coingeckoUrl + ids.join('%2C') + coingeckoSuffix);
+      return await res.json();
     }
 
-    document.getElementById("connectWallet").addEventListener("click", connectWallet);
-    document.getElementById("swapButton").addEventListener("click", swapTokens);
+    function getCategoryStyle(category) {
+      return `category-${category}`.replace(/\s/g, '');
+    }
 
-    // Load token options from tokenRegistry.json
-    fetch("tokenRegistry.json")
-      .then(res => res.json())
-      .then(data => {
-        const fromTokenSelect = document.getElementById("fromToken");
-        const toTokenSelect = document.getElementById("toToken");
+    function createCard(token, priceData) {
+      const card = document.createElement('div');
+      card.className = `token-card ${getCategoryStyle(token.category)}`;
+      card.onclick = () => window.location.href = `tokeninfo.html?ticker=${token.ticker}`;
 
-        Object.values(data).forEach(token => {
-          const option = `<option value="${token.ticker}">${token.name} (${token.ticker})</option>`;
-          fromTokenSelect.innerHTML += option;
-          toTokenSelect.innerHTML += option;
-        });
+      const logo = document.createElement('img');
+      logo.src = token.logo;
+      logo.className = 'token-logo';
+
+      const details = document.createElement('div');
+      details.className = 'token-details';
+      details.innerHTML = `
+        <div class="token-name">${token.name} (${token.ticker})</div>
+        <div class="token-meta">
+          Price: $${priceData?.[token.coingeckoId]?.usd?.toFixed(2) || 'N/A'}<br />
+          Category: ${token.category}<br />
+          Impact Score: ${token.impactScore}
+        </div>`;
+
+      card.appendChild(logo);
+      card.appendChild(details);
+      return card;
+    }
+
+    async function renderTokens() {
+      const container = document.getElementById("token-list");
+      const data = await fetchRegistry();
+      const tokenArray = Object.values(data);
+      const ids = tokenArray.map(t => t.coingeckoId).filter(Boolean);
+      const prices = await fetchPrices(ids);
+
+      tokenArray.forEach(token => {
+        container.appendChild(createCard(token, prices));
       });
-  </script>
+    }
 
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    renderTokens();
+  </script>
 </body>
 </html>
