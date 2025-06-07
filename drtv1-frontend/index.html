@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRTv1 - Evolution Through Contribution</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 2rem;
+      background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
+      color: #333;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2e7d32;
+      text-align: center;
+    }
+    p.slogan {
+      text-align: center;
+      font-style: italic;
+      color: #555;
+      margin-bottom: 2rem;
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 1rem auto;
+      width: 80px;
+    }
+    input, textarea, button {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #2e7d32;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #1b5e20;
+    }
+    #status {
+      margin-top: 1rem;
+      font-weight: bold;
+      text-align: center;
+      color: #00796b;
+    }
+    #estimate {
+      font-size: 1.2rem;
+      text-align: center;
+      margin-top: 0.5rem;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="./Logos/DRTv1 Logo.png" alt="DRTv1 Logo" class="logo">
+    <h1>DRTv2 Submission Portal</h1>
+    <p class="slogan">"Evolution Through Contribution"</p>
+
+    <form id="submissionForm" enctype="multipart/form-data" method="post">
+      <label for="name">Your Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="walletAddress">Wallet Address:</label>
+      <input type="text" id="walletAddress" name="walletAddress" required>
+
+      <label for="description">Description of Contribution:</label>
+      <textarea id="description" name="description" rows="5" required></textarea>
+
+      <label for="proof">Upload Proof (Image or PDF, Try to keep it under 1MB):</label>
+      <input type="file" id="proofFile" name="proof" accept="image/*,application/pdf" required>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <div id="status"></div>
+    <div id="estimate"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('submissionForm');
+    const status = document.getElementById('status');
+    const estimate = document.getElementById('estimate');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.textContent = '⏳ Submitting...';
+      status.style.color = '#00796b';
+      estimate.textContent = '';
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch('https://drtv1-backend.onrender.com/api/verify', {
+          method: 'POST',
+          body: formData
+        });
+
+        const rawText = await response.text();
+        let result;
+        try {
+          result = JSON.parse(rawText);
+        } catch (jsonErr) {
+          console.error('❌ Failed to parse JSON:', jsonErr);
+          status.textContent = '⚠️ Server error: Unexpected response format.';
+          status.style.color = 'red';
+          return;
+        }
+
+        if (response.ok) {
+          status.textContent = result.message || '✅ Submitted successfully!';
+          status.style.color = 'green';
+
+          if (result.openAiResponse) {
+            estimate.textContent = `🧠 Estimated Contribution Value: $${result.openAiResponse.trim()}`;
+          }
+        } else {
+          status.textContent = `❌ Error: ${result.error || 'An issue occurred.'}`;
+          status.style.color = 'red';
+        }
+      } catch (err) {
+        console.error('🚫 Network error:', err);
+        status.textContent = `🚫 Submission failed: ${err.message || 'Unable to connect to backend.'}`;
+        status.style.color = 'red';
+      }
+    });
+  </script>
+</body>
+</html>
+
