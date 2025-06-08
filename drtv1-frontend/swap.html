@@ -21,6 +21,15 @@
       font-size: 1.1em;
       margin-bottom: 2em;
     }
+    input[type="text"] {
+      padding: 0.5em;
+      width: 60%;
+      margin-bottom: 1em;
+      border-radius: 4px;
+      border: 1px solid #555;
+      background-color: #222;
+      color: #fff;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -32,6 +41,9 @@
     }
     th {
       background-color: #222;
+      position: sticky;
+      top: 0;
+      z-index: 2;
     }
     tr:hover {
       background-color: #1a1a1a;
@@ -64,6 +76,8 @@
   <h1>Welcome to DRT Mesh</h1>
   <p>Every buy supports global livelihoods. Earn DRT as impact rewards. 100 points = $1 worth of DRT.</p>
 
+  <input type="text" id="search" placeholder="Search tokens...">
+
   <table>
     <thead>
       <tr>
@@ -90,7 +104,7 @@
 
     async function fetchPrices(ids) {
       const res = await fetch(coingeckoUrl + ids.join('%2C') + coingeckoSuffix);
-      return await res.json();
+      return awaity res.json();
     }
 
     function createRow(token, priceData) {
@@ -98,26 +112,28 @@
 
       const logoCell = document.createElement('td');
       const logo = document.createElement('img');
-      logo.src = token.logo;
-      logo.className = 'token-logo';
+      logo.src = token.logo || "";
+      logo.alt = token.name || "";
       logo.style.height = '30px';
       logo.style.borderRadius = '50%';
       logoCell.appendChild(logo);
 
       const nameCell = document.createElement('td');
-      nameCell.textContent = `${token.name} (${token.ticker})`;
+      nameCell.textContent = `${token.name || 'Unnamed'} (${token.ticker || 'N/A'})`;
 
       const categoryCell = document.createElement('td');
       const badge = document.createElement('span');
-      badge.className = `badge category-${token.category}`;
-      badge.textContent = token.category;
+      const cat = token.category || 'Unknown';
+      badge.className = `badge category-${cat}`;
+      badge.textContent = cat;
       categoryCell.appendChild(badge);
 
       const scoreCell = document.createElement('td');
-      scoreCell.textContent = token.impactScore;
+      scoreCell.textContent = token.impactScore ?? 'N/A';
 
       const priceCell = document.createElement('td');
-      priceCell.textContent = `$${priceData?.[token.coingeckoId]?.usd?.toFixed(2) || 'N/A'}`;
+      const price = priceData?.[token.coingeckoId]?.usd;
+      priceCell.textContent = price ? `$${price.toFixed(2)}` : 'N/A';
 
       const actionCell = document.createElement('td');
       const btn = document.createElement('button');
@@ -139,7 +155,10 @@
     async function renderTokens() {
       const container = document.getElementById("token-list");
       const data = await fetchRegistry();
-      const tokenArray = Object.values(data);
+      let tokenArray = Object.values(data);
+
+      tokenArray.sort((a, b) => a.category.localeCompare(b.category));
+
       const ids = tokenArray.map(t => t.coingeckoId).filter(Boolean);
       const prices = await fetchPrices(ids);
 
@@ -147,6 +166,13 @@
         container.appendChild(createRow(token, prices));
       });
     }
+
+    document.getElementById('search').addEventListener('input', e => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('tbody tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+      });
+    });
 
     renderTokens();
   </script>
