@@ -1,80 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Token Info - DRT Mesh</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script defer src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token Info - DRT Mesh</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body class="bg-gray-900 text-white">
-  <div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold text-center mb-6">Token Info Registry</h1>
-    <div id="tokenContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-  </div>
+  <div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold text-center mb-6">Token Info Registry</h1>
+    <div id="tokenContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </div>
 
-  <script>
-    const COINMARKETCAP_API_KEY = 'YOUR_CMC_API_KEY_HERE';
+  <script>
+    const COINMARKETCAP_API_KEY = 'YOUR_CMC_API_KEY_HERE';
 
-    async function fetchCoinGeckoPrice(id) {
-      try {
-        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`);
-        const data = await res.json();
-        return data[id]?.usd || 'N/A';
-      } catch (e) {
-        return 'N/A';
-      }
-    }
+    async function fetchCoinGeckoPrice(id) {
+      try {
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`);
+        const data = await res.json();
+        return data[id]?.usd || 'N/A';
+      } catch (e) {
+        return 'N/A';
+      }
+    }
 
-    async function fetchCMCPrice(id) {
-      try {
-        const res = await fetch(`https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${id}`, {
-          headers: {
-            'X-CMC_PRO_API_KEY': COINMARKETCAP_API_KEY
-          }
-        });
-        const data = await res.json();
-        return data.data[id]?.quote?.USD?.price?.toFixed(2) || 'N/A';
-      } catch (e) {
-        return 'N/A';
-      }
-    }
+    async function fetchCMCPrice(id) {
+      try {
+        const res = await fetch(`https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${id}`, {
+          headers: {
+            'X-CMC_PRO_API_KEY': COINMARKETCAP_API_KEY
+          }
+        });
+        const data = await res.json();
+        return data.data[id]?.quote?.USD?.price?.toFixed(2) || 'N/A';
+      } catch (e) {
+        return 'N/A';
+      }
+    }
 
-    async function loadTokens() {
-      const res = await fetch('tokenRegistry.json');
-      const tokenData = await res.json();
+    async function loadTokens() {
+      const res = await fetch('tokenRegistry.json');
+      const tokenData = await res.json();
 
-      const container = document.getElementById('tokenContainer');
+      const container = document.getElementById('tokenContainer');
 
-      for (const key in tokenData) {
-        const token = tokenData[key];
+      for (const key in tokenData) {
+        const token = tokenData[key];
 
-        let price = 'N/A';
-        if (token.coingeckoId) {
-          price = await fetchCoinGeckoPrice(token.coingeckoId);
-        } else if (token.cmc_id) {
-          price = await fetchCMCPrice(token.cmc_id);
-        }
+        let price = 'N/A';
+        if (token.coingeckoId) {
+          price = await fetchCoinGeckoPrice(token.coingeckoId);
+        } else if (token.cmc_id) {
+          price = await fetchCMCPrice(token.cmc_id);
+        }
 
-        const card = document.createElement('div');
-        card.className = 'bg-gray-800 p-4 rounded shadow';
-        card.innerHTML = `
-          <div class="flex items-center space-x-4">
-            <img src="${token.logo}" alt="${token.ticker} Logo" class="w-12 h-12 rounded-full">
-            <div>
-              <h2 class="text-xl font-semibold">${token.name} (${token.ticker})</h2>
-              <p class="text-sm text-gray-400">Category: ${token.category}</p>
-              <p class="text-sm text-gray-400">Impact Score: ${token.impactScore}</p>
-              <p class="text-sm text-green-400">Live Price: $${price}</p>
-            </div>
-          </div>
-          <p class="mt-4 text-sm">${token.description}</p>
-        `;
-        container.appendChild(card);
-      }
-    }
+        const founder = token.founder || 'N/A';
+        const categoryText = Array.isArray(token.category)
+          ? token.category.join(', ')
+          : token.category;
 
-    loadTokens();
-  </script>
+        const card = document.createElement('div');
+        card.className = 'bg-gray-800 p-4 rounded shadow';
+        card.innerHTML = `
+          <div class="flex items-center space-x-4">
+            <img src="${token.logo}" alt="${token.ticker} Logo" class="w-12 h-12 rounded-full">
+            <div>
+              <h2 class="text-xl font-semibold">${token.name} (${token.ticker})</h2>
+              <p class="text-sm text-gray-300 italic">Founder: ${founder}</p>
+              <p class="text-sm text-gray-400">Category: ${categoryText}</p>
+              <p class="text-sm text-gray-400">Impact Score: ${token.impactScore}</p>
+              <p class="text-sm text-green-400">Live Price: $${price}</p>
+            </div>
+          </div>
+          <p class="mt-4 text-sm">${token.description}</p>
+        `;
+        container.appendChild(card);
+      }
+    }
+
+    loadTokens();
+  </script>
 </body>
 </html>
