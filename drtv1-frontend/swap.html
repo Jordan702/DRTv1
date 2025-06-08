@@ -5,13 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DRT Mesh Swap</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2em;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 0.2em;
+    }
+    p {
+      font-size: 1.1em;
+      margin-bottom: 2em;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+    }
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #444;
+    }
+    th {
+      background-color: #222;
+    }
+    tr:hover {
+      background-color: #1a1a1a;
+    }
+    .badge {
+      padding: 4px 8px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.8rem;
+    }
+    .category-Food { background-color: #5c4033; }
+    .category-Climate { background-color: #2e8b57; }
+    .category-Infrastructure { background-color: #8b0000; }
+    .category-Education { background-color: #fff; color: #000; }
+    .category-Health { background-color: #4682b4; }
+    .action-btn {
+      background-color: #2e7d32;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .action-btn:hover {
+      background-color: #388e3c;
+    }
+  </style>
 </head>
 <body>
   <h1>Welcome to DRT Mesh</h1>
   <p>Every buy supports global livelihoods. Earn DRT as impact rewards. 100 points = $1 worth of DRT.</p>
-
-  <input type="text" id="search" placeholder="Search tokens..." />
 
   <table>
     <thead>
@@ -27,6 +78,77 @@
     <tbody id="token-list"></tbody>
   </table>
 
-  <script src="js/swap.js"></script>
+  <script>
+    const registryUrl = "./tokenRegistry.json";
+    const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=";
+    const coingeckoSuffix = "&vs_currencies=usd";
+
+    async function fetchRegistry() {
+      const res = await fetch(registryUrl);
+      return await res.json();
+    }
+
+    async function fetchPrices(ids) {
+      const res = await fetch(coingeckoUrl + ids.join('%2C') + coingeckoSuffix);
+      return await res.json();
+    }
+
+    function createRow(token, priceData) {
+      const row = document.createElement('tr');
+
+      const logoCell = document.createElement('td');
+      const logo = document.createElement('img');
+      logo.src = token.logo;
+      logo.className = 'token-logo';
+      logo.style.height = '30px';
+      logo.style.borderRadius = '50%';
+      logoCell.appendChild(logo);
+
+      const nameCell = document.createElement('td');
+      nameCell.textContent = `${token.name} (${token.ticker})`;
+
+      const categoryCell = document.createElement('td');
+      const badge = document.createElement('span');
+      badge.className = `badge category-${token.category}`;
+      badge.textContent = token.category;
+      categoryCell.appendChild(badge);
+
+      const scoreCell = document.createElement('td');
+      scoreCell.textContent = token.impactScore;
+
+      const priceCell = document.createElement('td');
+      priceCell.textContent = `$${priceData?.[token.coingeckoId]?.usd?.toFixed(2) || 'N/A'}`;
+
+      const actionCell = document.createElement('td');
+      const btn = document.createElement('button');
+      btn.className = 'action-btn';
+      btn.textContent = 'View';
+      btn.onclick = () => window.location.href = `tokeninfo.html?ticker=${token.ticker}`;
+      actionCell.appendChild(btn);
+
+      row.appendChild(logoCell);
+      row.appendChild(nameCell);
+      row.appendChild(categoryCell);
+      row.appendChild(scoreCell);
+      row.appendChild(priceCell);
+      row.appendChild(actionCell);
+
+      return row;
+    }
+
+    async function renderTokens() {
+      const container = document.getElementById("token-list");
+      const data = await fetchRegistry();
+      const tokenArray = Object.values(data);
+      const ids = tokenArray.map(t => t.coingeckoId).filter(Boolean);
+      const prices = await fetchPrices(ids);
+
+      tokenArray.forEach(token => {
+        container.appendChild(createRow(token, prices));
+      });
+    }
+
+    renderTokens();
+  </script>
 </body>
 </html>
