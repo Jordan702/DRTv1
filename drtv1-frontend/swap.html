@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DRT Mesh Swap</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
   <style>
@@ -13,14 +13,25 @@
       text-align: center;
       padding: 2em;
     }
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 0.2em;
+    h1 { font-size: 2.5em; margin-bottom: 0.2em; }
+    p { font-size: 1.1em; margin-bottom: 1em; }
+
+    #wallet-address, #impact-points, #gas-cost {
+      margin: 0.5em 0;
+      font-size: 0.9em;
+      color: #ccc;
     }
-    p {
-      font-size: 1.1em;
-      margin-bottom: 2em;
+
+    input[type="text"] {
+      padding: 0.5em;
+      width: 60%;
+      margin-bottom: 1em;
+      border-radius: 4px;
+      border: 1px solid #555;
+      background-color: #222;
+      color: #fff;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -42,12 +53,14 @@
       color: #fff;
       font-size: 0.8rem;
     }
+
     .category-Food { background-color: #5c4033; }
     .category-Climate { background-color: #2e8b57; }
     .category-Infrastructure { background-color: #8b0000; }
     .category-Education { background-color: #fff; color: #000; }
     .category-Health { background-color: #4682b4; }
-    .category-Multi { background-color: #FFD700; color: #000; }
+    .category-Multi { background-color: yellow; color: black; }
+
     .action-btn {
       background-color: #2e7d32;
       color: white;
@@ -59,11 +72,34 @@
     .action-btn:hover {
       background-color: #388e3c;
     }
+
+    .connect-btn {
+      background-color: #444;
+      color: white;
+      padding: 6px 16px;
+      border: none;
+      border-radius: 4px;
+      margin-bottom: 1em;
+      cursor: pointer;
+    }
+
+    .legend {
+      margin-top: 1em;
+      font-size: 0.9em;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
   <h1>Welcome to DRT Mesh</h1>
   <p>Every buy supports global livelihoods. Earn DRT as impact rewards. 100 points = $1 worth of DRT.</p>
+
+  <button class="connect-btn" onclick="connectWallet()">Connect Wallet</button>
+  <div id="wallet-address"></div>
+  <div id="impact-points">Impact Points: 0</div>
+  <div id="gas-cost">Live Gas (Est): ...</div>
+
+  <input type="text" id="search" placeholder="Search tokens...">
 
   <table>
     <thead>
@@ -79,34 +115,62 @@
     <tbody id="token-list"></tbody>
   </table>
 
+  <div class="legend">
+    Categories: Food 🍞, Climate 🌱, Infrastructure 🏗, Education 📚, Health 🏥, Multi 🌀
+  </div>
+
   <script>
     const registryUrl = "./tokenRegistry.json";
     const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=";
     const coingeckoSuffix = "&vs_currencies=usd";
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          document.getElementById('wallet-address').textContent = "Connected: " + accounts[0];
+        } catch (error) {
+          console.error("User rejected connection");
+        }
+      } else {
+        alert("MetaMask not found!");
+      }
+    }
+
+    function updateImpactPoints(delta = 0) {
+      let points = parseInt(localStorage.getItem('impactPoints') || '0');
+      points += delta;
+      localStorage.setItem('impactPoints', points);
+      document.getElementById('impact-points').textContent = `Impact Points: ${points}`;
+    }
+
+    async function fetchGasEstimate() {
+      if (window.ethereum) {
+        const web3 = new Web3(window.ethereum);
+        const gasPrice = await web3.eth.getGasPrice();
+        const eth = parseFloat(web3.utils.fromWei(gasPrice, 'ether')) * 21000;
+        document.getElementById("gas-cost").textContent = `Live Gas (Est): ${eth.toFixed(6)} ETH`;
+      }
+    }
 
     async function fetchRegistry() {
       const res = await fetch(registryUrl);
       return await res.json();
     }
 
-    async function fetchPrices(ids) {
-      const res = await fetch(coingeckoUrl + ids.join('%2C') + coingeckoSuffix);
+    async function fetchPrices(tokens) {
+      const coingeckoIds = tokens.map(t => t.coingeckoId).filter(Boolean);
+      const res = await fetch(coingeckoUrl + coingeckoIds.join('%2C') + coingeckoSuffix);
       return await res.json();
     }
 
-    function getCategoryClass(category) {
-      if (!category) return 'category-Unknown';
-
-      if (Array.isArray(category) && category.length > 1) {
-        return 'category-Multi';
+    function getCategoryBadge(token) {
+      const category = token.category;
+      if (Array.isArray(category)) {
+        return `<span class="badge category-Multi">Multi</span>`;
+      } else {
+        return `<span class="badge category-${category}">${category}</span>`;
       }
-
-      if (typeof category === 'string' && category.includes(',')) {
-        return 'category-Multi';
-      }
-
-      const clean = Array.isArray(category) ? category[0] : category;
-      return `category-${clean.trim()}`;
     }
 
     function createRow(token, priceData) {
@@ -115,31 +179,32 @@
       const logoCell = document.createElement('td');
       const logo = document.createElement('img');
       logo.src = token.logo;
-      logo.className = 'token-logo';
+      logo.alt = token.name;
       logo.style.height = '30px';
       logo.style.borderRadius = '50%';
       logoCell.appendChild(logo);
 
       const nameCell = document.createElement('td');
-      nameCell.textContent = `${token.name} (${token.ticker})`;
+      nameCell.innerHTML = `<span title="Founder: ${token.founder || 'N/A'}">${token.name} (${token.ticker})</span>`;
 
       const categoryCell = document.createElement('td');
-      const badge = document.createElement('span');
-      badge.className = `badge ${getCategoryClass(token.category)}`;
-      badge.textContent = Array.isArray(token.category) ? token.category.join(', ') : token.category;
-      categoryCell.appendChild(badge);
+      categoryCell.innerHTML = getCategoryBadge(token);
 
       const scoreCell = document.createElement('td');
-      scoreCell.textContent = token.impactScore;
+      scoreCell.textContent = token.impactScore ?? 'N/A';
 
       const priceCell = document.createElement('td');
-      priceCell.textContent = `$${priceData?.[token.coingeckoId]?.usd?.toFixed(2) || 'N/A'}`;
+      const price = token.coingeckoId && priceData?.[token.coingeckoId]?.usd;
+      priceCell.textContent = price ? `$${price.toFixed(2)}` : 'N/A';
 
       const actionCell = document.createElement('td');
       const btn = document.createElement('button');
       btn.className = 'action-btn';
       btn.textContent = 'View';
-      btn.onclick = () => window.location.href = `tokeninfo.html?ticker=${token.ticker}`;
+      btn.onclick = () => {
+        updateImpactPoints(1);
+        window.location.href = `tokeninfo.html?ticker=${token.ticker}`;
+      };
       actionCell.appendChild(btn);
 
       row.appendChild(logoCell);
@@ -153,18 +218,35 @@
     }
 
     async function renderTokens() {
-      const container = document.getElementById("token-list");
-      const data = await fetchRegistry();
-      const tokenArray = Object.values(data);
-      const ids = tokenArray.map(t => t.coingeckoId).filter(Boolean);
-      const prices = await fetchPrices(ids);
+      try {
+        const container = document.getElementById("token-list");
+        const data = await fetchRegistry();
+        const tokenArray = Object.values(data);
 
-      tokenArray.forEach(token => {
-        container.appendChild(createRow(token, prices));
-      });
+        tokenArray.sort((a, b) => {
+          const catA = (Array.isArray(a.category) ? a.category[0] : a.category || "").toLowerCase();
+          const catB = (Array.isArray(b.category) ? b.category[0] : b.category || "").toLowerCase();
+          return catA.localeCompare(catB);
+        });
+
+        const prices = await fetchPrices(tokenArray);
+        tokenArray.forEach(token => container.appendChild(createRow(token, prices)));
+      } catch (err) {
+        console.error("Token render error:", err);
+      }
     }
 
+    document.getElementById('search').addEventListener('input', e => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('tbody tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+      });
+    });
+
+    updateImpactPoints(0);
     renderTokens();
+    fetchGasEstimate();
+    setInterval(fetchGasEstimate, 15000);
   </script>
 </body>
 </html>
