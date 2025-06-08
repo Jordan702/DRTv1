@@ -1,190 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DRT Mesh Swap</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-  <style>
-    body {
-      background-color: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 2em;
-    }
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 0.2em;
-    }
-    p {
-      font-size: 1.1em;
-      margin-bottom: 2em;
-    }
-    input[type="text"] {
-      padding: 0.5em;
-      width: 60%;
-      margin-bottom: 1em;
-      border-radius: 4px;
-      border: 1px solid #555;
-      background-color: #222;
-      color: #fff;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1em;
-    }
-    th, td {
-      padding: 12px 15px;
-      border-bottom: 1px solid #444;
-    }
-    th {
-      background-color: #222;
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-    tr:hover {
-      background-color: #1a1a1a;
-    }
-    .badge {
-      padding: 4px 8px;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 0.8rem;
-    }
-    .category-Food { background-color: #5c4033; }
-    .category-Climate { background-color: #2e8b57; }
-    .category-Infrastructure { background-color: #8b0000; }
-    .category-Education { background-color: #fff; color: #000; }
-    .category-Health { background-color: #4682b4; }
-    .action-btn {
-      background-color: #2e7d32;
-      color: white;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .action-btn:hover {
-      background-color: #388e3c;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DRT Mesh Swap</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2em;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 0.2em;
+    }
+    p {
+      font-size: 1.1em;
+      margin-bottom: 2em;
+    }
+    .category-Food {
+      background-color: #5c4033;
+    }
+    .category-Climate {
+      background-color: #2e8b57;
+    }
+    .category-Infrastructure {
+      background-color: #8b0000;
+    }
+    .category-Education {
+      background-color: #fff;
+      color: #000;
+    }
+    .category-Health {
+      background-color: #4682b4;
+    }
+    .token-card {
+      border-radius: 10px;
+      padding: 1em;
+      margin: 1em auto;
+      max-width: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .token-card:hover {
+      transform: scale(1.02);
+    }
+    .token-logo {
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      margin-right: 1em;
+    }
+    .token-details {
+      flex: 1;
+      text-align: left;
+    }
+    .token-name {
+      font-weight: bold;
+    }
+    .token-meta {
+      font-size: 0.9em;
+    }
+  </style>
 </head>
 <body>
-  <h1>Welcome to DRT Mesh</h1>
-  <p>Every buy supports global livelihoods. Earn DRT as impact rewards. 100 points = $1 worth of DRT.</p>
+  <h1>Welcome to DRT Mesh</h1>
+  <p>Every buy supports global livelihoods. Earn DRT as impact rewards. 100 points = $1 worth of DRT.</p>
 
-  <input type="text" id="search" placeholder="Search tokens...">
+  <div id="token-list"></div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Logo</th>
-        <th>Token</th>
-        <th>Category</th>
-        <th>Impact Score</th>
-        <th>Price</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="token-list"></tbody>
-  </table>
+  <script>
+    const registryUrl = "tokenRegistry.json";
+    const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=",
+          coingeckoSuffix = "&vs_currencies=usd";
 
-  <script>
-    const registryUrl = "./tokenRegistry.json";
-    const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=";
-    const coingeckoSuffix = "&vs_currencies=usd";
+    async function fetchRegistry() {
+      const res = await fetch(registryUrl);
+      return await res.json();
+    }
 
-    async function fetchRegistry() {
-      const res = await fetch(registryUrl);
-      return await res.json();
-    }
+    async function fetchPrices(ids) {
+      const res = await fetch(coingeckoUrl + ids.join('%2C') + coingeckoSuffix);
+      return await res.json();
+    }
 
-    async function fetchPrices(tokens) {
-      const coingeckoIds = tokens.map(t => t.coingeckoId).filter(Boolean);
-      let priceMap = {};
+    function getCategoryStyle(category) {
+      return `category-${category}`.replace(/\s/g, '');
+    }
 
-      if (coingeckoIds.length > 0) {
-        const res = await fetch(coingeckoUrl + coingeckoIds.join('%2C') + coingeckoSuffix);
-        priceMap = await res.json();
-      }
+    function createCard(token, priceData) {
+      const card = document.createElement('div');
+      card.className = `token-card ${getCategoryStyle(token.category)}`;
+      card.onclick = () => window.location.href = `tokeninfo.html?ticker=${token.ticker}`;
 
-      return priceMap;
-    }
+      const logo = document.createElement('img');
+      logo.src = token.logo;
+      logo.className = 'token-logo';
 
-    function createRow(token, priceData) {
-      const row = document.createElement('tr');
+      const details = document.createElement('div');
+      details.className = 'token-details';
+      details.innerHTML = `
+        <div class="token-name">${token.name} (${token.ticker})</div>
+        <div class="token-meta">
+          Price: $${priceData?.[token.coingeckoId]?.usd?.toFixed(2) || 'N/A'}<br />
+          Category: ${token.category}<br />
+          Impact Score: ${token.impactScore}
+        </div>`;
 
-      const logoCell = document.createElement('td');
-      const logo = document.createElement('img');
-      logo.src = token.logo || "";
-      logo.alt = token.name || "";
-      logo.style.height = '30px';
-      logo.style.borderRadius = '50%';
-      logoCell.appendChild(logo);
+      card.appendChild(logo);
+      card.appendChild(details);
+      return card;
+    }
 
-      const nameCell = document.createElement('td');
-      nameCell.textContent = `${token.name || 'Unnamed'} (${token.ticker || 'N/A'})`;
+    async function renderTokens() {
+      const container = document.getElementById("token-list");
+      const data = await fetchRegistry();
+      const tokenArray = Object.values(data);
+      const ids = tokenArray.map(t => t.coingeckoId).filter(Boolean);
+      const prices = await fetchPrices(ids);
 
-      const categoryCell = document.createElement('td');
-      const badge = document.createElement('span');
-      const cat = token.category || 'Unknown';
-      badge.className = `badge category-${cat}`;
-      badge.textContent = cat;
-      categoryCell.appendChild(badge);
+      tokenArray.forEach(token => {
+        container.appendChild(createCard(token, prices));
+      });
+    }
 
-      const scoreCell = document.createElement('td');
-      scoreCell.textContent = token.impactScore ?? 'N/A';
-
-      const priceCell = document.createElement('td');
-      const price = token.coingeckoId && priceData?.[token.coingeckoId]?.usd;
-      priceCell.textContent = price ? `$${price.toFixed(2)}` : 'N/A';
-
-      const actionCell = document.createElement('td');
-      const btn = document.createElement('button');
-      btn.className = 'action-btn';
-      btn.textContent = 'View';
-      btn.onclick = () => window.location.href = `tokeninfo.html?ticker=${token.ticker}`;
-      actionCell.appendChild(btn);
-
-      row.appendChild(logoCell);
-      row.appendChild(nameCell);
-      row.appendChild(categoryCell);
-      row.appendChild(scoreCell);
-      row.appendChild(priceCell);
-      row.appendChild(actionCell);
-
-      return row;
-    }
-
-    async function renderTokens() {
-      try {
-        const container = document.getElementById("token-list");
-        const data = await fetchRegistry();
-        const tokenArray = Object.values(data);
-
-        tokenArray.sort((a, b) => (a.category || "").localeCompare(b.category || ""));
-
-        const prices = await fetchPrices(tokenArray);
-
-        tokenArray.forEach(token => {
-          container.appendChild(createRow(token, prices));
-        });
-      } catch (err) {
-        console.error("Token render error:", err);
-      }
-    }
-
-    document.getElementById('search').addEventListener('input', e => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll('tbody tr').forEach(row => {
-        row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
-      });
-    });
-
-    renderTokens();
-  </script>
+    renderTokens();
+  </script>
 </body>
 </html>
