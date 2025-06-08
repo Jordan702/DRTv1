@@ -93,7 +93,7 @@
   </table>
 
   <script>
-    const registryUrl = "https://jordan702.github.io/DRTv1/drtv1-frontend/tokenRegistry.json"; // ✅ fixed path
+    const registryUrl = "./tokenRegistry.json";
     const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=";
     const coingeckoSuffix = "&vs_currencies=usd";
 
@@ -105,10 +105,12 @@
     async function fetchPrices(tokens) {
       const coingeckoIds = tokens.map(t => t.coingeckoId).filter(Boolean);
       let priceMap = {};
+
       if (coingeckoIds.length > 0) {
         const res = await fetch(coingeckoUrl + coingeckoIds.join('%2C') + coingeckoSuffix);
         priceMap = await res.json();
       }
+
       return priceMap;
     }
 
@@ -161,10 +163,15 @@
       try {
         const container = document.getElementById("token-list");
         const data = await fetchRegistry();
-        let tokenArray = Object.values(data);
+        const tokenArray = Object.values(data);
+
         tokenArray.sort((a, b) => (a.category || "").localeCompare(b.category || ""));
+
         const prices = await fetchPrices(tokenArray);
-        tokenArray.forEach(token => container.appendChild(createRow(token, prices)));
+
+        tokenArray.forEach(token => {
+          container.appendChild(createRow(token, prices));
+        });
       } catch (err) {
         console.error("Token render error:", err);
       }
