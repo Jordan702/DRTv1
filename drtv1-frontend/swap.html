@@ -21,51 +21,42 @@
       font-size: 1.1em;
       margin-bottom: 2em;
     }
-    .category-Food {
-      background-color: #5c4033;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
     }
-    .category-Climate {
-      background-color: #2e8b57;
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #444;
     }
-    .category-Infrastructure {
-      background-color: #8b0000;
+    th {
+      background-color: #222;
     }
-    .category-Education {
-      background-color: #fff;
-      color: #000;
+    tr:hover {
+      background-color: #1a1a1a;
     }
-    .category-Health {
-      background-color: #4682b4;
+    .badge {
+      padding: 4px 8px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.8rem;
     }
-    .token-card {
-      border-radius: 10px;
-      padding: 1em;
-      margin: 1em auto;
-      max-width: 600px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    .category-Food { background-color: #5c4033; }
+    .category-Climate { background-color: #2e8b57; }
+    .category-Infrastructure { background-color: #8b0000; }
+    .category-Education { background-color: #fff; color: #000; }
+    .category-Health { background-color: #4682b4; }
+    .action-btn {
+      background-color: #2e7d32;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
-      transition: transform 0.2s ease;
     }
-    .token-card:hover {
-      transform: scale(1.02);
-    }
-    .token-logo {
-      height: 40px;
-      width: 40px;
-      border-radius: 50%;
-      margin-right: 1em;
-    }
-    .token-details {
-      flex: 1;
-      text-align: left;
-    }
-    .token-name {
-      font-weight: bold;
-    }
-    .token-meta {
-      font-size: 0.9em;
+    .action-btn:hover {
+      background-color: #388e3c;
     }
   </style>
 </head>
@@ -73,12 +64,24 @@
   <h1>Welcome to DRT Mesh</h1>
   <p>Every buy supports global livelihoods. Earn DRT as impact rewards. 100 points = $1 worth of DRT.</p>
 
-  <div id="token-list"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Logo</th>
+        <th>Token</th>
+        <th>Category</th>
+        <th>Impact Score</th>
+        <th>Price</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="token-list"></tbody>
+  </table>
 
   <script>
     const registryUrl = "tokenRegistry.json";
-    const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=",
-          coingeckoSuffix = "&vs_currencies=usd";
+    const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=";
+    const coingeckoSuffix = "&vs_currencies=usd";
 
     async function fetchRegistry() {
       const res = await fetch(registryUrl);
@@ -90,32 +93,47 @@
       return await res.json();
     }
 
-    function getCategoryStyle(category) {
-      return `category-${category}`.replace(/\s/g, '');
-    }
+    function createRow(token, priceData) {
+      const row = document.createElement('tr');
 
-    function createCard(token, priceData) {
-      const card = document.createElement('div');
-      card.className = `token-card ${getCategoryStyle(token.category)}`;
-      card.onclick = () => window.location.href = `tokeninfo.html?ticker=${token.ticker}`;
-
+      const logoCell = document.createElement('td');
       const logo = document.createElement('img');
       logo.src = token.logo;
       logo.className = 'token-logo';
+      logo.style.height = '30px';
+      logo.style.borderRadius = '50%';
+      logoCell.appendChild(logo);
 
-      const details = document.createElement('div');
-      details.className = 'token-details';
-      details.innerHTML = `
-        <div class="token-name">${token.name} (${token.ticker})</div>
-        <div class="token-meta">
-          Price: $${priceData?.[token.coingeckoId]?.usd?.toFixed(2) || 'N/A'}<br />
-          Category: ${token.category}<br />
-          Impact Score: ${token.impactScore}
-        </div>`;
+      const nameCell = document.createElement('td');
+      nameCell.textContent = `${token.name} (${token.ticker})`;
 
-      card.appendChild(logo);
-      card.appendChild(details);
-      return card;
+      const categoryCell = document.createElement('td');
+      const badge = document.createElement('span');
+      badge.className = `badge category-${token.category}`;
+      badge.textContent = token.category;
+      categoryCell.appendChild(badge);
+
+      const scoreCell = document.createElement('td');
+      scoreCell.textContent = token.impactScore;
+
+      const priceCell = document.createElement('td');
+      priceCell.textContent = `$${priceData?.[token.coingeckoId]?.usd?.toFixed(2) || 'N/A'}`;
+
+      const actionCell = document.createElement('td');
+      const btn = document.createElement('button');
+      btn.className = 'action-btn';
+      btn.textContent = 'View';
+      btn.onclick = () => window.location.href = `tokeninfo.html?ticker=${token.ticker}`;
+      actionCell.appendChild(btn);
+
+      row.appendChild(logoCell);
+      row.appendChild(nameCell);
+      row.appendChild(categoryCell);
+      row.appendChild(scoreCell);
+      row.appendChild(priceCell);
+      row.appendChild(actionCell);
+
+      return row;
     }
 
     async function renderTokens() {
@@ -126,7 +144,7 @@
       const prices = await fetchPrices(ids);
 
       tokenArray.forEach(token => {
-        container.appendChild(createCard(token, prices));
+        container.appendChild(createRow(token, prices));
       });
     }
 
