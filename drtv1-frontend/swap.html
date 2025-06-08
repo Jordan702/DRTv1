@@ -1,136 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DRT Mesh Swap</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-  <style>
-    body {
-      background-color: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 2em;
-    }
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 0.2em;
-    }
-    p {
-      font-size: 1.1em;
-      margin-bottom: 2em;
-    }
-    .category-Food {
-      background-color: #5c4033;
-    }
-    .category-Climate {
-      background-color: #2e8b57;
-    }
-    .category-Infrastructure {
-      background-color: #8b0000;
-    }
-    .category-Education {
-      background-color: #fff;
-      color: #000;
-    }
-    .category-Health {
-      background-color: #4682b4;
-    }
-    .token-card {
-      border-radius: 10px;
-      padding: 1em;
-      margin: 1em auto;
-      max-width: 600px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    .token-card:hover {
-      transform: scale(1.02);
-    }
-    .token-logo {
-      height: 40px;
-      width: 40px;
-      border-radius: 50%;
-      margin-right: 1em;
-    }
-    .token-details {
-      flex: 1;
-      text-align: left;
-    }
-    .token-name {
-      font-weight: bold;
-    }
-    .token-meta {
-      font-size: 0.9em;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DRT Mesh Swap</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 2em;
+      margin: 0;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      margin-bottom: 0.2em;
+    }
+    p {
+      text-align: center;
+      font-size: 1.1em;
+      margin-bottom: 2em;
+    }
+
+    #token-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5em;
+      padding: 0 1em;
+    }
+
+    .token-card {
+      border-radius: 12px;
+      padding: 1em;
+      display: flex;
+      align-items: center;
+      background-color: #222;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .token-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    }
+
+    .token-logo {
+      height: 48px;
+      width: 48px;
+      border-radius: 50%;
+      margin-right: 1em;
+      background-color: #000;
+    }
+
+    .token-details {
+      text-align: left;
+      flex: 1;
+    }
+
+    .token-name {
+      font-weight: bold;
+      font-size: 1.1em;
+      margin-bottom: 0.3em;
+    }
+
+    .token-meta {
+      font-size: 0.85em;
+      line-height: 1.4em;
+    }
+
+    /* Category Colors */
+    .category-Food { background-color: #5c4033; }
+    .category-Climate { background-color: #2e8b57; }
+    .category-Infrastructure { background-color: #8b0000; }
+    .category-Education { background-color: #fff; color: #000; }
+    .category-Health { background-color: #4682b4; }
+  </style>
 </head>
 <body>
-  <h1>Welcome to DRT Mesh</h1>
-  <p>Every buy supports global livelihoods. Earn DRT as impact rewards. 100 points = $1 worth of DRT.</p>
+  <h1>Welcome to DRT Mesh</h1>
+  <p>Every buy supports global livelihoods. Earn DRT as impact rewards. 100 points = $1 worth of DRT.</p>
 
-  <div id="token-list"></div>
+  <div id="token-list"></div>
 
-  <script>
-    const registryUrl = "tokenRegistry.json";
-    const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=",
-          coingeckoSuffix = "&vs_currencies=usd";
+  <script>
+    const registryUrl = "./tokenRegistry.json";
+    const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=";
+    const coingeckoSuffix = "&vs_currencies=usd";
 
-    async function fetchRegistry() {
-      const res = await fetch(registryUrl);
-      return await res.json();
-    }
+    async function fetchRegistry() {
+      const res = await fetch(registryUrl);
+      return await res.json();
+    }
 
-    async function fetchPrices(ids) {
-      const res = await fetch(coingeckoUrl + ids.join('%2C') + coingeckoSuffix);
-      return await res.json();
-    }
+    async function fetchPrices(ids) {
+      if (!ids.length) return {};
+      const res = await fetch(coingeckoUrl + ids.join('%2C') + coingeckoSuffix);
+      return await res.json();
+    }
 
-    function getCategoryStyle(category) {
-      return `category-${category}`.replace(/\s/g, '');
-    }
+    function getCategoryStyle(category) {
+      return `category-${category}`.replace(/\s/g, '');
+    }
 
-    function createCard(token, priceData) {
-      const card = document.createElement('div');
-      card.className = `token-card ${getCategoryStyle(token.category)}`;
-      card.onclick = () => window.location.href = `tokeninfo.html?ticker=${token.ticker}`;
+    function createCard(token, priceData) {
+      const card = document.createElement('div');
+      card.className = `token-card ${getCategoryStyle(token.category)}`;
+      card.onclick = () => window.location.href = `tokeninfo.html?ticker=${token.ticker}`;
 
-      const logo = document.createElement('img');
-      logo.src = token.logo;
-      logo.className = 'token-logo';
+      const logo = document.createElement('img');
+      logo.src = token.logo;
+      logo.className = 'token-logo';
 
-      const details = document.createElement('div');
-      details.className = 'token-details';
-      details.innerHTML = `
-        <div class="token-name">${token.name} (${token.ticker})</div>
-        <div class="token-meta">
-          Price: $${priceData?.[token.coingeckoId]?.usd?.toFixed(2) || 'N/A'}<br />
-          Category: ${token.category}<br />
-          Impact Score: ${token.impactScore}
-        </div>`;
+      const details = document.createElement('div');
+      details.className = 'token-details';
+      details.innerHTML = `
+        <div class="token-name">${token.name} (${token.ticker})</div>
+        <div class="token-meta">
+          Price: $${priceData?.[token.coingeckoId]?.usd?.toFixed(2) || 'N/A'}<br />
+          Category: ${token.category}<br />
+          Impact Score: ${token.impactScore}
+        </div>`;
 
-      card.appendChild(logo);
-      card.appendChild(details);
-      return card;
-    }
+      card.appendChild(logo);
+      card.appendChild(details);
+      return card;
+    }
 
-    async function renderTokens() {
-      const container = document.getElementById("token-list");
-      const data = await fetchRegistry();
-      const tokenArray = Object.values(data);
-      const ids = tokenArray.map(t => t.coingeckoId).filter(Boolean);
-      const prices = await fetchPrices(ids);
+    async function renderTokens() {
+      const container = document.getElementById("token-list");
+      const data = await fetchRegistry();
+      const tokenArray = Object.values(data);
+      const ids = tokenArray.map(t => t.coingeckoId).filter(Boolean);
+      const prices = await fetchPrices(ids);
 
-      tokenArray.forEach(token => {
-        container.appendChild(createCard(token, prices));
-      });
-    }
+      // Optional: sort by category to group visually
+      tokenArray.sort((a, b) => (a.category || "").localeCompare(b.category || ""));
 
-    renderTokens();
-  </script>
+      tokenArray.forEach(token => {
+        container.appendChild(createCard(token, prices));
+      });
+    }
+
+    renderTokens();
+  </script>
 </body>
 </html>
