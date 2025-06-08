@@ -47,6 +47,7 @@
     .category-Infrastructure { background-color: #8b0000; }
     .category-Education { background-color: #fff; color: #000; }
     .category-Health { background-color: #4682b4; }
+    .category-Multi { background-color: #FFD700; color: #000; }
     .action-btn {
       background-color: #2e7d32;
       color: white;
@@ -93,6 +94,21 @@
       return await res.json();
     }
 
+    function getCategoryClass(category) {
+      if (!category) return 'category-Unknown';
+
+      if (Array.isArray(category) && category.length > 1) {
+        return 'category-Multi';
+      }
+
+      if (typeof category === 'string' && category.includes(',')) {
+        return 'category-Multi';
+      }
+
+      const clean = Array.isArray(category) ? category[0] : category;
+      return `category-${clean.trim()}`;
+    }
+
     function createRow(token, priceData) {
       const row = document.createElement('tr');
 
@@ -109,8 +125,8 @@
 
       const categoryCell = document.createElement('td');
       const badge = document.createElement('span');
-      badge.className = `badge category-${token.category}`;
-      badge.textContent = token.category;
+      badge.className = `badge ${getCategoryClass(token.category)}`;
+      badge.textContent = Array.isArray(token.category) ? token.category.join(', ') : token.category;
       categoryCell.appendChild(badge);
 
       const scoreCell = document.createElement('td');
