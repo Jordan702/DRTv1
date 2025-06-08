@@ -47,11 +47,14 @@
     tr:hover {
       background-color: #1a1a1a;
     }
+
     .badge {
       padding: 4px 8px;
       border-radius: 8px;
       color: #fff;
       font-size: 0.8rem;
+      margin: 2px;
+      display: inline-block;
     }
 
     .category-Food { background-color: #5c4033; }
@@ -116,7 +119,7 @@
   </table>
 
   <div class="legend">
-    Categories: Food 🍞, Climate 🌱, Infrastructure 🏗, Education 📚, Health 🏥, Multi 🌀
+    Categories: Food 🍞, Climate 🌱, Infrastructure 🏗, Education 📚, Health 🏥 — If multiple, badge is yellow 🌀
   </div>
 
   <script>
@@ -165,12 +168,13 @@
     }
 
     function getCategoryBadge(token) {
-      const category = token.category;
-      if (Array.isArray(category)) {
-        return `<span class="badge category-Multi">Multi</span>`;
-      } else {
-        return `<span class="badge category-${category}">${category}</span>`;
-      }
+      const categories = Array.isArray(token.category) ? token.category : [token.category];
+      const isMulti = categories.length > 1;
+
+      return categories.map(cat => {
+        const className = isMulti ? 'category-Multi' : `category-${cat}`;
+        return `<span class="badge ${className}">${cat}</span>`;
+      }).join(' ');
     }
 
     function createRow(token, priceData) {
