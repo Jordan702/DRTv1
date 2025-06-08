@@ -102,9 +102,17 @@
       return await res.json();
     }
 
-    async function fetchPrices(ids) {
-      const res = await fetch(coingeckoUrl + ids.join('%2C') + coingeckoSuffix);
-      return awaity res.json();
+    async function fetchPrices(tokens) {
+      const coingeckoIds = tokens.map(t => t.coingeckoId).filter(Boolean);
+
+      let priceMap = {};
+      if (coingeckoIds.length > 0) {
+        const res = await fetch(coingeckoUrl + coingeckoIds.join('%2C') + coingeckoSuffix);
+        const json = await res.json();
+        priceMap = json;
+      }
+
+      return priceMap;
     }
 
     function createRow(token, priceData) {
@@ -132,7 +140,7 @@
       scoreCell.textContent = token.impactScore ?? 'N/A';
 
       const priceCell = document.createElement('td');
-      const price = priceData?.[token.coingeckoId]?.usd;
+      const price = token.coingeckoId && priceData?.[token.coingeckoId]?.usd;
       priceCell.textContent = price ? `$${price.toFixed(2)}` : 'N/A';
 
       const actionCell = document.createElement('td');
@@ -153,18 +161,21 @@
     }
 
     async function renderTokens() {
-      const container = document.getElementById("token-list");
-      const data = await fetchRegistry();
-      let tokenArray = Object.values(data);
+      try {
+        const container = document.getElementById("token-list");
+        const data = await fetchRegistry();
+        let tokenArray = Object.values(data);
 
-      tokenArray.sort((a, b) => a.category.localeCompare(b.category));
+        tokenArray.sort((a, b) => (a.category || "").localeCompare(b.category || ""));
 
-      const ids = tokenArray.map(t => t.coingeckoId).filter(Boolean);
-      const prices = await fetchPrices(ids);
+        const prices = await fetchPrices(tokenArray);
 
-      tokenArray.forEach(token => {
-        container.appendChild(createRow(token, prices));
-      });
+        tokenArray.forEach(token => {
+          container.appendChild(createRow(token, prices));
+        });
+      } catch (err) {
+        console.error("Token render error:", err);
+      }
     }
 
     document.getElementById('search').addEventListener('input', e => {
