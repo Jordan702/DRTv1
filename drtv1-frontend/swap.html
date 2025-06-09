@@ -127,6 +127,17 @@
     const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=";
     const coingeckoSuffix = "&vs_currencies=usd";
 
+    async function fetchCMCPrice(cmcId) {
+      try {
+        const res = await fetch(`https://drtv1-backend.onrender.com/price?cmc_id=${cmcId}`);
+        const data = await res.json();
+        return parseFloat(data.price).toFixed(2);
+      } catch (e) {
+        console.error("CMC fallback error:", e);
+        return 'N/A';
+      }
+    }
+
     async function connectWallet() {
       if (window.ethereum) {
         try {
@@ -198,8 +209,14 @@
       scoreCell.textContent = token.impactScore ?? 'N/A';
 
       const priceCell = document.createElement('td');
-      const price = token.coingeckoId && priceData?.[token.coingeckoId]?.usd;
-      priceCell.textContent = price ? `$${price.toFixed(2)}` : 'N/A';
+      let price = token.coingeckoId && priceData?.[token.coingeckoId]?.usd;
+      if (!price && token.cmc_id) {
+        fetchCMCPrice(token.cmc_id).then(p => {
+          priceCell.textContent = p !== 'N/A' ? `$${p}` : 'N/A';
+        });
+      } else {
+        priceCell.textContent = price ? `$${price.toFixed(2)}` : 'N/A';
+      }
 
       const actionCell = document.createElement('td');
       const btn = document.createElement('button');
@@ -252,6 +269,7 @@
     fetchGasEstimate();
     setInterval(fetchGasEstimate, 15000);
   </script>
+
   <footer style="margin-top: 3em; font-size: 0.9em; color: #aaa;">
     💡 Have a token that supports global livelihoods?  
     <strong>DM me — I’ll list it for free.</strong><br><br>
