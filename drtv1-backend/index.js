@@ -4,6 +4,7 @@ const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const axios = require("axios");
 
 // Import routes (make sure these files exist and export valid Express routers)
 const drtradeRoutes = require("./routes/drtradeRoute"); // Trade endpoints (liquidity check & execution)
@@ -103,6 +104,29 @@ app.get("/api/swap", (req, res) => {
     });
   }
 });
+
+app.get('/price', async (req, res) => {
+  const cmcId = req.query.cmc_id;
+
+  if (!cmcId) {
+    return res.status(400).json({ error: 'Missing cmc_id' });
+  }
+
+  try {
+    const response = await axios.get(
+      `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${cmcId}`,
+      {
+        headers: { 'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY }
+      }
+    );
+    const price = response.data.data[cmcId].quote.USD.price;
+    res.json({ price });
+  } catch (error) {
+    console.error('CMC API Error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to fetch price from CMC' });
+  }
+});
+
 
 // ✅ Global error handler middleware
 app.use((err, req, res, next) => {
