@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DRT Mesh Swap</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
@@ -22,7 +22,7 @@
       color: #ccc;
     }
 
-    input[type="text"], select {
+    input[type="text"] {
       padding: 0.5em;
       width: 60%;
       margin-bottom: 1em;
@@ -97,22 +97,10 @@
   <h1>Welcome to DRT Mesh</h1>
   <p>Every buy supports global livelihoods. Earn DRT as impact rewards. 100 points = $1 worth of DRT.</p>
 
-  <button class="connect-btn" onclick="init()">Connect Wallet</button>
+  <button class="connect-btn" onclick="connectWallet()">Connect Wallet</button>
   <div id="wallet-address"></div>
   <div id="impact-points">Impact Points: 0</div>
   <div id="gas-cost">Live Gas (Est): ...</div>
-
-  <select id="swap-direction">
-    <option value="eth-to-drt">ETH to DRT</option>
-    <option value="drt-to-eth">DRT to ETH</option>
-  </select>
-  <select id="token-version">
-    <option value="v1">DRT v1</option>
-    <option value="v2">DRT v2</option>
-  </select>
-  <input type="text" id="amount" placeholder="Amount In">
-  <input type="text" id="min-out" placeholder="Min Amount Out">
-  <button id="swap-button">Swap</button>
 
   <input type="text" id="search" placeholder="Search tokens...">
 
@@ -131,66 +119,10 @@
   </table>
 
   <div class="legend">
-    Categories: Food 🍞, Climate 🌱, Infrastructure 🏟, Education 📚, Health 🏥 — If multiple, badge is yellow 🌀
+    Categories: Food 🍞, Climate 🌱, Infrastructure 🏗, Education 📚, Health 🏥 — If multiple, badge is yellow 🌀
   </div>
 
-  <script type="module">
-    import { abi as routerAbi } from '../abi/DRTUniversalRouter_abi.json' assert { type: 'json' };
-
-    const routerAddress = "0xd0fdaC020eFDBC4544372EB3260Bb15CE77206Ef";
-    let web3, account, router;
-
-    window.init = async function () {
-      if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        await ethereum.request({ method: 'eth_requestAccounts' });
-        const accounts = await web3.eth.getAccounts();
-        account = accounts[0];
-        router = new web3.eth.Contract(routerAbi, routerAddress);
-        document.getElementById("wallet-address").textContent = "Connected: " + account;
-        updateImpactPoints();
-      } else {
-        alert("MetaMask not found!");
-      }
-    }
-
-    async function executeSwap(fromV2, amountIn, minOut) {
-      try {
-        const isEthIn = document.getElementById("swap-direction").value === "eth-to-drt";
-        const method = isEthIn ? "swapETHforDRT" : "swapDRTforETH";
-        const value = isEthIn ? web3.utils.toWei(amountIn, "ether") : 0;
-        const options = isEthIn ? { from: account, value } : { from: account };
-
-        const callParams = isEthIn
-          ? [fromV2, web3.utils.toWei(minOut, "ether")]
-          : [fromV2, web3.utils.toWei(amountIn, "ether"), web3.utils.toWei(minOut, "ether")];
-
-        const result = await router.methods[method](...callParams).send(options);
-
-        if (result.status) {
-          incrementImpactPoints();
-          alert("Swap successful!");
-        }
-      } catch (e) {
-        console.error("Swap error:", e);
-        alert("Swap failed. Invalid path or insufficient funds.");
-      }
-    }
-
-    function incrementImpactPoints() {
-      const key = "impactPoints_" + account;
-      let points = parseInt(localStorage.getItem(key) || '0');
-      points += 10;
-      localStorage.setItem(key, points);
-      updateImpactPoints();
-    }
-
-    function updateImpactPoints() {
-      const key = "impactPoints_" + account;
-      const points = parseInt(localStorage.getItem(key) || '0');
-      document.getElementById("impact-points").textContent = `Impact Points: ${points}`;
-    }
-
+  <script>
     const registryUrl = "./tokenRegistry.json";
     const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=";
     const coingeckoSuffix = "&vs_currencies=usd";
@@ -206,8 +138,29 @@
       }
     }
 
+    async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          document.getElementById('wallet-address').textContent = "Connected: " + accounts[0];
+        } catch (error) {
+          console.error("User rejected connection");
+        }
+      } else {
+        alert("MetaMask not found!");
+      }
+    }
+
+    function updateImpactPoints(delta = 0) {
+      let points = parseInt(localStorage.getItem('impactPoints') || '0');
+      points += delta;
+      localStorage.setItem('impactPoints', points);
+      document.getElementById('impact-points').textContent = `Impact Points: ${points}`;
+    }
+
     async function fetchGasEstimate() {
       if (window.ethereum) {
+        const web3 = new Web3(window.ethereum);
         const gasPrice = await web3.eth.getGasPrice();
         const eth = parseFloat(web3.utils.fromWei(gasPrice, 'ether')) * 21000;
         document.getElementById("gas-cost").textContent = `Live Gas (Est): ${eth.toFixed(6)} ETH`;
@@ -311,7 +264,7 @@
       });
     });
 
-    updateImpactPoints();
+    updateImpactPoints(0);
     renderTokens();
     fetchGasEstimate();
     setInterval(fetchGasEstimate, 15000);
