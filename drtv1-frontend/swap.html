@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DRT Mesh Swap</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
@@ -22,7 +22,7 @@
       color: #ccc;
     }
 
-    input[type="text"] {
+    input[type="text"], select {
       padding: 0.5em;
       width: 60%;
       margin-bottom: 1em;
@@ -97,13 +97,24 @@
   <h1>Welcome to DRT Mesh</h1>
   <p>Every buy supports global livelihoods. Earn DRT as impact rewards. 100 points = $1 worth of DRT.</p>
 
-  <button class="connect-btn" onclick="connectWallet()">Connect Wallet</button>
+  <button class="connect-btn" onclick="init()">Connect Wallet</button>
   <div id="wallet-address"></div>
   <div id="impact-points">Impact Points: 0</div>
   <div id="gas-cost">Live Gas (Est): ...</div>
 
-  <input type="text" id="search" placeholder="Search tokens...">
+  <hr style="margin: 2em 0;">
+  <h2>Universal Token Swap</h2>
+  <div>
+    <select id="token-in"></select>
+    <input type="text" id="amount-in" placeholder="Amount In">
+    ⇅
+    <select id="token-out"></select>
+    <input type="text" id="min-out" placeholder="Min Amount Out">
+    <div id="estimated-out" style="color: #ccc; margin-bottom: 1em;"></div>
+    <button id="multi-swap">Execute Swap</button>
+  </div>
 
+  <input type="text" id="search" placeholder="Search tokens...">
   <table>
     <thead>
       <tr>
@@ -122,154 +133,6 @@
     Categories: Food 🍞, Climate 🌱, Infrastructure 🏗, Education 📚, Health 🏥 — If multiple, badge is yellow 🌀
   </div>
 
-  <script>
-    const registryUrl = "./tokenRegistry.json";
-    const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=";
-    const coingeckoSuffix = "&vs_currencies=usd";
-
-    async function fetchCMCPrice(cmcId) {
-      try {
-        const res = await fetch(`https://drtv1-backend.onrender.com/price?cmc_id=${cmcId}`);
-        const data = await res.json();
-        return parseFloat(data.price).toFixed(2);
-      } catch (e) {
-        console.error("CMC fallback error:", e);
-        return 'N/A';
-      }
-    }
-
-    async function connectWallet() {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          document.getElementById('wallet-address').textContent = "Connected: " + accounts[0];
-        } catch (error) {
-          console.error("User rejected connection");
-        }
-      } else {
-        alert("MetaMask not found!");
-      }
-    }
-
-    function updateImpactPoints(delta = 0) {
-      let points = parseInt(localStorage.getItem('impactPoints') || '0');
-      points += delta;
-      localStorage.setItem('impactPoints', points);
-      document.getElementById('impact-points').textContent = `Impact Points: ${points}`;
-    }
-
-    async function fetchGasEstimate() {
-      if (window.ethereum) {
-        const web3 = new Web3(window.ethereum);
-        const gasPrice = await web3.eth.getGasPrice();
-        const eth = parseFloat(web3.utils.fromWei(gasPrice, 'ether')) * 21000;
-        document.getElementById("gas-cost").textContent = `Live Gas (Est): ${eth.toFixed(6)} ETH`;
-      }
-    }
-
-    async function fetchRegistry() {
-      const res = await fetch(registryUrl);
-      return await res.json();
-    }
-
-    async function fetchPrices(tokens) {
-      const coingeckoIds = tokens.map(t => t.coingeckoId).filter(Boolean);
-      const res = await fetch(coingeckoUrl + coingeckoIds.join('%2C') + coingeckoSuffix);
-      return await res.json();
-    }
-
-    function getCategoryBadge(token) {
-      const categories = Array.isArray(token.category) ? token.category : [token.category];
-      const isMulti = categories.length > 1;
-
-      return categories.map(cat => {
-        const className = isMulti ? 'category-Multi' : `category-${cat}`;
-        return `<span class="badge ${className}">${cat}</span>`;
-      }).join(' ');
-    }
-
-    function createRow(token, priceData) {
-      const row = document.createElement('tr');
-
-      const logoCell = document.createElement('td');
-      const logo = document.createElement('img');
-      logo.src = token.logo;
-      logo.alt = token.name;
-      logo.style.height = '30px';
-      logo.style.borderRadius = '50%';
-      logoCell.appendChild(logo);
-
-      const nameCell = document.createElement('td');
-      nameCell.innerHTML = `<span title="Founder: ${token.founder || 'N/A'}">${token.name} (${token.ticker})</span>`;
-
-      const categoryCell = document.createElement('td');
-      categoryCell.innerHTML = getCategoryBadge(token);
-
-      const scoreCell = document.createElement('td');
-      scoreCell.textContent = token.impactScore ?? 'N/A';
-
-      const priceCell = document.createElement('td');
-      let price = token.coingeckoId && priceData?.[token.coingeckoId]?.usd;
-      if (!price && token.cmc_id) {
-        fetchCMCPrice(token.cmc_id).then(p => {
-          priceCell.textContent = p !== 'N/A' ? `$${p}` : 'N/A';
-        });
-      } else {
-        priceCell.textContent = price ? `$${price.toFixed(2)}` : 'N/A';
-      }
-
-      const actionCell = document.createElement('td');
-      const btn = document.createElement('button');
-      btn.className = 'action-btn';
-      btn.textContent = 'View';
-      btn.onclick = () => {
-        updateImpactPoints(1);
-        window.location.href = `tokeninfo.html?ticker=${token.ticker}`;
-      };
-      actionCell.appendChild(btn);
-
-      row.appendChild(logoCell);
-      row.appendChild(nameCell);
-      row.appendChild(categoryCell);
-      row.appendChild(scoreCell);
-      row.appendChild(priceCell);
-      row.appendChild(actionCell);
-
-      return row;
-    }
-
-    async function renderTokens() {
-      try {
-        const container = document.getElementById("token-list");
-        const data = await fetchRegistry();
-        const tokenArray = Object.values(data);
-
-        tokenArray.sort((a, b) => {
-          const catA = (Array.isArray(a.category) ? a.category[0] : a.category || "").toLowerCase();
-          const catB = (Array.isArray(b.category) ? b.category[0] : b.category || "").toLowerCase();
-          return catA.localeCompare(catB);
-        });
-
-        const prices = await fetchPrices(tokenArray);
-        tokenArray.forEach(token => container.appendChild(createRow(token, prices)));
-      } catch (err) {
-        console.error("Token render error:", err);
-      }
-    }
-
-    document.getElementById('search').addEventListener('input', e => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll('tbody tr').forEach(row => {
-        row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
-      });
-    });
-
-    updateImpactPoints(0);
-    renderTokens();
-    fetchGasEstimate();
-    setInterval(fetchGasEstimate, 15000);
-  </script>
-
   <footer style="margin-top: 3em; font-size: 0.9em; color: #aaa;">
     💡 Have a token that supports global livelihoods?  
     <strong>DM me — I’ll list it for free.</strong><br><br>
@@ -277,5 +140,128 @@
     💬 Telegram: <a href="https://t.me/DRTv1Official" target="_blank" style="color: #6cf;">@DRTv1Official</a><br>
     🐦 Twitter: <a href="https://twitter.com/DRTv1Official" target="_blank" style="color: #6cf;">@DRTv1Official</a>
   </footer>
+
+  <script type="module">
+    import { abi as routerAbi } from '../abi/DRTUniversalRouter_abi.json' assert { type: 'json' };
+
+    const routerAddress = "0xd0fdaC020eFDBC4544372EB3260Bb15CE77206Ef";
+    let web3, account, router, tokenRegistry, meshPools;
+
+    async function init() {
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        await ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await web3.eth.getAccounts();
+        account = accounts[0];
+        router = new web3.eth.Contract(routerAbi, routerAddress);
+        document.getElementById("wallet-address").textContent = "Connected: " + account;
+        updateImpactPoints();
+        await loadRegistry();
+        await loadMeshPools();
+      } else {
+        alert("MetaMask not found!");
+      }
+    }
+
+    async function loadRegistry() {
+      const res = await fetch('./tokenRegistry.json');
+      tokenRegistry = await res.json();
+      const selectIn = document.getElementById("token-in");
+      const selectOut = document.getElementById("token-out");
+      Object.values(tokenRegistry).forEach(token => {
+        selectIn.appendChild(new Option(`${token.name} (${token.ticker})`, token.address));
+        selectOut.appendChild(new Option(`${token.name} (${token.ticker})`, token.address));
+      });
+    }
+
+    async function loadMeshPools() {
+      const res = await fetch('./meshPools.json');
+      meshPools = await res.json();
+    }
+
+    function findPath(tokenIn, tokenOut) {
+      const graph = {};
+      for (const [pair, { token0, token1 }] of Object.entries(meshPools)) {
+        if (!graph[token0]) graph[token0] = [];
+        if (!graph[token1]) graph[token1] = [];
+        graph[token0].push({ token: token1, pair });
+        graph[token1].push({ token: token0, pair });
+      }
+
+      const queue = [[tokenIn]];
+      const visited = new Set();
+      const parent = {};
+
+      while (queue.length > 0) {
+        const path = queue.shift();
+        const last = path[path.length - 1];
+        if (last === tokenOut) break;
+        if (visited.has(last)) continue;
+        visited.add(last);
+        for (const { token, pair } of graph[last] || []) {
+          if (!visited.has(token)) {
+            parent[token] = { prev: last, pair };
+            queue.push([...path, token]);
+          }
+        }
+      }
+
+      if (!parent[tokenOut]) return { path: [], pairs: [] };
+      const path = [tokenOut];
+      const pairs = [];
+      while (path[0] !== tokenIn) {
+        const { prev, pair } = parent[path[0]];
+        path.unshift(prev);
+        pairs.unshift(pair);
+      }
+      return { path, pairs };
+    }
+
+    document.getElementById("multi-swap").addEventListener("click", async () => {
+      const tokenIn = document.getElementById("token-in").value;
+      const tokenOut = document.getElementById("token-out").value;
+      const amountIn = web3.utils.toWei(document.getElementById("amount-in").value, 'ether');
+      const minOut = web3.utils.toWei(document.getElementById("min-out").value, 'ether');
+
+      const { path, pairs } = findPath(tokenIn, tokenOut);
+      if (!path.length || !pairs.length) return alert("No path found");
+
+      const tokenContract = new web3.eth.Contract([{"constant":false,"inputs":[{"name":"spender","type":"address"},{"name":"amount","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"type":"function"}], tokenIn);
+      await tokenContract.methods.approve(routerAddress, amountIn).send({ from: account });
+
+      await router.methods.swapExactTokensForTokens(path, pairs, amountIn).send({ from: account });
+      incrementImpactPoints();
+      alert("Swap successful");
+    });
+
+    document.getElementById("amount-in").addEventListener("input", async () => {
+      const tokenIn = document.getElementById("token-in").value;
+      const tokenOut = document.getElementById("token-out").value;
+      const amountIn = web3.utils.toWei(document.getElementById("amount-in").value || '0', 'ether');
+
+      const { path, pairs } = findPath(tokenIn, tokenOut);
+      if (!path.length || !pairs.length) {
+        document.getElementById("estimated-out").textContent = "No route found.";
+        return;
+      }
+
+      const est = await router.methods.estimateMultiHop(path, pairs, amountIn).call();
+      document.getElementById("estimated-out").textContent = `Estimated Out: ${web3.utils.fromWei(est)} tokens`;
+    });
+
+    function incrementImpactPoints() {
+      const key = "impactPoints_" + account;
+      let points = parseInt(localStorage.getItem(key) || '0');
+      points += 10;
+      localStorage.setItem(key, points);
+      updateImpactPoints();
+    }
+
+    function updateImpactPoints() {
+      const key = "impactPoints_" + account;
+      const points = parseInt(localStorage.getItem(key) || '0');
+      document.getElementById("impact-points").textContent = `Impact Points: ${points}`;
+    }
+  </script>
 </body>
 </html>
