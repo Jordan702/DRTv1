@@ -164,7 +164,7 @@
     }
 
     async function loadRegistry() {
-      const res = await fetch('./tokenRegistry.json');
+      const res = await fetch("./tokenRegistry.json");
       tokenRegistry = await res.json();
       const selectIn = document.getElementById("token-in");
       const selectOut = document.getElementById("token-out");
