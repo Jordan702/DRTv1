@@ -104,19 +104,15 @@
     <div id="swap-status" style="margin-top: 1em; font-size: 0.9em; color: #ccc;"></div>
   </div>
   <footer style="margin-top: 3em; font-size: 0.9em; color: #aaa;">
-    💡 Have a token that supports global livelihoods?  <strong>DM me — I’ll list it for free.</strong><br><br>
+    💡 Have a token that supports global livelihoods? <strong>DM me — I’ll list it for free.</strong><br><br>
     📩 Email: <a href="mailto:jordanschwartz702@gmail.com" style="color: #6cf;">jordanschwartz702@gmail.com</a><br>
     💬 Telegram: <a href="https://t.me/DRTv1Official" target="_blank" style="color: #6cf;">@DRTv1Official</a><br>
     🐦 Twitter: <a href="https://twitter.com/DRTv1Official" target="_blank" style="color: #6cf;">@DRTv1Official</a>
   </footer>
+
   <script>
     const registryUrl = "./tokenRegistry.json";
     const routerAddress = "0xd0fdaC020eFDBC4544372EB3260Bb15CE77206Ef";
-    const DRTv1 = "0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1".toLowerCase();
-    const DRTv2 = "0x36C5183e972A46109A97774551328e1948AaD64b".toLowerCase();
-    const SETH = "0x98C29B3A30A118351D56589DD3622b89551e2dA3".toLowerCase();
-    const ETH = "ETH";
-
     let web3, routerContract, tokenRegistry = [], walletAddress;
 
     async function connectWallet() {
@@ -147,17 +143,45 @@
       return await res.json();
     }
 
+    async function fetchPrices(tokens) {
+      const ids = tokens.map(t => t.coingeckoId).filter(Boolean);
+      const result = {};
+      if (ids.length > 0) {
+        try {
+          const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=usd`);
+          const data = await res.json();
+          Object.assign(result, data);
+        } catch (e) {
+          console.error("Coingecko price fetch failed", e);
+        }
+      }
+      for (const token of tokens) {
+        if (!token.coingeckoId && token.cmc_id) {
+          try {
+            const cmcRes = await fetch(`https://drtv1-backend.onrender.com/price?cmc_id=${token.cmc_id}`);
+            const cmcData = await cmcRes.json();
+            result[token.ticker.toLowerCase()] = { usd: parseFloat(cmcData.price) };
+          } catch (e) {
+            console.warn(`CMC fallback failed for ${token.ticker}`);
+          }
+        }
+      }
+      return result;
+    }
+
     function getCategoryBadge(token) {
       const categories = Array.isArray(token.category) ? token.category : [token.category];
       const isMulti = categories.length > 1;
       return categories.map(cat => `<span class="badge ${isMulti ? 'category-Multi' : `category-${cat}`}">${cat}</span>`).join(' ');
     }
 
-    function createRow(token) {
+    function createRow(token, priceData) {
       const row = document.createElement('tr');
       const logo = `<img src="${token.logo}" alt="${token.name}" style="height:30px;border-radius:50%;">`;
       const category = getCategoryBadge(token);
-      row.innerHTML = `<td>${logo}</td><td title="Founder: ${token.founder || 'N/A'}">${token.name} (${token.ticker})</td><td>${category}</td><td>${token.impactScore ?? 'N/A'}</td><td>N/A</td><td><button class='action-btn' onclick="location.href='tokeninfo.html?ticker=${token.ticker}'">View</button></td>`;
+      const price = priceData[token.coingeckoId]?.usd || priceData[token.ticker?.toLowerCase()]?.usd;
+      const priceText = price ? `$${price.toFixed(2)}` : 'N/A';
+      row.innerHTML = `<td>${logo}</td><td title="Founder: ${token.founder || 'N/A'}">${token.name} (${token.ticker})</td><td>${category}</td><td>${token.impactScore ?? 'N/A'}</td><td>${priceText}</td><td><button class='action-btn' onclick="location.href='tokeninfo.html?ticker=${token.ticker}'">View</button></td>`;
       return row;
     }
 
@@ -165,7 +189,13 @@
       const container = document.getElementById("token-list");
       const data = await fetchRegistry();
       tokenRegistry = Object.values(data);
-      tokenRegistry.forEach(token => container.appendChild(createRow(token)));
+      tokenRegistry.sort((a, b) => {
+        const catA = (Array.isArray(a.category) ? a.category[0] : a.category || '').toLowerCase();
+        const catB = (Array.isArray(b.category) ? b.category[0] : b.category || '').toLowerCase();
+        return catA.localeCompare(catB);
+      });
+      const prices = await fetchPrices(tokenRegistry);
+      tokenRegistry.forEach(token => container.appendChild(createRow(token, prices)));
       const from = document.getElementById('from-token');
       const to = document.getElementById('to-token');
       tokenRegistry.forEach(token => {
