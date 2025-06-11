@@ -15,14 +15,12 @@
     }
     h1 { font-size: 2.5em; margin-bottom: 0.2em; }
     p { font-size: 1.1em; margin-bottom: 1em; }
-
     #wallet-address, #impact-points, #gas-cost {
       margin: 0.5em 0;
       font-size: 0.9em;
       color: #ccc;
     }
-
-    input[type="text"] {
+    input[type="text"], input[type="number"], select {
       padding: 0.5em;
       width: 60%;
       margin-bottom: 1em;
@@ -31,7 +29,6 @@
       background-color: #222;
       color: #fff;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -41,13 +38,8 @@
       padding: 12px 15px;
       border-bottom: 1px solid #444;
     }
-    th {
-      background-color: #222;
-    }
-    tr:hover {
-      background-color: #1a1a1a;
-    }
-
+    th { background-color: #222; }
+    tr:hover { background-color: #1a1a1a; }
     .badge {
       padding: 4px 8px;
       border-radius: 8px;
@@ -56,14 +48,12 @@
       margin: 2px;
       display: inline-block;
     }
-
     .category-Food { background-color: #5c4033; }
     .category-Climate { background-color: #2e8b57; }
     .category-Infrastructure { background-color: #8b0000; }
     .category-Education { background-color: #fff; color: #000; }
     .category-Health { background-color: #4682b4; }
     .category-Multi { background-color: yellow; color: black; }
-
     .action-btn {
       background-color: #2e7d32;
       color: white;
@@ -72,10 +62,7 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .action-btn:hover {
-      background-color: #388e3c;
-    }
-
+    .action-btn:hover { background-color: #388e3c; }
     .connect-btn {
       background-color: #444;
       color: white;
@@ -85,7 +72,6 @@
       margin-bottom: 1em;
       cursor: pointer;
     }
-
     .legend {
       margin-top: 1em;
       font-size: 0.9em;
@@ -96,75 +82,64 @@
 <body>
   <h1>Welcome to DRT Mesh</h1>
   <p>Every buy supports global livelihoods. Earn DRT as impact rewards. 100 points = $1 worth of DRT.</p>
-
   <button class="connect-btn" onclick="connectWallet()">Connect Wallet</button>
   <div id="wallet-address"></div>
   <div id="impact-points">Impact Points: 0</div>
   <div id="gas-cost">Live Gas (Est): ...</div>
-
   <input type="text" id="search" placeholder="Search tokens...">
-
   <table>
     <thead>
-      <tr>
-        <th>Logo</th>
-        <th>Token</th>
-        <th>Category</th>
-        <th>Impact Score</th>
-        <th>Price</th>
-        <th>Action</th>
-      </tr>
+      <tr><th>Logo</th><th>Token</th><th>Category</th><th>Impact Score</th><th>Price</th><th>Action</th></tr>
     </thead>
     <tbody id="token-list"></tbody>
   </table>
-
-  <div class="legend">
-    Categories: Food 🍞, Climate 🌱, Infrastructure 🏗, Education 📚, Health 🏥 — If multiple, badge is yellow 🌀
+  <div class="legend">Categories: Food 🍞, Climate 🌱, Infrastructure 🏗, Education 📚, Health 🏥 — If multiple, badge is yellow 🌀</div>
+  <hr style="margin: 3em 0; border-color: #333;">
+  <h2>Swap Tokens</h2>
+  <div style="margin: 1em auto; max-width: 500px; text-align: left;">
+    <label>From:</label><br><select id="from-token"></select><br><br>
+    <label>To:</label><br><select id="to-token"></select><br><br>
+    <label>Amount:</label><br><input type="number" id="swap-amount" placeholder="Enter amount" /><br><br>
+    <button class="action-btn" onclick="handleSwap()">Swap</button>
+    <div id="swap-status" style="margin-top: 1em; font-size: 0.9em; color: #ccc;"></div>
   </div>
-
+  <footer style="margin-top: 3em; font-size: 0.9em; color: #aaa;">
+    💡 Have a token that supports global livelihoods?  <strong>DM me — I’ll list it for free.</strong><br><br>
+    📩 Email: <a href="mailto:jordanschwartz702@gmail.com" style="color: #6cf;">jordanschwartz702@gmail.com</a><br>
+    💬 Telegram: <a href="https://t.me/DRTv1Official" target="_blank" style="color: #6cf;">@DRTv1Official</a><br>
+    🐦 Twitter: <a href="https://twitter.com/DRTv1Official" target="_blank" style="color: #6cf;">@DRTv1Official</a>
+  </footer>
   <script>
     const registryUrl = "./tokenRegistry.json";
-    const coingeckoUrl = "https://api.coingecko.com/api/v3/simple/price?ids=";
-    const coingeckoSuffix = "&vs_currencies=usd";
+    const routerAddress = "0xd0fdaC020eFDBC4544372EB3260Bb15CE77206Ef";
+    const DRTv1 = "0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1".toLowerCase();
+    const DRTv2 = "0x36C5183e972A46109A97774551328e1948AaD64b".toLowerCase();
+    const SETH = "0x98C29B3A30A118351D56589DD3622b89551e2dA3".toLowerCase();
+    const ETH = "ETH";
 
-    async function fetchCMCPrice(cmcId) {
-      try {
-        const res = await fetch(`https://drtv1-backend.onrender.com/price?cmc_id=${cmcId}`);
-        const data = await res.json();
-        return parseFloat(data.price).toFixed(2);
-      } catch (e) {
-        console.error("CMC fallback error:", e);
-        return 'N/A';
-      }
-    }
+    let web3, routerContract, tokenRegistry = [], walletAddress;
 
     async function connectWallet() {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          document.getElementById('wallet-address').textContent = "Connected: " + accounts[0];
-        } catch (error) {
-          console.error("User rejected connection");
-        }
-      } else {
-        alert("MetaMask not found!");
-      }
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      walletAddress = accounts[0];
+      document.getElementById('wallet-address').textContent = `Connected: ${walletAddress}`;
+      updateImpactPoints(0);
     }
 
     function updateImpactPoints(delta = 0) {
-      let points = parseInt(localStorage.getItem('impactPoints') || '0');
+      if (!walletAddress) return;
+      const key = `impactPoints_${walletAddress}`;
+      let points = parseInt(localStorage.getItem(key) || '0');
       points += delta;
-      localStorage.setItem('impactPoints', points);
+      localStorage.setItem(key, points);
       document.getElementById('impact-points').textContent = `Impact Points: ${points}`;
     }
 
     async function fetchGasEstimate() {
-      if (window.ethereum) {
-        const web3 = new Web3(window.ethereum);
-        const gasPrice = await web3.eth.getGasPrice();
-        const eth = parseFloat(web3.utils.fromWei(gasPrice, 'ether')) * 21000;
-        document.getElementById("gas-cost").textContent = `Live Gas (Est): ${eth.toFixed(6)} ETH`;
-      }
+      if (!web3) return;
+      const gasPrice = await web3.eth.getGasPrice();
+      const eth = parseFloat(web3.utils.fromWei(gasPrice, 'ether')) * 21000;
+      document.getElementById("gas-cost").textContent = `Live Gas (Est): ${eth.toFixed(6)} ETH`;
     }
 
     async function fetchRegistry() {
@@ -172,89 +147,31 @@
       return await res.json();
     }
 
-    async function fetchPrices(tokens) {
-      const coingeckoIds = tokens.map(t => t.coingeckoId).filter(Boolean);
-      const res = await fetch(coingeckoUrl + coingeckoIds.join('%2C') + coingeckoSuffix);
-      return await res.json();
-    }
-
     function getCategoryBadge(token) {
       const categories = Array.isArray(token.category) ? token.category : [token.category];
       const isMulti = categories.length > 1;
-
-      return categories.map(cat => {
-        const className = isMulti ? 'category-Multi' : `category-${cat}`;
-        return `<span class="badge ${className}">${cat}</span>`;
-      }).join(' ');
+      return categories.map(cat => `<span class="badge ${isMulti ? 'category-Multi' : `category-${cat}`}">${cat}</span>`).join(' ');
     }
 
-    function createRow(token, priceData) {
+    function createRow(token) {
       const row = document.createElement('tr');
-
-      const logoCell = document.createElement('td');
-      const logo = document.createElement('img');
-      logo.src = token.logo;
-      logo.alt = token.name;
-      logo.style.height = '30px';
-      logo.style.borderRadius = '50%';
-      logoCell.appendChild(logo);
-
-      const nameCell = document.createElement('td');
-      nameCell.innerHTML = `<span title="Founder: ${token.founder || 'N/A'}">${token.name} (${token.ticker})</span>`;
-
-      const categoryCell = document.createElement('td');
-      categoryCell.innerHTML = getCategoryBadge(token);
-
-      const scoreCell = document.createElement('td');
-      scoreCell.textContent = token.impactScore ?? 'N/A';
-
-      const priceCell = document.createElement('td');
-      let price = token.coingeckoId && priceData?.[token.coingeckoId]?.usd;
-      if (!price && token.cmc_id) {
-        fetchCMCPrice(token.cmc_id).then(p => {
-          priceCell.textContent = p !== 'N/A' ? `$${p}` : 'N/A';
-        });
-      } else {
-        priceCell.textContent = price ? `$${price.toFixed(2)}` : 'N/A';
-      }
-
-      const actionCell = document.createElement('td');
-      const btn = document.createElement('button');
-      btn.className = 'action-btn';
-      btn.textContent = 'View';
-      btn.onclick = () => {
-        updateImpactPoints(1);
-        window.location.href = `tokeninfo.html?ticker=${token.ticker}`;
-      };
-      actionCell.appendChild(btn);
-
-      row.appendChild(logoCell);
-      row.appendChild(nameCell);
-      row.appendChild(categoryCell);
-      row.appendChild(scoreCell);
-      row.appendChild(priceCell);
-      row.appendChild(actionCell);
-
+      const logo = `<img src="${token.logo}" alt="${token.name}" style="height:30px;border-radius:50%;">`;
+      const category = getCategoryBadge(token);
+      row.innerHTML = `<td>${logo}</td><td title="Founder: ${token.founder || 'N/A'}">${token.name} (${token.ticker})</td><td>${category}</td><td>${token.impactScore ?? 'N/A'}</td><td>N/A</td><td><button class='action-btn' onclick="location.href='tokeninfo.html?ticker=${token.ticker}'">View</button></td>`;
       return row;
     }
 
     async function renderTokens() {
-      try {
-        const container = document.getElementById("token-list");
-        const data = await fetchRegistry();
-        const tokenArray = Object.values(data);
-
-        tokenArray.sort((a, b) => {
-          const catA = (Array.isArray(a.category) ? a.category[0] : a.category || "").toLowerCase();
-          const catB = (Array.isArray(b.category) ? b.category[0] : b.category || "").toLowerCase();
-          return catA.localeCompare(catB);
-        });
-
-        const prices = await fetchPrices(tokenArray);
-        tokenArray.forEach(token => container.appendChild(createRow(token, prices)));
-      } catch (err) {
-        console.error("Token render error:", err);
-      }
+      const container = document.getElementById("token-list");
+      const data = await fetchRegistry();
+      tokenRegistry = Object.values(data);
+      tokenRegistry.forEach(token => container.appendChild(createRow(token)));
+      const from = document.getElementById('from-token');
+      const to = document.getElementById('to-token');
+      tokenRegistry.forEach(token => {
+        from.add(new Option(`${token.name} (${token.ticker})`, token.ticker));
+        to.add(new Option(`${token.name} (${token.ticker})`, token.ticker));
+      });
     }
 
     document.getElementById('search').addEventListener('input', e => {
@@ -264,18 +181,47 @@
       });
     });
 
+    async function initWeb3() {
+      web3 = new Web3(window.ethereum);
+      const abi = await fetch('./abi/DRTUniversalRouter_abi.json').then(res => res.json());
+      routerContract = new web3.eth.Contract(abi, routerAddress);
+    }
+
+    async function handleSwap() {
+      const fromTicker = document.getElementById('from-token').value;
+      const toTicker = document.getElementById('to-token').value;
+      const amount = parseFloat(document.getElementById('swap-amount').value);
+      const status = document.getElementById('swap-status');
+      if (!walletAddress || isNaN(amount) || amount <= 0 || fromTicker === toTicker) {
+        status.textContent = "❌ Invalid input.";
+        return;
+      }
+
+      const tokenIn = tokenRegistry.find(t => t.ticker === fromTicker);
+      const tokenOut = tokenRegistry.find(t => t.ticker === toTicker);
+      const path = [tokenIn.address, tokenOut.address];
+      const pairs = [tokenIn.pairs?.[tokenOut.address] || tokenOut.pairs?.[tokenIn.address]];
+      const amtWei = web3.utils.toWei(amount.toString(), 'ether');
+
+      try {
+        if (!pairs[0]) throw new Error("No valid route or pair");
+        const tokenInContract = new web3.eth.Contract([{ "constant": false, "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}], "name": "approve", "outputs": [{"name": "", "type": "bool"}], "type": "function" }], tokenIn.address);
+        await tokenInContract.methods.approve(routerAddress, amtWei).send({ from: walletAddress });
+        await routerContract.methods.swapExactTokensForTokens(path, pairs, amtWei).send({ from: walletAddress });
+        status.textContent = `✅ Swapped ${amount} ${fromTicker} → ${toTicker}`;
+        updateImpactPoints(5);
+      } catch (err) {
+        console.error(err);
+        status.textContent = `❌ Swap failed: ${err.message}`;
+      }
+    }
+
+    connectWallet();
     updateImpactPoints(0);
-    renderTokens();
     fetchGasEstimate();
     setInterval(fetchGasEstimate, 15000);
+    initWeb3();
+    renderTokens();
   </script>
-
-  <footer style="margin-top: 3em; font-size: 0.9em; color: #aaa;">
-    💡 Have a token that supports global livelihoods?  
-    <strong>DM me — I’ll list it for free.</strong><br><br>
-    📩 Email: <a href="mailto:jordanschwartz702@gmail.com" style="color: #6cf;">jordanschwartz702@gmail.com</a><br>
-    💬 Telegram: <a href="https://t.me/DRTv1Official" target="_blank" style="color: #6cf;">@DRTv1Official</a><br>
-    🐦 Twitter: <a href="https://twitter.com/DRTv1Official" target="_blank" style="color: #6cf;">@DRTv1Official</a>
-  </footer>
 </body>
 </html>
