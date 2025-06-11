@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<nav style="background:#000; padding: 1em; text-align: center; border-bottom: 1px solid #333;">
+  <a href="../drtlanding.html" style="color:#6cf; margin:0 1em; text-decoration:none; font-weight:bold;">Home</a>
+  <a href="DRTtrade.html" style="color:#6cf; margin:0 1em; text-decoration:none; font-weight:bold;">Buy DRT</a>
+  <a href="swap.html" style="color:#6cf; margin:0 1em; text-decoration:none; font-weight:bold;">Swap</a>
+  <a href="index.html" style="color:#6cf; margin:0 1em; text-decoration:none; font-weight:bold;">Submit Proof</a>
+  <a href="mesh-dashboard.html" style="color:#6cf; margin:0 1em; text-decoration:none; font-weight:bold;">Dashboard</a>
+</nav>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRT Mesh Dashboard</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 2em;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 1em;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2em;
+    }
+    th, td {
+      padding: 0.75em;
+      border-bottom: 1px solid #444;
+    }
+    th {
+      background: #222;
+    }
+    tr:hover {
+      background: #1a1a1a;
+    }
+    .loading {
+      margin-top: 2em;
+      color: #aaa;
+    }
+    .badge {
+      padding: 2px 6px;
+      background: #2e8b57;
+      border-radius: 6px;
+      font-size: 0.8em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mesh Liquidity Dashboard</h1>
+  <p style="color:#ccc">View active token pairs and their pool metadata</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Token A</th>
+        <th>Token B</th>
+        <th>Pair Address</th>
+        <th>Liquidity</th>
+        <th>Trades</th>
+      </tr>
+    </thead>
+    <tbody id="pool-table"></tbody>
+  </table>
+
+  <div class="loading" id="loading">Loading pool data...</div>
+
+  <script>
+    async function fetchPools() {
+      try {
+        const res = await fetch('./meshPools.json'); // or backend endpoint
+        const pools = await res.json();
+        const table = document.getElementById('pool-table');
+        document.getElementById('loading').style.display = 'none';
+
+        pools.forEach(pool => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${pool.tokenA.symbol}</td>
+            <td>${pool.tokenB.symbol}</td>
+            <td><code>${pool.address}</code></td>
+            <td>${pool.liquidity ? `$${pool.liquidity.toLocaleString()}` : 'N/A'}</td>
+            <td>${pool.trades ?? '0'}</td>
+          `;
+          table.appendChild(row);
+        });
+      } catch (err) {
+        document.getElementById('loading').textContent = '❌ Failed to load meshPools.json';
+        console.error(err);
+      }
+    }
+
+    fetchPools();
+  </script>
+</body>
+</html>
