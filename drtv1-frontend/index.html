@@ -7,8 +7,7 @@
     <a href="swap.html" style="color:#6cf; margin:0 1em; text-decoration:none; font-weight:bold;">Swap</a>
     <a href="index.html" style="color:#6cf; margin:0 1em; text-decoration:none; font-weight:bold;">Submit Proof</a>
     <a href="mesh-dashboard.html" style="color:#6cf; margin:0 1em; text-decoration:none; font-weight:bold;">Dashboard</a>
-  </nav>
-
+  </nav> 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DRTv1 - Evolution Through Contribution</title>
@@ -77,7 +76,7 @@
 <body>
   <div class="container">
     <img src="DRTv1 Logo.png" alt="DRTv1 Logo" class="logo">
-    <h1>DRTv2 Submission Portal</h1>
+    <h1>DRTv1 Submission Portal</h1>
     <p class="slogan">"Evolution Through Contribution"</p>
 
     <form id="submissionForm" enctype="multipart/form-data" method="post">
@@ -91,7 +90,7 @@
       <textarea id="description" name="description" rows="5" required></textarea>
 
       <label for="proof">Upload Proof (Image or PDF, Try to keep it under 1MB):</label>
-      <input type="file" id="proofFile" name="proof" accept="image/*,application/pdf" required>
+      <input type="file" id="proofFile" name="proofFile" accept="image/*,application/pdf" required>
 
       <button type="submit">Submit</button>
     </form>
@@ -134,6 +133,7 @@
           status.textContent = result.message || '✅ Submitted successfully!';
           status.style.color = 'green';
 
+          // Optional: Show OpenAI evaluation if exposed by backend
           if (result.openAiResponse) {
             estimate.textContent = `🧠 Estimated Contribution Value: $${result.openAiResponse.trim()}`;
           }
@@ -150,4 +150,3 @@
   </script>
 </body>
 </html>
-
