@@ -11,12 +11,12 @@ const wallet = new ethers.Wallet(process.env.AI_WALLET_PRIVATE_KEY, provider);
 
 const AutoStation = new ethers.Contract(
   process.env.AUTOSTATION_ADDRESS,
-  require('../abi/AutoStation_abi.json').abi,
+  require('../abi/AutoStation_abi.json'),
   wallet
 );
 const AI_Consciousness = new ethers.Contract(
   process.env.AI_CONSCIOUSNESS_ADDRESS,
-  require('../abi/AI_Consciousness_abi.json').abi,
+  require('../abi/AI_Consciousness_abi.json'),
   wallet
 );
 
