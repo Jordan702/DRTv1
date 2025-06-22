@@ -7,7 +7,7 @@ const fs = require('fs');
 // ========== CONFIG ==========
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+const wallet = new ethers.Wallet(process.env.AI_WALLET_PRIVATE_KEY, provider);
 
 const AutoStation = new ethers.Contract(
   process.env.AUTOSTATION_ADDRESS,
