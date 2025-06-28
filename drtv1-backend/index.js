@@ -6,8 +6,8 @@ const path = require("path");
 const fs = require("fs");
 const axios = require("axios");
 
-// Import routes (make sure these files exist and export valid Express routers)
-const drtradeRoutes = require("./routes/drtradeRoute"); // Trade endpoints (liquidity check & execution)
+// Import routes
+const drtradeRoutes = require("./routes/drtradeRoute");
 const submitRoute = require("./routes/submit");
 const vaultRoutes = require("./routes/vaultRoutes");
 const transactionsRoute = require("./routes/transactions");
@@ -16,7 +16,7 @@ const balanceRoutes = require("./routes/balanceRoutes");
 
 const app = express();
 
-// CORS setup for frontend domain
+// CORS setup
 const corsOptions = {
   origin: "https://jordan702.github.io",
   methods: ["GET", "POST", "OPTIONS"],
@@ -24,11 +24,9 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Middleware to parse JSON and URL-encoded body content
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
-// Ensure logs and uploads directories exist
 const ensureDirectoryExists = (dir) => {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
@@ -40,18 +38,18 @@ ensureDirectoryExists(path.join(__dirname, "uploads"));
 
 const upload = multer({
   dest: "uploads/",
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB file size limit
+  limits: { fileSize: 20 * 1024 * 1024 },
 });
 
-// ✅ Mount API routes
+// ✅ Mount routes
 app.use("/api/transactions", transactionsRoute);
-app.use("/api/swap", drtradeRoutes); // endpoints for liquidity check & execution trade
+app.use("/api/swap", drtradeRoutes);
 app.use("/api/verify", submitRoute);
 app.use("/api/vault", vaultRoutes);
 app.use("/api/trade", tradeRoutes);
 app.use("/api/balance", balanceRoutes);
 
-// ✅ Liquidity Data API Route
+// ✅ Liquidity cache access
 app.get("/api/liquidity", async (req, res) => {
   try {
     if (!global.liquidityCache || Object.keys(global.liquidityCache).length === 0) {
@@ -64,31 +62,28 @@ app.get("/api/liquidity", async (req, res) => {
   }
 });
 
-// ✅ Serve static frontend files
+// ✅ Serve frontend
 const frontendPath = path.resolve(__dirname, "../drtv1-frontend");
 app.use(express.static(frontendPath));
 
-// ✅ Serve frontend UI pages for specific routes
+// ✅ UI routes
 app.get(["/approve", "/swap"], (req, res) => {
   res.sendFile(path.join(frontendPath, "drtrade.html"));
 });
 
-// ✅ Health check endpoint
+// ✅ Health
 app.get("/health", (req, res) => {
   res.send("✅ DRTv1 Backend API is live 🚀");
 });
 
-// ✅ Dashboard & Logs API routes
+// ✅ Logs
 app.get("/api/dashboard", (req, res) => {
   const logPath = path.resolve(__dirname, "logs/submissions.json");
   try {
     const logs = fs.existsSync(logPath) ? JSON.parse(fs.readFileSync(logPath)) : [];
     res.json(logs);
   } catch (err) {
-    res.status(500).json({
-      error: "Failed to load submission logs",
-      details: err.message,
-    });
+    res.status(500).json({ error: "Failed to load submission logs", details: err.message });
   }
 });
 
@@ -98,26 +93,19 @@ app.get("/api/swap", (req, res) => {
     const logs = fs.existsSync(logPath) ? JSON.parse(fs.readFileSync(logPath)) : [];
     res.json(logs);
   } catch (err) {
-    res.status(500).json({
-      error: "Failed to load swap logs",
-      details: err.message,
-    });
+    res.status(500).json({ error: "Failed to load swap logs", details: err.message });
   }
 });
 
+// ✅ Price API
 app.get('/price', async (req, res) => {
   const cmcId = req.query.cmc_id;
-
-  if (!cmcId) {
-    return res.status(400).json({ error: 'Missing cmc_id' });
-  }
+  if (!cmcId) return res.status(400).json({ error: 'Missing cmc_id' });
 
   try {
     const response = await axios.get(
       `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${cmcId}`,
-      {
-        headers: { 'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY }
-      }
+      { headers: { 'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY } }
     );
     const price = response.data.data[cmcId].quote.USD.price;
     res.json({ price });
@@ -127,14 +115,45 @@ app.get('/price', async (req, res) => {
   }
 });
 
+// ✅ Add new pool
+app.post("/pools", (req, res) => {
+  const newPool = req.body;
+  const poolsPath = path.join(__dirname, "../drtv1-frontend/pools.json");
 
-// ✅ Global error handler middleware
+  try {
+    const currentPools = fs.existsSync(poolsPath)
+      ? JSON.parse(fs.readFileSync(poolsPath))
+      : [];
+
+    currentPools.push(newPool);
+    fs.writeFileSync(poolsPath, JSON.stringify(currentPools, null, 2));
+
+    res.status(200).json({ success: true, message: "✅ Pool added to pools.json" });
+  } catch (err) {
+    console.error("❌ Failed to append pool:", err);
+    res.status(500).json({ error: "Failed to write to pools.json" });
+  }
+});
+
+// ✅ GET pools.json for frontend rendering
+app.get("/pools", (req, res) => {
+  const poolsPath = path.join(__dirname, "../drtv1-frontend/pools.json");
+  try {
+    const pools = fs.existsSync(poolsPath) ? JSON.parse(fs.readFileSync(poolsPath)) : [];
+    res.json(pools);
+  } catch (err) {
+    console.error("❌ Failed to load pools.json:", err);
+    res.status(500).json({ error: "Failed to load pools" });
+  }
+});
+
+// ✅ Global error handler
 app.use((err, req, res, next) => {
   console.error("🌐 Global Error:", err);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
-// ✅ Start the server
+// ✅ Start
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ DRTv1 backend running on port ${PORT}`);
