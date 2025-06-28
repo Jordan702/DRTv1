@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Pool - DRT Mesh</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+</head>
+<body class="bg-gray-900 text-white">
+  <div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold text-center mb-4">Add Pool (Uniswap V2)</h1>
+
+    <div class="space-y-4">
+      <input id="tokenA" type="text" placeholder="Token A Address" class="w-full p-2 rounded bg-gray-800 border border-gray-600">
+      <input id="symbolA" type="text" placeholder="Token A Symbol" class="w-full p-2 rounded bg-gray-800 border border-gray-600">
+      <input id="tokenB" type="text" placeholder="Token B Address" class="w-full p-2 rounded bg-gray-800 border border-gray-600">
+      <input id="symbolB" type="text" placeholder="Token B Symbol" class="w-full p-2 rounded bg-gray-800 border border-gray-600">
+      <input id="amountA" type="text" placeholder="Amount Token A" class="w-full p-2 rounded bg-gray-800 border border-gray-600">
+      <input id="amountB" type="text" placeholder="Amount Token B" class="w-full p-2 rounded bg-gray-800 border border-gray-600">
+      <input id="category" type="text" placeholder="Category (e.g., Infrastructure)" class="w-full p-2 rounded bg-gray-800 border border-gray-600">
+      <input id="impactScore" type="number" placeholder="Impact Score (0-5)" class="w-full p-2 rounded bg-gray-800 border border-gray-600">
+      <button onclick="estimateGas()" class="w-full bg-yellow-600 p-2 rounded hover:bg-yellow-700">Estimate Gas</button>
+      <button onclick="addLiquidity()" class="w-full bg-blue-600 p-2 rounded hover:bg-blue-700">Add Liquidity</button>
+    </div>
+
+    <p id="gasEstimate" class="mt-4 text-center text-yellow-300"></p>
+    <p id="status" class="mt-4 text-center text-green-400"></p>
+  </div>
+
+  <script>
+    const routerAddress = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
+    let web3;
+
+    async function estimateGas() {
+      if (!web3) web3 = new Web3(window.ethereum);
+      const accounts = await web3.eth.requestAccounts();
+      const from = accounts[0];
+
+      try {
+        const estimate = await web3.eth.estimateGas({
+          from,
+          to: routerAddress,
+          value: 0,
+          data: "0x"
+        });
+        document.getElementById("gasEstimate").innerText = `Estimated Gas: ${estimate}`;
+      } catch (err) {
+        document.getElementById("gasEstimate").innerText = `Gas estimate failed.`;
+      }
+    }
+
+    async function addLiquidity() {
+      if (!web3) web3 = new Web3(window.ethereum);
+      const accounts = await web3.eth.requestAccounts();
+      const from = accounts[0];
+
+      const tokenA = document.getElementById('tokenA').value;
+      const tokenB = document.getElementById('tokenB').value;
+      const symbolA = document.getElementById('symbolA').value;
+      const symbolB = document.getElementById('symbolB').value;
+      const amountA = web3.utils.toWei(document.getElementById('amountA').value, 'ether');
+      const amountB = web3.utils.toWei(document.getElementById('amountB').value, 'ether');
+      const category = document.getElementById('category').value;
+      const impactScore = parseInt(document.getElementById('impactScore').value);
+      const deadline = Math.floor(Date.now() / 1000) + 60 * 10;
+
+      const tokenABI = [{"constant":false,"inputs":[{"name":"spender","type":"address"},{"name":"amount","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"type":"function"}];
+
+      const tokenAContract = new web3.eth.Contract(tokenABI, tokenA);
+      const tokenBContract = new web3.eth.Contract(tokenABI, tokenB);
+
+      await tokenAContract.methods.approve(routerAddress, amountA).send({ from });
+      await tokenBContract.methods.approve(routerAddress, amountB).send({ from });
+
+      const routerABI = [{
+        "name": "addLiquidity",
+        "type": "function",
+        "inputs": [
+          { "type": "address", "name": "tokenA" },
+          { "type": "address", "name": "tokenB" },
+          { "type": "uint256", "name": "amountADesired" },
+          { "type": "uint256", "name": "amountBDesired" },
+          { "type": "uint256", "name": "amountAMin" },
+          { "type": "uint256", "name": "amountBMin" },
+          { "type": "address", "name": "to" },
+          { "type": "uint256", "name": "deadline" }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+      }];
+
+      const router = new web3.eth.Contract(routerABI, routerAddress);
+      await router.methods.addLiquidity(tokenA, tokenB, amountA, amountB, 1, 1, from, deadline).send({ from });
+
+      const poolAddress = await getPairAddress(tokenA, tokenB);
+
+      const newPool = {
+        tokenA: { symbol: symbolA, address: tokenA, decimals: 18 },
+        tokenB: { symbol: symbolB, address: tokenB, decimals: 18 },
+        address: poolAddress,
+        version: "v2",
+        liquidity: parseFloat(document.getElementById('amountA').value) + parseFloat(document.getElementById('amountB').value),
+        trades: 0,
+        category,
+        impactScore,
+        lastUpdated: new Date().toISOString()
+      };
+
+      // Send to backend to append to pools.json
+      await fetch("/pools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newPool)
+      });
+
+      document.getElementById("status").innerText = `Pool created: ${poolAddress}`;
+    }
+
+    async function getPairAddress(tokenA, tokenB) {
+      const factoryABI = [{"constant":true,"inputs":[{"name":"tokenA","type":"address"},{"name":"tokenB","type":"address"}],"name":"getPair","outputs":[{"name":"pair","type":"address"}],"type":"function"}];
+      const factoryAddress = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
+      const factory = new web3.eth.Contract(factoryABI, factoryAddress);
+      return await factory.methods.getPair(tokenA, tokenB).call();
+    }
+  </script>
+</body>
+</html>
