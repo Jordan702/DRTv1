@@ -203,12 +203,13 @@
         const path = [tokenIn.address];
         for (let i = 0; i < 28; i++) {
           const hop = tokenRegistry[i % tokenRegistry.length];
-          if (hop.address !== tokenIn.address && hop.address !== tokenOut.address) {
+          if (!path.includes(hop.address) && hop.address !== tokenOut.address) {
             path.push(hop.address);
           }
         }
         path.push(tokenOut.address);
 
+        // ✅ Fix: wrap path to match address[][] Solidity input
         const res = await fetch("https://drtv1-backend.onrender.com/api/meshSwap", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -216,7 +217,7 @@
             tokenIn: tokenIn.address,
             tokenOut: tokenOut.address,
             amountIn: amount,
-            paths: path
+            paths: [path] // 👈 fix: wrap array to match address[][]
           })
         });
 
