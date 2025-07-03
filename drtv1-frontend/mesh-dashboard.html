@@ -73,7 +73,7 @@
   <script>
     async function fetchPools() {
       try {
-        const res = await fetch('https://drtv1-backend.onrender.com/pools.json');
+        const res = await fetch('https://drtv1-backend.onrender.com/pools');
         const pools = await res.json();
         const table = document.getElementById('pool-table');
         document.getElementById('loading').style.display = 'none';
