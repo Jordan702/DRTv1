@@ -40,18 +40,10 @@ exports.meshSwap = async (req, res) => {
       await approveTx.wait();
     }
 
-    // Wrap paths as required by address[][] calldata
-    const wrappedPaths = [paths];
-
-    const tx = await contract.multiHopSwap(
-      tokenIn,
-      tokenOut,
-      parsedAmount,
-      wrappedPaths,
-      deadline
-    );
-
+    // Use provided paths (already address[][] from frontend)
+    const tx = await contract.multiHopSwap(tokenIn, tokenOut, parsedAmount, paths, deadline);
     const receipt = await tx.wait();
+
     return res.status(200).json({ success: true, txHash: receipt.hash });
   } catch (err) {
     console.error("❌ meshSwap error:", err);
