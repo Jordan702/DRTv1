@@ -5,6 +5,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const axios = require("axios");
+const Web3 = require("web3");
 
 // Import routes
 const drtradeRoutes = require("./routes/drtradeRoute");
@@ -13,6 +14,7 @@ const vaultRoutes = require("./routes/vaultRoutes");
 const transactionsRoute = require("./routes/transactions");
 const tradeRoutes = require("./routes/tradeRoutes");
 const balanceRoutes = require("./routes/balanceRoutes");
+const meshSwapHandler = require("./controllers/meshSwapController");
 
 const app = express();
 
@@ -48,6 +50,9 @@ app.use("/api/verify", submitRoute);
 app.use("/api/vault", vaultRoutes);
 app.use("/api/trade", tradeRoutes);
 app.use("/api/balance", balanceRoutes);
+
+// ✅ Mesh swap API
+app.post("/api/meshSwap", meshSwapHandler);
 
 // ✅ Liquidity cache access
 app.get("/api/liquidity", async (req, res) => {
