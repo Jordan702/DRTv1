@@ -18,7 +18,7 @@ if (!process.env.MAINNET_RPC_URL || !process.env.MINTER_PRIVATE_KEY) {
   throw new Error("❌ Missing environment variables: MAINNET_RPC_URL or MINTER_PRIVATE_KEY.");
 }
 
-const provider = new ethers.providers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
+const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 const wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 
 // Create contract instances
