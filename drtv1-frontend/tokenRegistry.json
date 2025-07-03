@@ -33,7 +33,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/aave.png",
+    "logo": "./Logos/aave-token-round.bin.webp",
     "ipfs_cid": "Qm22e5964c1cb55f63ef7c02cf72956f912f5ccd2",
     "coingeckoId": "aave",
     "cmc_id": null,
@@ -139,25 +139,25 @@
     "cmc_id": 9202,
     "description": "AgriChain's vision is to be the largest industry-wide platform for managing the agricultural supply chain; connecting sellers and buyers, providing full paddock-to-plate traceability and allowing bulk logistics companies to manage and grow their operations."
   },
-  "AgriDex": {
-    "name": "AgriDex",
-    "ticker": "AGRI",
-    "address": "AGRidUXLeDij9CJprkZx7WBXtTQC67jtfiwz293mVrJ",
-    "founder": ["Henry Duckworth"],
-    "category": ["Food"],
+  "Lympo": {
+    "name": "Lympo",
+    "ticker": "LYM",
+    "address": "0xc690f7c7fcffa6a82b79fab7508c466fefdfc8c5",
+    "founder": ["Ada Jonuse, Tadas Maurukas"],
+    "category": ["Health"],
     "impactScore": 2,
     "impactData": {
       "infrastructure": { "score": 0, "multiplier": 0.0 },
       "climate": { "score": 0, "multiplier": 0.0 },
-      "food": { "score": 2, "multiplier": 1.5 },
-      "health": { "score": 0, "multiplier": 0.0 },
+      "food": { "score": 0, "multiplier": 0.0 },
+      "health": { "score": 2, "multiplier": 1.5 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/agridexdarklogo.bin.webp",
+    "logo": "./Logos/lym.webp",
     "ipfs_cid": "Qmc64e5b33d3a837adb6f79557d1beeac9e3fa8d34",
-    "coingeckoId": "agridex-governance-token",
-    "cmc_id": null,
-    "description": "AgriDex is revolutionizing the $3 trillion global food and agriculture sector by integrating blockchain technology and DeFi."
+    "coingeckoId": "lympo",
+    "cmc_id": 2554,
+    "description": "Lympo is a sports and health ecosystem powered by user generated and user controlled data which can help generate exponential returns for industry stakeholders and users alike."
   },
   "AgroTechFarm": {
     "name": "AgroTechFarm",
@@ -179,25 +179,25 @@
     "cmc_id": 4319,
     "description": "AgroTechFarm is a fully automated intelligent equipment for industrial growing natural food in any region."
   },
-  "AgroGlobalTokenv2": {
-    "name": "Agro Global Token v2",
-    "ticker": "AGRO",
-    "address": "0x404f83279c36e3E0e2771B7ae9f9B0B2B50EE27C",
-    "founder": ["Eduardo Novillo Astrada", "Ariel Scaliter"],
-    "category": ["Food"],
+  "CRYN": {
+    "name": "Creative Rich Yield Coin",
+    "ticker": "CRYN",
+    "address": "0xc31cebf8f9e825d1d1244d73d0a65e44bd5210db",
+    "founder": ["Alejandro Jimenez"],
+    "category": ["Food, Infrastructure"],
     "impactScore": 2,
     "impactData": {
-      "infrastructure": { "score": 0, "multiplier": 0.0 },
+      "infrastructure": { "score": 1, "multiplier": 0.5 },
       "climate": { "score": 0, "multiplier": 0.0 },
-      "food": { "score": 2, "multiplier": 1.5 },
+      "food": { "score": 1, "multiplier": 1.5 },
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     }, 
-    "logo": "./Logos/Agro.webp",
+    "logo": "./Logos/cryn.webp",
     "ipfs_cid": "Qma5f01f30d60d6d33fdaa9d2cb406ba4ba965f40b",
-    "coingeckoId": "agro-global",
-    "cmc_id": null,
-    "description": "Agro Global Token provides high efficiency and profit by combining blockchain technology with agriculture."
+    "coingeckoId": "cryn",
+    "cmc_id": 19117,
+    "description": "CRYN is a cryptocurrency that emerged with the digital financial evolution helping human rights development brinding the gap for a better world to achive a healthy environment without hunger enriching the rigth to learn and respect the nature of each culture achieving sustainable social development for new generations. We start seeing a need and end up providing solutions. Every time you acquired a CRYN with your investment solve the great gap of social differences your purchase becomes less hunger and more education for the most needy population centers of our world this effort will be reflected in everyones future. Cryn value is given by destiny not the origin."
   },
   "Archway": {
     "name": "ARCHWAY",
@@ -233,7 +233,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     }, 
-    "logo": "./Logos/biconomy.png",
+    "logo": "./Logos/biconomy_logo.jpeg",
     "ipfs_cid": "Qm6106a75740969a64d01511a92c323a927c54d0ee",
     "coingeckoId": "biconomy",
     "cmc_id": null,
@@ -399,11 +399,11 @@
     "cmc_id": 12553,
     "description": "CureToken is a decentralized project focused on funding cancer research and supporting health-related initiatives through blockchain donations."
   },
-  "EDU": {
-    "name": "Open Campus",
-    "ticker": "EDU",
-    "address": "0xbdeae1ca48894a1759a8374d63925f21f2ee2639",
-    "founder": ["Scott Smallwood", "Sara Hebel"],
+  "IQ": {
+    "name": "IQ",
+    "ticker": "IQ",
+    "address": "0x579cea1889991f68acc35ff5c3dd0621ff29b0c9",
+    "founder": ["Sam Kazemian, Theodor Forselius, Travis Moore"],
     "category": ["Education"],
     "impactScore": 4,
     "impactData": {
@@ -413,11 +413,11 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 4, "multiplier": 1.8 }
     },
-    "logo": "./Logos/EDU_Logo.webp",
+    "logo": "./Logos/iq.webp",
     "ipfs_cid": "QmZUXmFeqXuGJ8HT8BP4n4Q2ffMnthqfb9AtKnLTYGBux6",
-    "coingeckoId": "edu-coin",
-    "cmc_id": null,
-    "description": "Open Campus is a decentralized platform for educators, content creators, and learners to earn and access educational content globally."
+    "coingeckoId": "everipedia",
+    "cmc_id": 2930,
+    "description": "The IQ token is a cryptocurrency that powers the Agent Tokenization Platform ATP. ATP was built for developers to launch the next generation of tokenized agents that are verifiably autonomous and sovereign. These agents are capable of owning and managing digital and physical assets from cryptocurrencies to DeFi transactions to robots."
   },
   "MTN": {
     "name": "Medicalchain",
@@ -439,25 +439,25 @@
     "cmc_id": null,
     "description": "Medicalchain uses blockchain technology to securely store health records and maintain a single version of the truth."
   },
-  "CO2": {
-    "name": "Carbon",
-    "ticker": "CO2",
-    "address": "0xF0d35f96Ad8CEfcA54e048bF1569B5Fd94C27dc1",
-    "founder": ["Choky YF Simanjuntak"],
-    "category": ["Climate"],
-    "impactScore": 4,
+  "TRB": {
+    "name": "TellorTributes",
+    "ticker": "TRB",
+    "address": "0x88df592f8eb5d7bd38bfef7deb0fbc02cf3778a0",
+    "founder": ["Brenda Loya, Nick Fett, Michael Zemrose"],
+    "category": ["Infrastructure"],
+    "impactScore": 3,
     "impactData": {
-      "infrastructure": { "score": 0, "multiplier": 0.0 },
-      "climate": { "score": 4, "multiplier": 1.7 },
+      "infrastructure": { "score": 3, "multiplier": 1.7 },
+      "climate": { "score": 0, "multiplier": 0.0 },
       "food": { "score": 0, "multiplier": 0.0 },
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/co2.png",
+    "logo": "./Logos/tellor.png",
     "ipfs_cid": "QmTbbrYxYx3YysZfLb64xqkLTNjzQ6WEKKz5cn9wq6coXb",
-    "coingeckoId": null,
-    "cmc_id": 17893,
-    "description": "Carbon is a carbon credit-backed token enabling individuals and companies to offset carbon footprints through blockchain-based climate projects."
+    "coingeckoId": tellor,
+    "cmc_id": 4944,
+    "description": "Tellor is the oracle layer for secure censorship resistant data creation and distribution. Built to be the source of truth not just middleware it is unlike any other data provider in the industry."
   },
   "SOLVE": {
     "name": "Solve.Care",
@@ -473,7 +473,7 @@
       "health": { "score": 3, "multiplier": 1.5 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/solvecare.jpg",
+    "logo": "./Logos/Solve.bin(1).webp",
     "ipfs_cid": "QmNRvHYWoAyDFVqzFbdkfvLsFfqkN7yRmtKFD8z9kwRSsq",
     "coingeckoId": "solve-care",
     "cmc_id": null,
@@ -519,11 +519,11 @@
     "cmc_id": null,
     "description": "PowerLedger enables decentralized peer-to-peer energy trading, allowing households and businesses to sell their surplus solar energy directly within their communities."
   },
-  "FoodChainGlobal": {
-    "name": "FoodChain Global",
-    "ticker": "FOOD",
-    "address": "0x6F06e6beD64cF4c4187c06Ee2a4732f6a171BC4e",
-    "founder": ["Shawn Kurz"],
+  "Grow": {
+    "name": "Grow",
+    "ticker": "GROW",
+    "address": "0x1223334444A7466fBf985B14E1F4EdAf3883bCa6",
+    "founder": [" 0xbrainjar, Abdalla Kablan, Adam Back "],
     "category": ["Food"],
     "impactScore": 4,
     "impactData": {
@@ -533,11 +533,11 @@
       "health": { "score": 1, "multiplier": 0.5 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/food.webp",
+    "logo": "./Logos/grow.png",
     "ipfs_cid": "Qmcc71eb1d21678aa247d66aa9f1f80b2b3ea35b7f",
-    "coingeckoId": null,
-    "cmc_id": 18201,
-    "description": "FoodChain Global uses blockchain and crypto to help fight world hunger. Token proceeds support food donation logistics and transparent global food programs."
+    "coingeckoId": "grow",
+    "cmc_id": 29862,
+    "description": "Grow is a renaissance in the food supply industry. We are an AgTech blockchain-based ecosystem committed to sustainable and organic farming practices. The current food supply is broken centralized and unsustainable and the Grow Renaissance is how we together can fix it. There are many projects being built within the Grow Renaissance ecosystem with a shared mission of Nourising People Animals and The Planet. Among these projects are FarmTracer The Nourish Mart and the Grow Blockchain."
   },
   "BitDegree": {
     "name": "BitDegree",
@@ -639,25 +639,25 @@
     "cmc_id": null,
     "description": "Plentify leverages IoT, AI, and blockchain to deliver reliable, affordable, and clean energy to underserved communities through smart demand management systems."
   },
-  "RegenNetwork": {
-     "name": "Regen Network",
+  "Regentics": {
+     "name": "Regentics",
     "ticker": "REGEN",
-    "address": "ibc/1DCC8A6CB5689018431323953344A9F6CC4D0BFB261E88C9F7777372C10CD076",
-    "founder": ["Christian Shearer", "Gregory Landua"],
-    "category": ["Climate"],
+    "address": "0x775e8647b21606a21ee7f4a1efa1fc9be515666b",
+    "founder": ["Not Listed"],
+    "category": ["Health"],
     "impactScore": 4,
     "impactData": {
       "infrastructure": { "score": 0, "multiplier": 0.0 },
-      "climate": { "score": 4, "multiplier": 2.0 },
+      "climate": { "score": 0, "multiplier": 0.0 },
       "food": { "score": 0, "multiplier": 0.0 },
-      "health": { "score": 0, "multiplier": 0.0 },
+      "health": { "score": 4, "multiplier": 2.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/REGEN.webp",
+    "logo": "./Logos/regen.jpg",
     "ipfs_cid": "QmS5enwr9rb3eEbTwNzbi2Xcf2v3frzMYf7dZo1XUasMoX",
-    "coingeckoId": "regen",
+    "coingeckoId": "regentics",
     "cmc_id": null,
-    "description": "Regen Network is a Proof-of-Stake blockchain on the Cosmos SDK focused on ecological regeneration, enabling transparent ecological data and carbon credit issuance."
+    "description": "Empowering Medical Innovation Regentics REGEN emerges as a bold response to this stagnationna next generation project that unites robotics and DeSci Decentralized Science to transform the future of medicine."
   },
   "MindAI": {
     "name": "MindAI",
@@ -699,25 +699,25 @@
     "cmc_id": null,
     "description": "ODEM is a decentralized education marketplace using blockchain to reduce cost and increase access to global education credentials and custom learning pathways."
   },
-  "Plastiks": {
-    "name": "Plastiks",
-    "ticker": "PLASTIK",
-    "address": "0x27cd006548df7c8c8e9fdc4a67fa05c2e3ca5cf9",
-    "founder": ["André Vanyi-Robin", "Daniel García", "Trym Lyngset"],
-    "category": ["Climate"],
+  "ARTX": {
+    "name": "ARTX",
+    "ticker": "ARTX",
+    "address": "0x741b0428efdf4372a8df6fb54b018db5e5ab7710",
+    "founder": ["James A Matthewson"],
+    "category": ["Education"],
     "impactScore": 2,
     "impactData": {
       "infrastructure": { "score": 0, "multiplier": 0.0 },
-      "climate": { "score": 2, "multiplier": 2.0 },
+      "climate": { "score": 0, "multiplier": 0.0 },
       "food": { "score": 0, "multiplier": 0.0 },
       "health": { "score": 0, "multiplier": 0.0 },
-      "education": { "score": 0, "multiplier": 0.0 }
+      "education": { "score": 2, "multiplier": 2.0 }
     },
-    "logo": "./Logos/plastik.webp",
-    "ipfs_cid": "Qmbcf23462342f2fcdca234d42e8fe57cfef8a9cd",
-    "coingeckoId": "plastiks",
-    "cmc_id": null,
-    "description": "Plastiks tokenizes the act of recycling ocean-bound plastic waste, rewarding communities in developing countries for reducing environmental pollution and supporting circular economies."
+    "logo": "./Logos/ARTX.png",
+    "ipfs_cid": "Unknown",
+    "coingeckoId": "artx",
+    "cmc_id": 9105,
+    "description": "ARTX is a utility token associated with the SUPERLUXE.io platform a digital art marketplace. Its designed to make art purchases on the platform more efficient and cost effective offering benefits like discounts on platform fees access to special features and participation in artist events."
   },
   "Brainedge": {
     "name": "Brainedge",
@@ -753,7 +753,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/Oceanprotocol.png",
+    "logo": "./Logos/ocean-protocol.png",
     "ipfs_cid": "QmW2f5d9ad2a63ed59e4d78a58df2c77e3ecbdff7d",
     "coingeckoId": "ocean-protocol",
     "cmc_id": null,
@@ -779,11 +779,11 @@
     "cmc_id": null,
     "description": "MCO2 tokenizes carbon credits, allowing businesses and individuals to offset emissions transparently by supporting certified climate-positive projects like rainforest preservation."
   },
-  "BCT": {
-    "name": "Toucan Protocol: Base Carbon Tonne",
-    "ticker": "BCT",
-    "address": "0x2f800db0fdb5223b3c3f354886d907a671414a7f",
-    "founder": ["James Farrell", "Raphael Haupt"],
+  "ECT": {
+    "name": "Ecotrader",
+    "ticker": "ECT",
+    "address": "0xb96682a8f558b8199a2dc039b1dd8911e5068faf",
+    "founder": ["Itay Azaraty"],
     "category": ["Climate"],
     "impactScore": 4,
     "impactData": {
@@ -793,11 +793,11 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/bct.webp",
+    "logo": "./Logos/ecotrader.webp",
     "ipfs_cid": "QmUc3dca46bc9aef918c5f451df82aa8964cc1cda",
-    "coingeckoId": "toucan-protocol-base-carbon-tonne",
+    "coingeckoId": "ecotrader",
     "cmc_id": null,
-    "description": "Toucan’s BCT brings carbon offsets onto the blockchain, enabling DeFi protocols to build carbon-neutral applications and fund climate-positive projects."
+    "description": "Ecotrader is a blockchain-based platform that enables fractional ownership of renewable energy projects through asset tokenization. It allows investors to participate in green energy projects by purchasing tokenized shares through fractional ownership and opens the door for crypto investors to take part in the growing energy sector bridging the gap between retail investors and the renewable energy sector."
   },
   "MED": {
     "name": "MediBloc",
@@ -819,11 +819,11 @@
     "cmc_id": null,
     "description": "MediBloc is a patient-centric health data blockchain platform designed to empower individuals with control over their own medical records, enhancing data privacy and accessibility."
   },
-  "RecycleX": {
-    "name": "RecycleX",
-    "ticker": "RCX",
-    "address": "0x636f434941421d18aEa649201c8319323bA7DEd6",
-    "founder": ["Abhishek Chhazed", "Vedant Gandhi"],
+  "BRKL": {
+    "name": "Brokoli",
+    "ticker": "BRKL",
+    "address": "0x4674a4f24c5f63d53f22490fb3a08eaaad739ff8",
+    "founder": ["Monika Proffitt, Edmundas Balčikonis"],
     "category": ["Climate"],
     "impactScore": 4,
     "impactData": {
@@ -833,51 +833,51 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/recyclex.png",
+    "logo": "./Logos/brkl.webp",
     "ipfs_cid": "QmPc6te9q8a45a8944fcd55ee49128b5dc65ad05b6",
-    "coingeckoId": null,
-    "cmc_id": 35996,
-    "description": "ReCycleX is a blockchain-based platform that integrates real-world recycling infrastructure with digital incentives through a Recycle-to-Earn R2E model."
+    "coingeckoId": brokoli,
+    "cmc_id": 10893,
+    "description": "Brokoli is an impact to earn NFT tree metaverse where every DeFi function is climate positive at no extra cost for the user. Users can create own and trade the positive impact they make by using Brokolis green DeFi products."
   },
-  "EnergyWebToken": {
-    "name": "Energy Web Token",
-    "ticker": "EWT",
-    "address": "0x6a8cb6714b1ee5b471a7d2ec4302cb4f5ff25ec2",
-    "founder": ["Jesse Morris", "Walter Kok"],
-    "category": ["Climate", "Education"],
-    "impactScore": 4,
+  "district0x": {
+    "name": "district0x",
+    "ticker": "DNT",
+    "address": "0x0abdace70d3790235af448c88547603b945604ea",
+    "founder": ["Joe Urgo, Matus Lestan"],
+    "category": ["Infrastructure"],
+    "impactScore": 2,
     "impactData": {
-      "infrastructure": { "score": 1, "multiplier": 0.5 },
-      "climate": { "score": 2, "multiplier": 1.5 },
-      "food": { "score": 0, "multiplier": 0.0 },
-      "health": { "score": 0, "multiplier": 0.0 },
-      "education": { "score": 1, "multiplier": 1.0 }
-    },
-    "logo": "./Logos/energywebtoken.png",
-    "ipfs_cid": "QmUxkXZvtzpaHV7b5xz6nW23hNN3NN1VpJAGJmRZ6TcAvf",
-    "coingeckoId": "energy-web-token",
-    "cmc_id": null,
-    "description": "Energy Web Token powers the Energy Web Chain, a blockchain platform specifically designed for the energy sector to decarbonize and democratize energy."
-  },
-  "CleanCarbon": {
-    "name": "CleanCarbon",
-    "ticker": "CARBO",
-    "address": "0xa52262dA176186105199a597aC8Cf094FF71b0C5",
-    "founder": ["Udo Abraham"],
-    "category": ["Climate"],
-    "impactScore": 5,
-    "impactData": {
-      "infrastructure": { "score": 0, "multiplier": 0.0 },
-      "climate": { "score": 5, "multiplier": 2.0 },
+      "infrastructure": { "score": 2, "multiplier": 0.5 },
+      "climate": { "score": 0, "multiplier": 0.0 },
       "food": { "score": 0, "multiplier": 0.0 },
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/cleancarbon.png",
+    "logo": "./Logos/district0x.webp",
+    "ipfs_cid": "QmUxkXZvtzpaHV7b5xz6nW23hNN3NN1VpJAGJmRZ6TcAvf",
+    "coingeckoId": "district0x",
+    "cmc_id": 1856,
+    "description": "The district0x network is a collective of decentralized and autonomous marketplaces and communities also known as districts. These districts are built upon a decentralized and distributed open source framework the d0xINFRA network which is powered by Ethereum smart contracts. The district0x network aims at creating a friction free virtual economy where the users will be able to make buying and selling decisions complete transactions and even rank their peers with just one simple click. District0x aims to develop a flexible and free market with advanced entrepreneurial concepts."
+  },
+  "Fetchai": {
+    "name": "Artificial Superintelligence Alliance",
+    "ticker": "FET",
+    "address": "0xaea46a60368a7bd060eec7df8cba43b7ef41ad85",
+    "founder": ["Humayun Sheikh, Toby Simpson, Thomas Hain"],
+    "category": ["Infrastructure"],
+    "impactScore": 2,
+    "impactData": {
+      "infrastructure": { "score": 2, "multiplier": 1.0 },
+      "climate": { "score": 0, "multiplier": 0.0 },
+      "food": { "score": 0, "multiplier": 0.0 },
+      "health": { "score": 0, "multiplier": 0.0 },
+      "education": { "score": 0, "multiplier": 0.0 }
+    },
+    "logo": "./Logos/FET.png",
     "ipfs_cid": "QmYe4ztm3gEuvXbdM94NGcEX4kt9oJpqPtN8U48Da9GQvT",
-    "coingeckoId": null,
-    "cmc_id": 20824,
-    "description": "CleanCarbon aims to bridge blockchain and physical waste-to-energy infrastructure to address plastic pollution and carbon emissions."
+    "coingeckoId": fetch-ai,
+    "cmc_id": 3773,
+    "description": "Fetch.ai is delivering AI to the crypto economy. Digital Twins powered by artificial intelligence can provide automation to decentralized finance that can serve the needs of a single user or aggregate millions of data points for on chain oracles. These agent based systems provide greater flexibility speed and crypto economic security than existing oracle networks and represent the future of decentralized finance. This technology enables creation of personalized oracles that maintain users DeFi positions using decentralized and non custodial protocols to increase the security and convenience of crypto asset management."
   },
   "Moeda": {
     "name": "Moeda Seeds",
@@ -959,31 +959,31 @@
     "cmc_id": null,
     "description": "SolarCoin rewards solar energy producers with blockchain-based tokens, incentivizing sustainable energy production globally."
   },
-  "Wateract": {
-    "name": "Wateract",
-    "ticker": "WTR",
-    "address": "1675351423",
-    "founder": ["Hypercube.eco"],
+  "Carbify": {
+    "name": "Carbify",
+    "ticker": "CBY",
+    "address": "0xb9d27bc093ed0a3b7c18366266704cfe5e7af77b",
+    "founder": ["Jaap Harmsma, William ten Zijthoff"],
     "category": ["Climate"],
-    "impactScore": 3,
+    "impactScore": 5,
     "impactData": {
-      "infrastructure": { "score": 1, "multiplier": 0.5 },
-      "climate": { "score": 2, "multiplier": 1.2 },
+      "infrastructure": { "score": 0, "multiplier": 0.0 },
+      "climate": { "score": 5, "multiplier": 1.2 },
       "food": { "score": 0, "multiplier": 0.0 },
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/wateract'.webp",
+    "logo": "./Logos/carbify.png",
     "ipfs_cid": "QmS6euwcqdyhBZk39PfipbKAvBSkiqqduer1mbXjxuz3v4",
-    "coingeckoId": "wateract",
-    "cmc_id": null,
-    "description": "Wateract is building decentralized infrastructure for clean water access, especially in underserved and drought-prone regions."
+    "coingeckoId": "carbify",
+    "cmc_id": 24521,
+    "description": "Carbify is an exciting platform offering multiple products NFTrees bound to real planted trees in the Amazon rainforest. Yield program based on tokenized CO2. Food security and social impact for local communities is the main goal. Carbify designed and filed an official global carbon standard under the guidance of the UN Climate Change association. Carbify is a game studio. Offering a real time strategy MMO to bridge the gaming world with sustainability and Defi solutions. The main focus is transparency by using blockchain technology. Carbify offers carbon debits with an undisputed single spend guarantee. No double counting or double spending is possible. This is why carbon debits are the future and they will disrupt carbon credits."
   },
-  "FOREST": {
-    "name": "FOREST",
-    "ticker": "FOREST",
-    "address": "BoAQaykj3LtkM2Brevc7cQcRAzpqcsP47nJ2rkyopump",
-    "founder": ["SAN"],
+  "CHMPZ": {
+    "name": "Chimpzee",
+    "ticker": "CHMPZ",
+    "address": "0x1161aB556bAA457994b1D6A6cCa3A7a6891009FD",
+    "founder": ["Chimpzee Project"],
     "category": ["Climate"],
     "impactScore": 5,
     "impactData": {
@@ -993,11 +993,11 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/forest.webp",
+    "logo": "./Logos/chmpz.png",
     "ipfs_cid": "QmS1j5DwFe6GJp3EbN4cPjvHETt1HHqjppnxyDxvKN1dkB",
-    "coingeckoId": "forest",
-    "cmc_id": null,
-    "description": "FOREST is a Solana token backed by a Twitter account known as S.A.N., an AI dedicated to doing the most real-world good to help the environment."
+    "coingeckoId": "chimpzee-chmpz",
+    "cmc_id": 29777,
+    "description": "Chimpzee is the first Web3 project that provides three ways for people to earn passive income while simultaneously saving animals and fighting climate change. The new Chimpzee green initiative significantly emphasizes protecting Earths natural environment. It seeks to increase public awareness and revolutionize the way people contribute to charitable organizations that help endangered species and fight climate change."
   },
   "Humaniq": {
     "name": "Humaniq",
@@ -1013,17 +1013,17 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 1, "multiplier": 1.0 }
     },
-    "logo": "./Logos/humaniq.jpg",
+    "logo": "./Logos/humaniq.png",
     "ipfs_cid": "QmZfEP6eK3J8ZMnJe3FLc5DeSTNPmvNzC8TFiJoH5N7TCY",
     "coingeckoId": "humaniq",
     "cmc_id": null,
     "description": "Humaniq is a financial inclusion project aimed at empowering the unbanked with blockchain identity and banking services."
   },
-  "IFScience": {
-    "name": "IF Science",
-    "ticker": "IFSCI",
-    "address": "RqGHXg2eh3zPjyzNM7kUyrrSmhb9M9q4mCKFH1mpump",
-    "founder": ["Not Available"],
+  "BCDT": {
+    "name": "EviddenZ",
+    "ticker": "BCDT",
+    "address": "0xacfa209fb73bf3dd5bbfb1101b9bc999c49062a5",
+    "founder": ["Luc Jarry-Lacombe, Vincent Langard, Alexis Berolatti"],
     "category": ["Education"],
     "impactScore": 4,
     "impactData": {
@@ -1033,17 +1033,17 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 3, "multiplier": 1.8 }
     },
-    "logo": "./Logos/ifscience.jpg",
+    "logo": "./Logos/bcdt.webp",
     "ipfs_cid": "QmTYex1pqYDo3sbKhMcbC7mXk5zEsbUtqz6A2h1r2LSHZG",
-    "coingeckoId": "if-science",
-    "cmc_id": null,
-    "description": "IF Science provides decentralized infrastructure for publishing, reviewing, and monetizing open-access scientific research and datasets."
+    "coingeckoId": "blockchain-certified-data-token",
+    "cmc_id": 3616,
+    "description": "BCDT is the token linked to the EvidenZ framework used by the company BCdiploma to allow hundreds of institutions to issue diplomas in a digital decentralized and secure way. The BCDT is required to issue each certificate on the Ethereum blockchain."
   },
-  "Treecle": {
-    "name": "Treecle",
-    "ticker": "TRCL",
-    "address": "0x4b91c67a89d4c4b2a4ed9fcde6130d7495330972",
-    "founder": ["Kim Dong-Yeol"],
+  "IMPT": {
+    "name": "IMPT",
+    "ticker": "IMPT",
+    "address": "0x04c17b9d3b29a78f7bd062a57cf44fc633e71f85",
+    "founder": ["Denis Creighton, Mike English, Hugh Phelan."],
     "category": ["Climate"],
     "impactScore": 4,
     "impactData": {
@@ -1053,11 +1053,11 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/treecle.jpg",
+    "logo": "./Logos/impt.webp",
     "ipfs_cid": "Qmc7GjehL8oeTrhXzr4Ms1a6qXZVrmLgFSZYdvghDL4sP2",
-    "coingeckoId": "treecle",
-    "cmc_id": null,
-    "description": "Treecle promotes eco-driving and tree-planting rewards via blockchain to support carbon neutrality."
+    "coingeckoId": "impt",
+    "cmc_id": 22985,
+    "description": "IMPT connects users with hundreds of impactful environmental projects worldwide, aiming to reduce carbon emissions and support the planet. It also partners with thousands of large retail brands that allocate a specific percentage of their sale margins to environmental projects. These contributions are accumulated in users accounts as IMPT tokens. Once users have enough tokens to meet the required amount for a chosen carbon credit they can redeem it. This allows users to continue their regular shopping habits while contributing to environmental conservation."
   },
   "CeloDollar": {
     "name": "Celo Dollar",
@@ -1099,25 +1099,25 @@
     "cmc_id": 2462,
     "description": "AidCoin is a token for charitable giving, built to bring transparency to donations via blockchain and support humanitarian causes globally."
   },
-  "WGC": {
-    "name": "Green Climate World",
-    "ticker": "WGC",
-    "address": "0x6f6bec146ec5729a2a10ffa9d1123715c0e280e5",
-    "founder": ["Dr. Yasam Ayavefe"],
-    "category": ["Climate"],
-    "impactScore": 4,
+  "XAUT": {
+    "name": "TetherGold",
+    "ticker": "XAUT",
+    "address": "0x68749665ff8d2d112fa859aa293f07a622782f38",
+    "founder": ["Brock Pierce, Reeve Collins, Craig Sellars"],
+    "category": ["Infrastructure"],
+    "impactScore": 5,
     "impactData": {
       "infrastructure": { "score": 0, "multiplier": 0.0 },
-      "climate": { "score": 4, "multiplier": 1.7 },
+      "climate": { "score": 5, "multiplier": 3.0 },
       "food": { "score": 0, "multiplier": 0.0 },
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/greenclimateworld.webp",
+    "logo": "./Logos/tethergold.webp",
     "ipfs_cid": "QmRzjF9gAqb9tHfhKwSGeDRJKW5qsbgiDz8Ujyb1Ub3Qzo",
-    "coingeckoId": "green-climate-world",
-    "cmc_id": null,
-    "description": "WGC focuses on reducing CO2 emissions by supporting reforestation projects, using blockchain for transparent environmental impact tracking."
+    "coingeckoId": "tether-gold",
+    "cmc_id": 5176,
+    "description": "Tether Gold XAUT is a stablecoin that provides ownership on a one to one basis of one fine troy ounce of gold on a physical bar of gold that meets the Good Delivery standard of the London Bullion Market Association LBMA."
   },
   "NRG": {
     "name": "Energi",
@@ -1199,6 +1199,46 @@
     "cmc_id": null,
     "description": "DRT v2 is the next-generation Decentralized Resource Token, powering Mesh-based AI and DePIN for distributed ethical infrastructure."
   },
+  "DRTv4": {
+    "name": "DRT v4",
+    "ticker": "DRTv4",
+    "address": "0x4B9DD9091bD9B232925e98259344c3ac44aA2C8D",
+    "founder": ["Jordan Schwartz"],
+    "category": ["Infrastructure", "Climate", "Food", "Health", "Education"],
+    "impactScore": 5,
+    "impactData": {
+      "infrastructure": { "score": 1, "multiplier": 1.7 },
+      "climate": { "score": 1, "multiplier": 0.5 },
+      "food": { "score": 1, "multiplier": 0.5 },
+      "health": { "score": 1, "multiplier": 0.5 },
+      "education": { "score": 1, "multiplier": 0.5 }
+    },
+    "logo": "./Logos/DRTv4_Logo_200x200.jpg",
+    "ipfs_cid": "bafybeid7nmbroxu4s6lso7tspcfsgyc23abmdvs5wpkr5qvjn62ori7aky",
+    "coingeckoId": null,
+    "cmc_id": null,
+    "description": "DRT v4 is the lowest priced token on chain, part of the anchor pool."
+  },
+  "DRTv3": {
+    "name": "DRT v3",
+    "ticker": "DRTv3",
+    "address": "0xBe7355ffa9c87925FE8d47AcC2E901453609E09E",
+    "founder": ["Jordan Schwartz"],
+    "category": ["Infrastructure", "Climate", "Food", "Health", "Education"],
+    "impactScore": 5,
+    "impactData": {
+      "infrastructure": { "score": 5, "multiplier": 2.0 },
+      "climate": { "score": 1, "multiplier": 1.0 },
+      "food": { "score": 1, "multiplier": 1.0 },
+      "health": { "score": 1, "multiplier": 1.0 },
+      "education": { "score": 1, "multiplier": 1.0 }
+    },
+    "logo": "./Logos/drtv3.png",
+    "ipfs_cid": "bafybeicalv7neqlywl6yuooyb5cnb5o57vjshndgwqrtd2lkrsdzjcghyi",
+    "coingeckoId": null,
+    "cmc_id": null,
+    "description": "DRT v3 is the highest priced token on chain, part of the anchor pool."
+  },
   "DRTv1": {
     "name": "DRT v1",
     "ticker": "DRTv1",
@@ -1279,11 +1319,11 @@
     "cmc_id": null,
     "description": "Giveth supports impact-based decentralized donations to foster open-source projects focused on public good and global equity."
   },
-  "KLIMA": {
-    "name": "KlimaDAO",
-    "ticker": "KLIMA",
-    "address": "0x4e78011ce80ee02d2c3e649fb657e45898257815",
-    "founder": ["Anonymous"],
+  "PERLeco": {
+    "name": "PERLeco",
+    "ticker": "PERL",
+    "address": "0xeca82185adce47f39c684352b0439f030f860318",
+    "founder": [" Kenta Iwasaki, Ajay Prakash, Dorjee Sun"],
     "category": ["Climate"],
     "impactScore": 5,
     "impactData": {
@@ -1293,11 +1333,11 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/klima.webp",
+    "logo": "./Logos/perl.webp",
     "ipfs_cid": "Qmc02db3e9cb623e2ffb67a89c57b7c01edab34c72",
-    "coingeckoId": "klimadao",
-    "cmc_id": null,
-    "description": "KlimaDAO is a carbon-backed digital currency project that drives demand for carbon credits through DeFi mechanisms."
+    "coingeckoId": "perlin",
+    "cmc_id": 4293,
+    "description": "Tokenized real world ecological assets Perlins latest project PERL.eco the Planetary Ecosystem Registration Ledger will use blockchain technologies for real world ecological assets through tokenizing carbon credits and biodiversity NFTs and decentralised DeFi rewards. PERL.eco focuses on tokenization and achieving broader adoption of ecological related assets like tokenized carbon assets genomic biodiversity and more."
   },
   "IXO": {
     "name": "ixo",
@@ -1339,25 +1379,25 @@
     "cmc_id": null,
     "description": "SORA is a decentralized economic system that enables funding and governance of public goods with a focus on inclusive finance."
   },
-  "Reverse": {
-    "name": "Reverse",
-    "ticker": "RVRS",
-    "address": "0x5dd175a4242afe19e5c1051d8cd13fc8979f2329",
-    "founder": ["Stefan", "Tomasz"],
-    "category": ["Climate"],
+  "OpenVision": {
+    "name": "OpenVision",
+    "ticker": "VISION",
+    "address": "0xe6f98920852A360497dBcc8ec895F1bB1F7c8Df4",
+    "founder": ["Akshay Narisetti, Gabriel Dymowski, Tasha Pais"],
+    "category": ["Education"],
     "impactScore": 3,
     "impactData": {
       "infrastructure": { "score": 0, "multiplier": 0.0 },
-      "climate": { "score": 3, "multiplier": 2.0 },
+      "climate": { "score": 0, "multiplier": 0.0 },
       "food": { "score": 0, "multiplier": 0.0 },
       "health": { "score": 0, "multiplier": 0.0 },
-      "education": { "score": 0, "multiplier": 0.0 }
+      "education": { "score": 3, "multiplier": 2.0 }
     },
-    "logo": "./Logos/reverse.png",
+    "logo": "./Logos/openvision.png",
     "ipfs_cid": "Qmecb92f4e050c4403cc09ebcf2ac066d88c5fc2cb",
-    "coingeckoId": null,
-    "cmc_id": 12560,
-    "description": "REVERSE is a token that uses reflection to fight climate change with carbon removals and other climate-saving projects."
+    "coingeckoId": "openvision",
+    "cmc_id": 36868,
+    "description": "Training the worlds Vision Language Model using your camera and GPU. Powered by MCP. Earn VISION. Decentralized. Permissionless. Real world AI. OpenVision is a decentralized AI protocol advancing machine perception through real world video and edge compute."
   },
   "Cortensor": {
     "name": "Cortensor",
@@ -1373,7 +1413,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/cortensor.webp",
+    "logo": "./Logos/cortensor-logo-square-transparent.webp",
     "ipfs_cid": "Qm6f2133d4f4af3bf74ce24c01abe3f38ed8a63fcd",
     "coingeckoId": "cortensor",
     "cmc_id": null,
@@ -1519,25 +1559,25 @@
     "cmc_id": null,
     "description": "Galeon is a revolutionary AI-powered healthcare community that empowers patients, researchers and healthcare professionals to collaborate and drive innovation in medicine by building the largest high-quality medical database with hospitals."
   },
-  "Matryx": {
-    "name": "Matryx",
-    "ticker": "MTX",
-    "address": "0x0af44e2784637218dd1d32a322d44e603a8f0c6a",
-    "founder": ["Nanome Inc"],
-    "category": ["Education"],
+  "SelfKey": {
+    "name": "SelfKey",
+    "ticker": "KEY",
+    "address": "0x4cc19356f2d37338b9802aa8e8fc58b0373296e7",
+    "founder": ["Edmund Lowell"],
+    "category": ["Health"],
     "impactScore": 2,
     "impactData": {
       "infrastructure": { "score": 0, "multiplier": 0.0 },
       "climate": { "score": 0, "multiplier": 0.0 },
       "food": { "score": 0, "multiplier": 0.0 },
-      "health": { "score": 0, "multiplier": 0.0 },
-      "education": { "score": 2, "multiplier": 1.0 }
+      "health": { "score": 2, "multiplier": 1.0 },
+      "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/matryx.webp",
+    "logo": "./Logos/selfkey.webp",
     "ipfs_cid": "Qma45cae33a5a9fe67500697419aaa982678dc5a0b",
-    "coingeckoId": null,
-    "cmc_id": 2325,
-    "description": "Current incentive and attribution models actually deter scientific collaboration. This lowers accessibility to great research and hinders innovation. Matryx is here to change that. It's a decentralized platform that lets anyone contribute research, get the credit they deserve, and ultimately solve problems faster."
+    "coingeckoId": "selfkey",
+    "cmc_id": 2398,
+    "description": "SelfKey offers individuals and organizations full control over their digital identities enhancing privacy and freedom. As a self sovereign identity system built on blockchain technology it enables users to manage their digital identities effectively. Additionally SelfKey allows secure management of crypto portfolios and streamlined onboarding for immigration cryptocurrency and financial services."
   },
   "MelloAI": {
     "name": "MelloAI",
@@ -1581,7 +1621,7 @@
   },
   "MuhdoHub": {
     "name": "Muhdo Hub",
-    "ticker": "MUHDO",
+    "ticker": "DNA",
     "address": "0x7d3e4165fd7d8590fb2a415a550f7bdece5c4f52",
     "founder": ["Nathan Berkley"],
     "category": ["Health"],
@@ -1753,7 +1793,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/TE-food.png",
+    "logo": "./Logos/TE-food/png",
     "ipfs_cid": "Qm5f16d2c521fd149cdd714566100ad6701dd7a410",
     "coingeckoId": "te-food",
     "cmc_id": null,
@@ -1779,25 +1819,25 @@
     "cmc_id": 23684,
     "description": "Seamlessly merging the physical with the virtual world and opening up a universe of possibilities for medical professionals and patients around the world."
   },
-  "RenewableEnergy": {
-    "name": "Renewable Energy",
-    "ticker": "RET",
-    "address": "0x10b9dd394467f2cfbc769e07e88dc7e2c41b0965",
-    "founder": ["Lucas"],
-    "category": ["Climate"],
+  "Bluzelle": {
+    "name": "Bluzelle",
+    "ticker": "BLZ",
+    "address": "0x5732046a883704404f284ce41ffadd5b007fd668",
+    "founder": ["Pavel Bains, Neeraj Muraka"],
+    "category": ["Health"],
     "impactScore": 2,
     "impactData": {
       "infrastructure": { "score": 0, "multiplier": 0.0 },
-      "climate": { "score": 2, "multiplier": 1.5 },
+      "climate": { "score": 0, "multiplier": 0.0 },
       "food": { "score": 0, "multiplier": 0.0 },
-      "health": { "score": 0, "multiplier": 0.0 },
+      "health": { "score": 2, "multiplier": 1.5 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/RET.webp",
+    "logo": "./Logos/bluzelle.png",
     "ipfs_cid": "none",
-    "coingeckoId": "renewable-energy",
-    "cmc_id": null,
-    "description": "RET token is a BEP-20 token created on January 04, 2022, on the Binance Smart Chain network. It is designed to provide functionality and experience for all supporters of renewable energy, allowing them to participate in the creation of physical projects on renewable energy that are environmentally friendly."
+    "coingeckoId": "bluzelle",
+    "cmc_id": 2505,
+    "description": "On Chain Infrastructure for DeSci Redefining how science is funded shared and conducted through blockchain."
   },
   "EthereumNameService": {
     "name": "Ethereum Name Service",
@@ -1839,11 +1879,11 @@
     "cmc_id": null,
     "description": "Efforce WOZX is a platform that enables contributors to benefit from energy savings generated by energy efficiency projects worldwide. It utilizes smart contracts and blockchain technology to redistribute energy savings to individuals and companies based on energy consumption and savings data, eliminating intermediaries."
   },
-  "SustainableEnergy": {
-    "name": "Sustainable Energy",
-    "ticker": "SET",
-    "address": "0x1b391f9d0fffa86a6088a73ac4ac28d12c9ccfbd",
-    "founder": ["Sainath Survase"],
+  "DOVU": {
+    "name": "DOVU",
+    "ticker": "DOVU",
+    "address": "0x2aeAbde1aB736c59E9A19BeD67681869eEF39526",
+    "founder": ["Irfon Watkins, Krasina Mileva"],
     "category": ["Climate"],
     "impactScore": 4,
     "impactData": {
@@ -1853,31 +1893,31 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/sustainableenergytoken.png",
+    "logo": "./Logos/dovu.webp",
     "ipfs_cid": "Qm749fb59301557872340bb822f4241d923c76d376",
-    "coingeckoId": "sustainable-energy-token",
-    "cmc_id": null,
-    "description": "Historically, biomass was the primary energy source, with wood, timber, and waste products being the only major energy sources available. The discovery of fossil fuels like coal, oil, and natural gas revolutionized energy production, as they were widely available and easily harnessed."
+    "coingeckoId": "dovu-2",
+    "cmc_id": 30677,
+    "description": "DOVU is building a trust layer for carbon offset integrity. Powered by Hedera Hashgraph the DOVU Carbon Market is designed to facilitate offsetting in real time. The DOVU utility token DOVU provides access to the DOVU platform and marketplace."
   },
-  "GreenTrust": {
-    "name": "GreenTrust",
-    "ticker": "GNT",
-    "address": "0xf750a26eb0acf95556e8529e72ed530f3b60f348",
-    "founder": [ "Gio Niu" ],
-    "category": [ "Climate" ],
+  "Blocery": {
+    "name": "Blocery",
+    "ticker": "BLY",
+    "address": "0xf8ad7dfe656188a23e89da09506adf7ad9290d5d",
+    "founder": [ "Young-Kook Kim, Grant Gin" ],
+    "category": [ "Food" ],
     "impactScore": 5,
     "impactData": {
       "infrastructure": { "score": 0, "multiplier": 0.0 },
-      "climate": { "score": 5, "multiplier": 3.0 },
-      "food": { "score": 0, "multiplier": 0.0 },
+      "climate": { "score": 0, "multiplier": 0.0 },
+      "food": { "score": 5, "multiplier": 3.0 },
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/greentrust.webp",
+    "logo": "./Logos/bly.webp",
     "ipfs_cid": "QmX1kBZyB63h7bhsRkLffuAaXzADaR4J114wBNanQLGNcU",
-    "coingeckoId": "greentrust",
-    "cmc_id": null,
-    "description": "GreenTrust is a sustainable decentralized finance project aiming to combat climate change. Every GNT transaction contributes to reforestation and other green initiatives, effectively making the token carbon-negative."
+    "coingeckoId": "blocery",
+    "cmc_id": 6283,
+    "description": "BLOCERY offers the new Agricultural Goods supply chain ecosystem by utilizing fourIR technologies. Transparent and Trustable Value Chain will be presented with our new efficient supply chain system."
   },
   "RefugeesToken": {
     "name": "Refugees Token",
@@ -1899,11 +1939,11 @@
     "cmc_id": 14674,
     "description": "Refugees Token is a project aimed at supporting refugees and displaced communities worldwide. The token serves as a fundraising mechanism where transactions help raise funds for refugee aid, and holders can vote on which refugee relief projects to support."
   },
-  "Edu3Labs": {
-    "name": "Edu3Labs",
-    "ticker": "NFE",
-    "address": "0xf03ca04dd56d695a410f46f14fef4028b22fb79a",
-    "founder": [ "Mustafa Güler" ],
+  "OpenCampus": {
+    "name": "OpenCampus",
+    "ticker": "EDU",
+    "address": "0x26aad156ba8efa501b32b42ffcdc8413f90e9c99",
+    "founder": [ "Open Campus Project" ],
     "category": [ "Education" ],
     "impactScore": 4,
     "impactData": {
@@ -1913,31 +1953,31 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 4, "multiplier": 1.0 }
     },
-    "logo": "./Logos/nfe.jpeg",
+    "logo": "./Logos/edu.webp",
     "ipfs_cid": "Qma8euNac9kNsRZixPke6s8JFEvLz3eR6spN8r6Ev3sahS",
-    "coingeckoId": "edu3labs",
-    "cmc_id": null,
-    "description": "Edu3Labs is a pioneering force at the intersection of education, AI, and blockchain. Our mission is to revolutionize the learning experience by leveraging cutting-edge technologies and innovative solutions."
+    "coingeckoId": "edu-coin",
+    "cmc_id": 24613,
+    "description": "The Open Campus Protocol is a decentralized solution for educators content creators parents students and co publishers designed to address the major challenges in education today. Despite the critical role of educators in shaping the future generation they are often undervalued and underpaid. Additionally parents frequently lack control over their childrens educational content."
   },
-  "AcademicLabs": {
-    "name": "Academic Labs",
-    "ticker": "AAX",
-    "address": "8W3DbYbLY1zWXm6YDqfPYFpyKsjytD5vhhPN2AyNVdM9",
-    "founder": [ "Kingston Kwek" ],
-    "category": [ "Education" ],
+  "Medifakt": {
+    "name": "Medifakt",
+    "ticker": "FAKT",
+    "address": "0x0262e9374e95b9667b78136c3897cb4e4ef7f0c2",
+    "founder": [ "Aditya Tallapragada" ],
+    "category": [ "Health" ],
     "impactScore": 3,
     "impactData": {
       "infrastructure": { "score": 0, "multiplier": 0.0 },
       "climate": { "score": 0, "multiplier": 0.0 },
       "food": { "score": 0, "multiplier": 0.0 },
-      "health": { "score": 0, "multiplier": 0.0 },
-      "education": { "score": 3, "multiplier": 1.5 }
+      "health": { "score": 3, "multiplier": 1.5 },
+      "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/academiclabs.webp",
+    "logo": "./Logos/fakt.webp",
     "ipfs_cid": null,
-    "coingeckoId": "academic-labs",
-    "cmc_id": null,
-    "description": "Academic Labs aims to combine DAO and Web3 with social-education and gamification systems to enhance the efficiency of the value exchange process in learning and sharing knowledge, fostering a continuously growing education ecosystem and knowledge database."
+    "coingeckoId": "medifakt",
+    "cmc_id": 19823,
+    "description": "Medifakt will use a combination of IoT plus Blockchain plus AI the combination of these technologies will enhance the security of the collected data through IoT devices. Feeding them to a decentralized network built on the Polkadot network."
   },
   "SavePlanetEarth": {
     "name": "SavePlanetEarth",
@@ -1957,13 +1997,13 @@
     "ipfs_cid": "f9580c88f0295c91c28d57cd210d36691f3b0daa7de3e745631096ac7ac840f0",
     "coingeckoId": "saveplanetearth",
     "cmc_id": null,
-    "description": "SavePlanetEarth is a Global Initiative dedicated to developing programs to combat Global Warming and Climate Change. It focuses on realistic Carbon Sequestration methods, including Afforestation, Reforestation, and Enhanced Marine Climate Management. The initiative employs innovative financing mechanisms and public engagement to achieve its goals."
+    "description": "SavePlanetEarth is a Global Initiative dedicated to developing programs to combat Global Warming and Climate Change. It focuses on realistic Carbon Sequestration methods including Afforestation Reforestation and Enhanced Marine Climate Management. The initiative employs innovative financing mechanisms and public engagement to achieve its goals."
   },
-  "EDUM": {
-    "name": "EDUM",
-    "ticker": "EDUM",
-    "address": "0xac9518ba93eeb2336a03137d254d8cc2e4d0fa38",
-    "founder": [ "Undisclosed" ],
+  "RPL": {
+    "name": "RocketPool",
+    "ticker": "RPL",
+    "address": "0xd33526068d116ce69f19a9ee46f0bd304f21a51f",
+    "founder": [ "David Rugendyke" ],
     "category": [ "Education" ],
     "impactScore": 4,
     "impactData": {
@@ -1973,11 +2013,11 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 4, "multiplier": 1.0 }
     },
-    "logo": "./Logos/edum.webp",
+    "logo": "./Logos/rocketpool.webp",
     "ipfs_cid": "QmYgEFk3Yypc3cYqAbdKjeXdVnX5JJpHkqEERLKqZzdcGL",
-    "coingeckoId": "edum",
-    "cmc_id": null,
-    "description": "EDUM is an S2E Study To Earn project that provides rewards through learning behaviors. It measures and certifies learners' study activities and provides appropriate rewards."
+    "coingeckoId": "rocket-pool",
+    "cmc_id": 2943,
+    "description": "Rocket Pool is a decentralized Ethereum staking pool offering up to 4.33 percent APR for ETHtwo staking. Users can join the Rocket Pool with its decentralized node operator network or run their own nodes with only sixteen ETH. In the latter case they can earn a commission from staking ETH and earn additional RPL rewards from providing RPL collateral amounting to up to 6.36 percent APR for ETH and the additional RPL rewards."
   },
   "ElectrifyAsia": {
     "name": "Electrify.Asia",
