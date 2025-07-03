@@ -22,7 +22,9 @@ function getPairAddress(tokenA, tokenB) {
 async function poolExists(tokenA, tokenB) {
   const pair = getPairAddress(tokenA, tokenB);
   const code = await provider.getCode(pair);
-  return code && code !== '0x';
+  const exists = code && code !== '0x';
+  console.log(`Pair ${tokenA.slice(0,6)} / ${tokenB.slice(0,6)} → ${exists ? "✅ Exists" : "❌ Missing"} @ ${pair}`);
+  return exists;
 }
 
 function shuffle(array) {
@@ -55,9 +57,8 @@ router.post('/api/meshRoute', async (req, res) => {
       }
     }
 
-    // Final hop to tokenOut
     if (!(await poolExists(last, tokenOut))) {
-      return res.status(400).json({ error: `No valid final hop from ${last} to ${tokenOut}` });
+      return res.status(400).json({ error: `❌ No final pool from ${last} to ${tokenOut}` });
     }
     flatPath.push(tokenOut);
 
