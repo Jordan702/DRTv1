@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const tokenRegistry = require('../drtv1-frontend/tokenRegistry.json');
 
-const provider = new ethers.JsonRpcProvider(process.env.ALCHEMY_RPC || process.env.MAINNET_RPC);
+const provider = new ethers.JsonRpcProvider(process.env.ALCHEMY_RPC || process.env.MAINNET_RPC_URL);
 const UNISWAP_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
 const INIT_CODE_HASH = "0x96e8ac4277198fff5f97f64f52a84324ba619eca72ca36c9e5ef15f8b41e0d5a";
 
