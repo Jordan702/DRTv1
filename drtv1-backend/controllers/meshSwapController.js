@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require("path");
 
 // Load DRTUniversalRouterV2 ABI
-const routerAbi = require("../abi/DRTUniversalRouterV2_abi.json");
+const routerAbi = require("../abi/DRTUniversalRouterv2_abi.json");
 
 // Load environment variables
 const provider = new ethers.providers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
