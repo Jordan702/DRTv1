@@ -9,7 +9,7 @@ const routerAbi = require("../abi/DRTUniversalRouterv2_abi.json");
 
 // Load environment variables
 const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+const wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 const routerAddress = process.env.DRT_ROUTER_ADDRESS;
 
 const contract = new ethers.Contract(routerAddress, routerAbi, wallet);
