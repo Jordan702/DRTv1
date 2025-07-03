@@ -7,8 +7,6 @@ require("dotenv").config();
 const tokenRegistry = require('../drtv1-frontend/tokenRegistry.json');
 
 const provider = new ethers.JsonRpcProvider(process.env.ALCHEMY_RPC || process.env.MAINNET_RPC);
-
-// Uniswap V2 Factory
 const UNISWAP_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
 const INIT_CODE_HASH = "0x96e8ac4277198fff5f97f64f52a84324ba619eca72ca36c9e5ef15f8b41e0d5a";
 
@@ -22,53 +20,46 @@ function getPairAddress(tokenA, tokenB) {
 }
 
 async function poolExists(tokenA, tokenB) {
-  const pairAddress = getPairAddress(tokenA, tokenB);
-  const code = await provider.getCode(pairAddress);
-  return code !== '0x';
+  const pair = getPairAddress(tokenA, tokenB);
+  const code = await provider.getCode(pair);
+  return code && code !== '0x';
 }
 
-function generateHops(tokenIn, tokenOut, count = 28) {
-  const hops = [];
-  const used = new Set([tokenIn.toLowerCase(), tokenOut.toLowerCase()]);
-  const tokens = Object.values(tokenRegistry).filter(t =>
-    t.address && !used.has(t.address.toLowerCase())
-  );
-  while (hops.length < count && tokens.length > 0) {
-    const idx = Math.floor(Math.random() * tokens.length);
-    const candidate = tokens.splice(idx, 1)[0];
-    if (!used.has(candidate.address.toLowerCase())) {
-      hops.push(candidate.address);
-      used.add(candidate.address.toLowerCase());
-    }
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
   }
-  return hops;
+  return array;
 }
 
 router.post('/api/meshRoute', async (req, res) => {
+  const { tokenIn, tokenOut, amountIn } = req.body;
+  if (!tokenIn || !tokenOut || !amountIn) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
   try {
-    const { tokenIn, tokenOut, amountIn } = req.body;
-    if (!tokenIn || !tokenOut || !amountIn) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
+    const tokens = Object.values(tokenRegistry)
+      .filter(t => t.address && t.address !== tokenIn && t.address !== tokenOut);
+    const shuffled = shuffle(tokens);
+    
     const flatPath = [tokenIn];
-    const hops = generateHops(tokenIn, tokenOut, 28);
+    let last = tokenIn;
 
-    for (let i = 0; i < hops.length; i++) {
-      const prev = flatPath[flatPath.length - 1];
-      const next = hops[i];
-      const exists = await poolExists(prev, next);
-      if (exists) flatPath.push(next);
-      if (flatPath.length >= 30) break;
+    for (let i = 0; i < shuffled.length && flatPath.length < 30; i++) {
+      const next = shuffled[i].address;
+      if (await poolExists(last, next)) {
+        flatPath.push(next);
+        last = next;
+      }
     }
 
-    // Must end with tokenOut, but only if a pool exists
-    const final = flatPath[flatPath.length - 1];
-    if (await poolExists(final, tokenOut)) {
-      flatPath.push(tokenOut);
-    } else {
-      return res.status(400).json({ error: 'No valid route to tokenOut. Not enough pools.' });
+    // Final hop to tokenOut
+    if (!(await poolExists(last, tokenOut))) {
+      return res.status(400).json({ error: `No valid final hop from ${last} to ${tokenOut}` });
     }
+    flatPath.push(tokenOut);
 
     const wrappedPath = [];
     for (let i = 0; i < flatPath.length - 1; i++) {
@@ -78,20 +69,14 @@ router.post('/api/meshRoute', async (req, res) => {
     const response = await fetch('https://drtv1-backend.onrender.com/api/meshSwap', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tokenIn,
-        tokenOut,
-        amountIn,
-        paths: wrappedPath
-      })
+      body: JSON.stringify({ tokenIn, tokenOut, amountIn, paths: wrappedPath })
     });
 
     const result = await response.json();
-    res.status(response.status).json(result);
-
+    return res.status(response.status).json(result);
   } catch (err) {
     console.error("❌ meshRoute error:", err);
-    res.status(500).json({ error: 'Internal server error', details: err.message });
+    return res.status(500).json({ error: 'Internal error', details: err.message });
   }
 });
 
