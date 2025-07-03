@@ -52,7 +52,7 @@ app.use("/api/trade", tradeRoutes);
 app.use("/api/balance", balanceRoutes);
 
 // ✅ Mesh swap API
-app.post("/api/meshSwap", meshSwapHandler);
+app.post("/api/meshSwap", meshSwapHandler.meshSwap);
 
 // ✅ Liquidity cache access
 app.get("/api/liquidity", async (req, res) => {
