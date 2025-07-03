@@ -73,7 +73,7 @@
   <script>
     async function fetchPools() {
       try {
-        const res = await fetch('./meshPools.json'); // or backend endpoint
+        const res = await fetch('meshPools.json'); // or backend endpoint
         const pools = await res.json();
         const table = document.getElementById('pool-table');
         document.getElementById('loading').style.display = 'none';
