@@ -31,20 +31,23 @@ exports.meshSwap = async (req, res) => {
     ];
     const tokenContract = new Contract(tokenIn, tokenAbi, wallet);
 
-    // Approve router to spend tokens if not already approved
-    const allowance = await tokenContract.allowance(wallet.address, routerAddress);
     const parsedAmount = parseUnits(amountIn.toString(), 18);
+    const allowance = await tokenContract.allowance(wallet.address, routerAddress);
 
+    // Approve router to spend tokenIn if not already approved
     if (allowance < parsedAmount) {
-      const tx = await tokenContract.approve(routerAddress, MaxUint256);
-      await tx.wait();
+      const approveTx = await tokenContract.approve(routerAddress, MaxUint256);
+      await approveTx.wait();
     }
+
+    // Wrap paths as required by address[][] calldata
+    const wrappedPaths = [paths];
 
     const tx = await contract.multiHopSwap(
       tokenIn,
       tokenOut,
       parsedAmount,
-      paths,
+      wrappedPaths,
       deadline
     );
 
