@@ -1,6 +1,6 @@
 // drtv1-backend/controllers/meshSwapController.js
 require("dotenv").config();
-const { ethers } = require("ethers");
+const { JsonRpcProvider, Wallet, Contract, parseUnits, MaxUint256 } = require("ethers");
 const fs = require("fs");
 const path = require("path");
 
@@ -8,11 +8,11 @@ const path = require("path");
 const routerAbi = require("../abi/DRTUniversalRouterv2_abi.json");
 
 // Load environment variables
-const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
-const wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
+const provider = new JsonRpcProvider(process.env.MAINNET_RPC_URL);
+const wallet = new Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 const routerAddress = process.env.DRT_ROUTER_ADDRESS;
 
-const contract = new ethers.Contract(routerAddress, routerAbi, wallet);
+const contract = new Contract(routerAddress, routerAbi, wallet);
 
 exports.meshSwap = async (req, res) => {
   const { tokenIn, tokenOut, amountIn, paths } = req.body;
@@ -23,25 +23,33 @@ exports.meshSwap = async (req, res) => {
   }
 
   try {
-    const tokenContract = new ethers.Contract(tokenIn, ["function approve(address,uint256) public returns (bool)", "function allowance(address,address) view returns (uint256)", "function balanceOf(address) view returns (uint256)", "function transferFrom(address,address,uint256) public returns (bool)"], wallet);
+    const tokenAbi = [
+      "function approve(address,uint256) public returns (bool)",
+      "function allowance(address,address) view returns (uint256)",
+      "function balanceOf(address) view returns (uint256)",
+      "function transferFrom(address,address,uint256) public returns (bool)"
+    ];
+    const tokenContract = new Contract(tokenIn, tokenAbi, wallet);
 
     // Approve router to spend tokens if not already approved
     const allowance = await tokenContract.allowance(wallet.address, routerAddress);
-    if (allowance.lt(ethers.utils.parseUnits(amountIn.toString(), 18))) {
-      const tx = await tokenContract.approve(routerAddress, ethers.constants.MaxUint256);
+    const parsedAmount = parseUnits(amountIn.toString(), 18);
+
+    if (allowance < parsedAmount) {
+      const tx = await tokenContract.approve(routerAddress, MaxUint256);
       await tx.wait();
     }
 
     const tx = await contract.multiHopSwap(
       tokenIn,
       tokenOut,
-      ethers.utils.parseUnits(amountIn.toString(), 18),
+      parsedAmount,
       paths,
       deadline
     );
 
     const receipt = await tx.wait();
-    return res.status(200).json({ success: true, txHash: receipt.transactionHash });
+    return res.status(200).json({ success: true, txHash: receipt.hash });
   } catch (err) {
     console.error("❌ meshSwap error:", err);
     return res.status(500).json({ error: "Failed to execute multi-hop swap", details: err.message });
