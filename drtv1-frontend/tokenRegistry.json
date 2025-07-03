@@ -455,7 +455,7 @@
     },
     "logo": "./Logos/tellor.png",
     "ipfs_cid": "QmTbbrYxYx3YysZfLb64xqkLTNjzQ6WEKKz5cn9wq6coXb",
-    "coingeckoId": tellor,
+    "coingeckoId": "tellor",
     "cmc_id": 4944,
     "description": "Tellor is the oracle layer for secure censorship resistant data creation and distribution. Built to be the source of truth not just middleware it is unlike any other data provider in the industry."
   },
@@ -835,7 +835,7 @@
     },
     "logo": "./Logos/brkl.webp",
     "ipfs_cid": "QmPc6te9q8a45a8944fcd55ee49128b5dc65ad05b6",
-    "coingeckoId": brokoli,
+    "coingeckoId": "brokoli",
     "cmc_id": 10893,
     "description": "Brokoli is an impact to earn NFT tree metaverse where every DeFi function is climate positive at no extra cost for the user. Users can create own and trade the positive impact they make by using Brokolis green DeFi products."
   },
@@ -875,7 +875,7 @@
     },
     "logo": "./Logos/FET.png",
     "ipfs_cid": "QmYe4ztm3gEuvXbdM94NGcEX4kt9oJpqPtN8U48Da9GQvT",
-    "coingeckoId": fetch-ai,
+    "coingeckoId": "fetch-ai",
     "cmc_id": 3773,
     "description": "Fetch.ai is delivering AI to the crypto economy. Digital Twins powered by artificial intelligence can provide automation to decentralized finance that can serve the needs of a single user or aggregate millions of data points for on chain oracles. These agent based systems provide greater flexibility speed and crypto economic security than existing oracle networks and represent the future of decentralized finance. This technology enables creation of personalized oracles that maintain users DeFi positions using decentralized and non custodial protocols to increase the security and convenience of crypto asset management."
   },
