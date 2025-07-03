@@ -1,57 +1,44 @@
-// File: root/drtv1-backend/controllers/meshSwapController.js
-
 const Web3 = require("web3");
-const { abi } = require("../../drtv1-frontend/abi/DRTUniversalRouter_abi.json");
-require("dotenv").config();
+const fs = require("fs");
+const path = require("path");
 
-const routerAddress = "0xd0fdaC020eFDBC4544372EB3260Bb15CE77206Ef"; // DRTUniversalRouterV2
-const web3 = new Web3(process.env.INFURA_URL || process.env.RPC_URL);
-const router = new web3.eth.Contract(abi, routerAddress);
-const sender = process.env.OWNER_ADDRESS;
-const privateKey = process.env.OWNER_PRIVATE_KEY;
+// Load ABI and setup web3 + contract instance
+const ABI_PATH = path.join(__dirname, "../abi/DRTUniversalRouter_abi.json");
+const ABI = JSON.parse(fs.readFileSync(ABI_PATH));
+const ROUTER_ADDRESS = "0xd0fdaC020eFDBC4544372EB3260Bb15CE77206Ef"; // Your deployed router
+const web3 = new Web3(process.env.INFURA_URL); // or your preferred provider (Infura, Alchemy, or local)
 
-exports.meshSwap = async (req, res) => {
+const router = new web3.eth.Contract(ABI, ROUTER_ADDRESS);
+
+const meshSwapHandler = async (req, res) => {
   try {
-    const { tokenIn, tokenOut, amountIn, paths } = req.body;
-    if (!tokenIn || !tokenOut || !amountIn || !paths || paths.length < 1) {
-      return res.status(400).json({ error: "Missing required fields." });
+    const { tokenIn, tokenOut, amountIn, paths, userAddress } = req.body;
+
+    if (!tokenIn || !tokenOut || !amountIn || !paths || !userAddress) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const deadline = Math.floor(Date.now() / 1000) + 600;
-    const amtWei = web3.utils.toWei(amountIn.toString(), "ether");
+    const amountWei = web3.utils.toWei(amountIn.toString(), "ether");
 
-    const approveTx = {
-      from: sender,
-      to: tokenIn,
-      gas: 100000,
-      data: web3.eth.abi.encodeFunctionCall({
-        name: "approve",
-        type: "function",
-        inputs: [
-          { name: "_spender", type: "address" },
-          { name: "_value", type: "uint256" }
-        ]
-      }, [routerAddress, amtWei])
-    };
+    const tx = router.methods.multiHopSwap(tokenIn, tokenOut, amountWei, paths, Math.floor(Date.now() / 1000) + 1800);
 
-    const signedApprove = await web3.eth.accounts.signTransaction(approveTx, privateKey);
-    await web3.eth.sendSignedTransaction(signedApprove.rawTransaction);
+    const gas = await tx.estimateGas({ from: userAddress });
+    const txData = tx.encodeABI();
 
-    const swapTx = router.methods.multiHopSwap(tokenIn, tokenOut, amtWei, paths, deadline);
-    const gas = await swapTx.estimateGas({ from: sender });
-    const txData = {
-      to: routerAddress,
-      data: swapTx.encodeABI(),
-      gas,
-      from: sender
-    };
-
-    const signedTx = await web3.eth.accounts.signTransaction(txData, privateKey);
-    const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-
-    res.status(200).json({ success: true, txHash: receipt.transactionHash });
+    return res.json({
+      success: true,
+      message: "Ready to sign and send",
+      data: {
+        to: ROUTER_ADDRESS,
+        data: txData,
+        gas,
+        from: userAddress,
+      },
+    });
   } catch (err) {
     console.error("❌ meshSwap error:", err);
-    res.status(500).json({ error: "Swap failed", details: err.message });
+    return res.status(500).json({ error: "meshSwap failed", details: err.message });
   }
 };
+
+module.exports = meshSwapHandler;
