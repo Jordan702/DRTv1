@@ -188,7 +188,7 @@
             tokenIn: tokenIn.address,
             tokenOut: tokenOut.address,
             amountIn: amount,
-            paths: pathSegments
+            paths: [flatPath] // ✅ this is the only correct structure
           })
         });
 
