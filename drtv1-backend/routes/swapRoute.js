@@ -1,45 +1,52 @@
 // swapRoute.js
-const pools = require("../pools.json");
+const fs = require('fs');
+const path = require('path');
 
-// Build route from tokenIn to tokenOut using the pool graph
-function buildRoute(tokenIn, tokenOut, maxHops = 30) {
-  const visited = new Set();
-  const queue = [[tokenIn]];
+const poolsFile = path.join(__dirname, 'pools.json');
+const pools = JSON.parse(fs.readFileSync(poolsFile));
 
-  while (queue.length) {
-    const path = queue.shift();
-    const last = path[path.length - 1];
+function generate30HopPath(tokenIn, tokenOut) {
+  const path = [];
+  const availableTokens = new Set();
+  pools.forEach(pool => {
+    availableTokens.add(pool.tokenA.address);
+    availableTokens.add(pool.tokenB.address);
+  });
 
-    if (last === tokenOut) return path;
-    if (path.length > maxHops) continue;
+  // Early exit if tokens are invalid
+  if (!availableTokens.has(tokenIn) || !availableTokens.has(tokenOut)) {
+    throw new Error("Token not part of any pool");
+  }
 
-    visited.add(last);
-    const neighbors = getNeighbors(last);
+  // Build path starting from tokenIn through unique tokens
+  let current = tokenIn;
+  const visited = new Set();
+  path.push(current);
+  visited.add(current);
 
-    for (const neighbor of neighbors) {
-      if (!visited.has(neighbor)) {
-        queue.push([...path, neighbor]);
-      }
-    }
-  }
-  return null;
+  for (let i = 0; i < 28; i++) {
+    let next = null;
+    for (const pool of pools) {
+      if (pool.tokenA.address === current && !visited.has(pool.tokenB.address)) {
+        next = pool.tokenB.address;
+        break;
+      } else if (pool.tokenB.address === current && !visited.has(pool.tokenA.address)) {
+        next = pool.tokenA.address;
+        break;
+      }
+    }
+    if (!next) break;
+    path.push(next);
+    visited.add(next);
+    current = next;
+  }
+
+  // End on tokenOut if not already there
+  if (current !== tokenOut) {
+    path.push(tokenOut);
+  }
+
+  return path;
 }
 
-function getNeighbors(tokenAddress) {
-  const neighbors = new Set();
-  for (const pool of pools) {
-    if (pool.tokenA.address === tokenAddress) neighbors.add(pool.tokenB.address);
-    if (pool.tokenB.address === tokenAddress) neighbors.add(pool.tokenA.address);
-  }
-  return Array.from(neighbors);
-}
-
-function buildPaths(route) {
-  const hops = [];
-  for (let i = 0; i < route.length - 1; i++) {
-    hops.push([route[i], route[i + 1]]);
-  }
-  return hops;
-}
-
-module.exports = { buildRoute, buildPaths };
+module.exports = { generate30HopPath };
