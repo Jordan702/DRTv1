@@ -14,47 +14,21 @@
   <title>DRT Mesh Swap</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
   <style>
-    body {
-      background-color: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 2em;
-    }
+    body { background-color: #111; color: #fff; font-family: Arial, sans-serif; text-align: center; padding: 2em; }
     h1 { font-size: 2.5em; margin-bottom: 0.2em; }
     p { font-size: 1.1em; margin-bottom: 1em; }
-    #wallet-address, #impact-points, #gas-cost {
-      margin: 0.5em 0;
-      font-size: 0.9em;
-      color: #ccc;
-    }
+    #wallet-address, #impact-points, #gas-cost { margin: 0.5em 0; font-size: 0.9em; color: #ccc; }
     input[type="text"], input[type="number"], select {
-      padding: 0.5em;
-      width: 60%;
-      margin-bottom: 1em;
-      border-radius: 4px;
-      border: 1px solid #555;
-      background-color: #222;
-      color: #fff;
+      padding: 0.5em; width: 60%; margin-bottom: 1em; border-radius: 4px;
+      border: 1px solid #555; background-color: #222; color: #fff;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1em;
-    }
-    th, td {
-      padding: 12px 15px;
-      border-bottom: 1px solid #444;
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+    th, td { padding: 12px 15px; border-bottom: 1px solid #444; }
     th { background-color: #222; }
     tr:hover { background-color: #1a1a1a; }
     .badge {
-      padding: 4px 8px;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 0.8rem;
-      margin: 2px;
-      display: inline-block;
+      padding: 4px 8px; border-radius: 8px; color: #fff;
+      font-size: 0.8rem; margin: 2px; display: inline-block;
     }
     .category-Food { background-color: #5c4033; }
     .category-Climate { background-color: #2e8b57; }
@@ -63,28 +37,15 @@
     .category-Health { background-color: #4682b4; }
     .category-Multi { background-color: yellow; color: black; }
     .action-btn {
-      background-color: #2e7d32;
-      color: white;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      background-color: #2e7d32; color: white; padding: 6px 12px;
+      border: none; border-radius: 4px; cursor: pointer;
     }
     .action-btn:hover { background-color: #388e3c; }
     .connect-btn {
-      background-color: #444;
-      color: white;
-      padding: 6px 16px;
-      border: none;
-      border-radius: 4px;
-      margin-bottom: 1em;
-      cursor: pointer;
+      background-color: #444; color: white; padding: 6px 16px;
+      border: none; border-radius: 4px; margin-bottom: 1em; cursor: pointer;
     }
-    .legend {
-      margin-top: 1em;
-      font-size: 0.9em;
-      color: #aaa;
-    }
+    .legend { margin-top: 1em; font-size: 0.9em; color: #aaa; }
   </style>
 </head>
 <body>
@@ -212,17 +173,8 @@
       });
     }
 
-    document.getElementById('search').addEventListener('input', e => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll('tbody tr').forEach(row => {
-        row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
-      });
-    });
-
     async function initWeb3() {
       web3 = new Web3(window.ethereum);
-      const abi = await fetch('./abi/DRTUniversalRouter_abi.json').then(res => res.json());
-      routerContract = new web3.eth.Contract(abi, routerAddress);
     }
 
     async function handleSwap() {
@@ -230,6 +182,7 @@
       const toTicker = document.getElementById('to-token').value;
       const amount = parseFloat(document.getElementById('swap-amount').value);
       const status = document.getElementById('swap-status');
+
       if (!walletAddress || isNaN(amount) || amount <= 0 || fromTicker === toTicker) {
         status.textContent = "❌ Invalid input.";
         return;
@@ -237,17 +190,43 @@
 
       const tokenIn = tokenRegistry.find(t => t.ticker === fromTicker);
       const tokenOut = tokenRegistry.find(t => t.ticker === toTicker);
-      const path = [tokenIn.address, tokenOut.address];
-      const pairs = [tokenIn.pairs?.[tokenOut.address] || tokenOut.pairs?.[tokenIn.address]];
       const amtWei = web3.utils.toWei(amount.toString(), 'ether');
 
       try {
-        if (!pairs[0]) throw new Error("No valid route or pair");
-        const tokenInContract = new web3.eth.Contract([{ "constant": false, "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}], "name": "approve", "outputs": [{"name": "", "type": "bool"}], "type": "function" }], tokenIn.address);
+        const tokenInContract = new web3.eth.Contract(
+          [{ "constant": false, "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}], "name": "approve", "outputs": [{"name": "", "type": "bool"}], "type": "function" }],
+          tokenIn.address
+        );
         await tokenInContract.methods.approve(routerAddress, amtWei).send({ from: walletAddress });
-        await routerContract.methods.swapExactTokensForTokens(path, pairs, amtWei).send({ from: walletAddress });
-        status.textContent = `✅ Swapped ${amount} ${fromTicker} → ${toTicker}`;
-        updateImpactPoints(5);
+
+        // Generate mock 30-hop path
+        const path = [tokenIn.address];
+        for (let i = 0; i < 28; i++) {
+          const hop = tokenRegistry[i % tokenRegistry.length];
+          if (hop.address !== tokenIn.address && hop.address !== tokenOut.address) {
+            path.push(hop.address);
+          }
+        }
+        path.push(tokenOut.address);
+
+        const res = await fetch("https://drtv1-backend.onrender.com/api/meshSwap", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tokenIn: tokenIn.address,
+            tokenOut: tokenOut.address,
+            amountIn: amount,
+            paths: path
+          })
+        });
+
+        const result = await res.json();
+        if (result.success) {
+          status.textContent = `✅ Swap successful! TX: ${result.txHash}`;
+          updateImpactPoints(5);
+        } else {
+          throw new Error(result.error || "Unknown error");
+        }
       } catch (err) {
         console.error(err);
         status.textContent = `❌ Swap failed: ${err.message}`;
