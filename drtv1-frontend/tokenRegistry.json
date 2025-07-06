@@ -33,7 +33,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "../Logos/aave-token-round.bin.webp",
+    "logo": "../Logos/aave.png",
     "ipfs_cid": "Qm22e5964c1cb55f63ef7c02cf72956f912f5ccd2",
     "coingeckoId": "aave",
     "cmc_id": null,
@@ -193,7 +193,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     }, 
-    "logo": "./Logos/cryn.webp",
+    "logo": "../Logos/cryn.webp",
     "ipfs_cid": "Qma5f01f30d60d6d33fdaa9d2cb406ba4ba965f40b",
     "coingeckoId": "cryn",
     "cmc_id": 19117,
@@ -233,7 +233,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     }, 
-    "logo": "../Logos/biconomy_logo.jpeg",
+    "logo": "../Logos/biconomy.png",
     "ipfs_cid": "Qm6106a75740969a64d01511a92c323a927c54d0ee",
     "coingeckoId": "biconomy",
     "cmc_id": null,
@@ -473,7 +473,7 @@
       "health": { "score": 3, "multiplier": 1.5 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "../Logos/Solve.bin(1).webp",
+    "logo": "../Logos/solvecare.jpg",
     "ipfs_cid": "QmNRvHYWoAyDFVqzFbdkfvLsFfqkN7yRmtKFD8z9kwRSsq",
     "coingeckoId": "solve-care",
     "cmc_id": null,
@@ -753,7 +753,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "../Logos/ocean-protocol.png",
+    "logo": "../Logos/oceanprotocol.png",
     "ipfs_cid": "QmW2f5d9ad2a63ed59e4d78a58df2c77e3ecbdff7d",
     "coingeckoId": "ocean-protocol",
     "cmc_id": null,
@@ -1413,7 +1413,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "../Logos/cortensor-logo-square-transparent.webp",
+    "logo": "../Logos/cortensor.webp",
     "ipfs_cid": "Qm6f2133d4f4af3bf74ce24c01abe3f38ed8a63fcd",
     "coingeckoId": "cortensor",
     "cmc_id": null,
@@ -1793,7 +1793,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "../Logos/TE-food/png",
+    "logo": "../Logos/TE-food.png",
     "ipfs_cid": "Qm5f16d2c521fd149cdd714566100ad6701dd7a410",
     "coingeckoId": "te-food",
     "cmc_id": null,
