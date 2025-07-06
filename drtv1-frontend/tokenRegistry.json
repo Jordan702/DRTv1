@@ -33,7 +33,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/aave-token-round.bin.webp",
+    "logo": "../Logos/aave-token-round.bin.webp",
     "ipfs_cid": "Qm22e5964c1cb55f63ef7c02cf72956f912f5ccd2",
     "coingeckoId": "aave",
     "cmc_id": null,
@@ -153,7 +153,7 @@
       "health": { "score": 2, "multiplier": 1.5 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/lym.webp",
+    "logo": "../Logos/lym.webp",
     "ipfs_cid": "Qmc64e5b33d3a837adb6f79557d1beeac9e3fa8d34",
     "coingeckoId": "lympo",
     "cmc_id": 2554,
@@ -233,7 +233,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     }, 
-    "logo": "./Logos/biconomy_logo.jpeg",
+    "logo": "../Logos/biconomy_logo.jpeg",
     "ipfs_cid": "Qm6106a75740969a64d01511a92c323a927c54d0ee",
     "coingeckoId": "biconomy",
     "cmc_id": null,
@@ -413,7 +413,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 4, "multiplier": 1.8 }
     },
-    "logo": "./Logos/iq.webp",
+    "logo": "../Logos/iq.webp",
     "ipfs_cid": "QmZUXmFeqXuGJ8HT8BP4n4Q2ffMnthqfb9AtKnLTYGBux6",
     "coingeckoId": "everipedia",
     "cmc_id": 2930,
@@ -453,7 +453,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/tellor.png",
+    "logo": "../Logos/tellor.png",
     "ipfs_cid": "QmTbbrYxYx3YysZfLb64xqkLTNjzQ6WEKKz5cn9wq6coXb",
     "coingeckoId": "tellor",
     "cmc_id": 4944,
@@ -473,7 +473,7 @@
       "health": { "score": 3, "multiplier": 1.5 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/Solve.bin(1).webp",
+    "logo": "../Logos/Solve.bin(1).webp",
     "ipfs_cid": "QmNRvHYWoAyDFVqzFbdkfvLsFfqkN7yRmtKFD8z9kwRSsq",
     "coingeckoId": "solve-care",
     "cmc_id": null,
@@ -653,7 +653,7 @@
       "health": { "score": 4, "multiplier": 2.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/regen.jpg",
+    "logo": "../Logos/regen.jpg",
     "ipfs_cid": "QmS5enwr9rb3eEbTwNzbi2Xcf2v3frzMYf7dZo1XUasMoX",
     "coingeckoId": "regentics",
     "cmc_id": null,
@@ -713,7 +713,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 2, "multiplier": 2.0 }
     },
-    "logo": "./Logos/ARTX.png",
+    "logo": "../Logos/ARTX.png",
     "ipfs_cid": "Unknown",
     "coingeckoId": "artx",
     "cmc_id": 9105,
@@ -753,7 +753,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/ocean-protocol.png",
+    "logo": "../Logos/ocean-protocol.png",
     "ipfs_cid": "QmW2f5d9ad2a63ed59e4d78a58df2c77e3ecbdff7d",
     "coingeckoId": "ocean-protocol",
     "cmc_id": null,
@@ -793,7 +793,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/ecotrader.webp",
+    "logo": "../Logos/ecotrader.webp",
     "ipfs_cid": "QmUc3dca46bc9aef918c5f451df82aa8964cc1cda",
     "coingeckoId": "ecotrader",
     "cmc_id": null,
@@ -833,7 +833,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/brkl.webp",
+    "logo": "../Logos/brkl.webp",
     "ipfs_cid": "QmPc6te9q8a45a8944fcd55ee49128b5dc65ad05b6",
     "coingeckoId": "brokoli",
     "cmc_id": 10893,
@@ -853,7 +853,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/district0x.webp",
+    "logo": "../Logos/district0x.webp",
     "ipfs_cid": "QmUxkXZvtzpaHV7b5xz6nW23hNN3NN1VpJAGJmRZ6TcAvf",
     "coingeckoId": "district0x",
     "cmc_id": 1856,
@@ -873,7 +873,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/FET.png",
+    "logo": "../Logos/FET.png",
     "ipfs_cid": "QmYe4ztm3gEuvXbdM94NGcEX4kt9oJpqPtN8U48Da9GQvT",
     "coingeckoId": "fetch-ai",
     "cmc_id": 3773,
@@ -973,7 +973,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/carbify.png",
+    "logo": "../Logos/carbify.png",
     "ipfs_cid": "QmS6euwcqdyhBZk39PfipbKAvBSkiqqduer1mbXjxuz3v4",
     "coingeckoId": "carbify",
     "cmc_id": 24521,
@@ -993,7 +993,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/chmpz.png",
+    "logo": "../Logos/chmpz.png",
     "ipfs_cid": "QmS1j5DwFe6GJp3EbN4cPjvHETt1HHqjppnxyDxvKN1dkB",
     "coingeckoId": "chimpzee-chmpz",
     "cmc_id": 29777,
@@ -1013,7 +1013,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 1, "multiplier": 1.0 }
     },
-    "logo": "./Logos/humaniq.png",
+    "logo": "../Logos/humaniq.png",
     "ipfs_cid": "QmZfEP6eK3J8ZMnJe3FLc5DeSTNPmvNzC8TFiJoH5N7TCY",
     "coingeckoId": "humaniq",
     "cmc_id": null,
@@ -1033,7 +1033,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 3, "multiplier": 1.8 }
     },
-    "logo": "./Logos/bcdt.webp",
+    "logo": "../Logos/bcdt.webp",
     "ipfs_cid": "QmTYex1pqYDo3sbKhMcbC7mXk5zEsbUtqz6A2h1r2LSHZG",
     "coingeckoId": "blockchain-certified-data-token",
     "cmc_id": 3616,
@@ -1053,7 +1053,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/impt.webp",
+    "logo": "../Logos/impt.webp",
     "ipfs_cid": "Qmc7GjehL8oeTrhXzr4Ms1a6qXZVrmLgFSZYdvghDL4sP2",
     "coingeckoId": "impt",
     "cmc_id": 22985,
@@ -1113,7 +1113,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/tethergold.webp",
+    "logo": "../Logos/tethergold.webp",
     "ipfs_cid": "QmRzjF9gAqb9tHfhKwSGeDRJKW5qsbgiDz8Ujyb1Ub3Qzo",
     "coingeckoId": "tether-gold",
     "cmc_id": 5176,
@@ -1333,7 +1333,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/perl.webp",
+    "logo": "../Logos/perl.webp",
     "ipfs_cid": "Qmc02db3e9cb623e2ffb67a89c57b7c01edab34c72",
     "coingeckoId": "perlin",
     "cmc_id": 4293,
@@ -1393,7 +1393,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 3, "multiplier": 2.0 }
     },
-    "logo": "./Logos/openvision.png",
+    "logo": "../Logos/openvision.png",
     "ipfs_cid": "Qmecb92f4e050c4403cc09ebcf2ac066d88c5fc2cb",
     "coingeckoId": "openvision",
     "cmc_id": 36868,
@@ -1413,7 +1413,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/cortensor-logo-square-transparent.webp",
+    "logo": "../Logos/cortensor-logo-square-transparent.webp",
     "ipfs_cid": "Qm6f2133d4f4af3bf74ce24c01abe3f38ed8a63fcd",
     "coingeckoId": "cortensor",
     "cmc_id": null,
@@ -1573,7 +1573,7 @@
       "health": { "score": 2, "multiplier": 1.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/selfkey.webp",
+    "logo": "../Logos/selfkey.webp",
     "ipfs_cid": "Qma45cae33a5a9fe67500697419aaa982678dc5a0b",
     "coingeckoId": "selfkey",
     "cmc_id": 2398,
@@ -1793,7 +1793,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/TE-food/png",
+    "logo": "../Logos/TE-food/png",
     "ipfs_cid": "Qm5f16d2c521fd149cdd714566100ad6701dd7a410",
     "coingeckoId": "te-food",
     "cmc_id": null,
@@ -1833,7 +1833,7 @@
       "health": { "score": 2, "multiplier": 1.5 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/bluzelle.png",
+    "logo": "../Logos/bluzelle.png",
     "ipfs_cid": "none",
     "coingeckoId": "bluzelle",
     "cmc_id": 2505,
@@ -1893,7 +1893,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/dovu.webp",
+    "logo": "../Logos/dovu.webp",
     "ipfs_cid": "Qm749fb59301557872340bb822f4241d923c76d376",
     "coingeckoId": "dovu-2",
     "cmc_id": 30677,
@@ -1913,7 +1913,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/bly.webp",
+    "logo": "../Logos/bly.webp",
     "ipfs_cid": "QmX1kBZyB63h7bhsRkLffuAaXzADaR4J114wBNanQLGNcU",
     "coingeckoId": "blocery",
     "cmc_id": 6283,
@@ -1953,7 +1953,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 4, "multiplier": 1.0 }
     },
-    "logo": "./Logos/edu.webp",
+    "logo": "../Logos/edu.webp",
     "ipfs_cid": "Qma8euNac9kNsRZixPke6s8JFEvLz3eR6spN8r6Ev3sahS",
     "coingeckoId": "edu-coin",
     "cmc_id": 24613,
@@ -1973,7 +1973,7 @@
       "health": { "score": 3, "multiplier": 1.5 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/fakt.webp",
+    "logo": "../Logos/fakt.webp",
     "ipfs_cid": null,
     "coingeckoId": "medifakt",
     "cmc_id": 19823,
@@ -2013,7 +2013,7 @@
       "health": { "score": 0, "multiplier": 0.0 },
       "education": { "score": 4, "multiplier": 1.0 }
     },
-    "logo": "./Logos/rocketpool.webp",
+    "logo": "../Logos/rocketpool.webp",
     "ipfs_cid": "QmYgEFk3Yypc3cYqAbdKjeXdVnX5JJpHkqEERLKqZzdcGL",
     "coingeckoId": "rocket-pool",
     "cmc_id": 2943,
