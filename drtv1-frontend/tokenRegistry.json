@@ -533,7 +533,7 @@
       "health": { "score": 1, "multiplier": 0.5 },
       "education": { "score": 0, "multiplier": 0.0 }
     },
-    "logo": "./Logos/grow.png",
+    "logo": "../Logos/grow.png",
     "ipfs_cid": "Qmcc71eb1d21678aa247d66aa9f1f80b2b3ea35b7f",
     "coingeckoId": "grow",
     "cmc_id": 29862,
