@@ -16,7 +16,7 @@ const tradeRoutes = require("./routes/tradeRoutes");
 const balanceRoutes = require("./routes/balanceRoutes");
 const meshSwapHandler = require("./controllers/meshSwapController");
 const meshRouterv1Route = require("./routes/meshRouterv1Route");
-const mountMeshRouterPlugin = require("../mesh-router-plugin/index");
+const mountMeshRouterPlugin = require("./mesh-router-plugin/index");
 
 const app = express();
 
