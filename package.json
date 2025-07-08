@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "DRTv1 - Decentralized Resource Token",
   "main": "drtv1-backend/index.js",
-  "type": "module",
   "scripts": {
     "start": "node drtv1-backend/index.js"
   },
