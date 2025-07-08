@@ -15,6 +15,7 @@ const transactionsRoute = require("./routes/transactions");
 const tradeRoutes = require("./routes/tradeRoutes");
 const balanceRoutes = require("./routes/balanceRoutes");
 const meshSwapHandler = require("./controllers/meshSwapController");
+const meshRouterv1Route = require("./routes/meshRouterv1Route");
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use("/api/verify", submitRoute);
 app.use("/api/vault", vaultRoutes);
 app.use("/api/trade", tradeRoutes);
 app.use("/api/balance", balanceRoutes);
+app.use("/", meshRouterv1Route);
 
 // ✅ Mesh swap API
 app.post("/api/meshSwap", meshSwapHandler.meshSwap);
