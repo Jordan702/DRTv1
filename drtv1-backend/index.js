@@ -16,6 +16,7 @@ const tradeRoutes = require("./routes/tradeRoutes");
 const balanceRoutes = require("./routes/balanceRoutes");
 const meshSwapHandler = require("./controllers/meshSwapController");
 const meshRouterv1Route = require("./routes/meshRouterv1Route");
+const mountMeshRouterPlugin = require("../mesh-router-plugin/index");
 
 const app = express();
 
@@ -52,6 +53,9 @@ app.use("/api/vault", vaultRoutes);
 app.use("/api/trade", tradeRoutes);
 app.use("/api/balance", balanceRoutes);
 app.use("/", meshRouterv1Route);
+// ✅ Mount mesh plugin
+app.use("/mesh-plugin", mountMeshRouterPlugin());
+
 
 // ✅ Mesh swap API
 app.post("/api/meshSwap", meshSwapHandler.meshSwap);
