@@ -4,9 +4,7 @@ const router = express.Router();
 const fetch = require('node-fetch');
 const path = require("path");
 const fs = require("fs");
-
-const poolsPath = path.resolve(__dirname, "../../../drtv1-frontend/pools.json");
-const pools = JSON.parse(fs.readFileSync(poolsPath));
+const pools = require('../drtv1-frontend/pools.json');
 
 require('dotenv').config();
 
