@@ -1,36 +1,18 @@
 {
-  "name": "DRTv1",
+  "name": "drtv1-root",
   "version": "1.0.0",
-  "description": "DRTv1 - Decentralized Resource Token",
   "main": "drtv1-backend/index.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node drtv1-backend/index.js"
   },
-  "keywords": [
-    "DRT",
-    "web3",
-    "ethers",
-    "ethereum",
-    "AI",
-    "resource-token"
-  ],
-  "author": "Jordan",
-  "license": "MIT",
   "dependencies": {
-    "configuration": "^4.1.5",
+    "express": "^4.18.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "ethers": "^6.7.0",
-    "express": "^4.18.2",
-    "web3": "^1.10.0", 
+    "axios": "^1.6.8",
     "multer": "^1.4.5-lts.1",
-    "openai": "^4.91.1",
-    "tesseract.js": "^4.1.1",
-    "axios": "^1.9.0",
-    "i": "^0.3.7",
-    "npm": "^11.4.0",
-    "openai": "^4.100.0",
-    "twitter-v2": "^1.1.0",
-    "node-fetch": "^2.6.7"
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
   }
 }
