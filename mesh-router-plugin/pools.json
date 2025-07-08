@@ -1,0 +1,477 @@
+[
+  {
+    "tokenA": {
+      "symbol": "DRTv3",
+      "address": "0xBe7355ffa9c87925FE8d47AcC2E901453609E09E",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "DRTv1",
+      "address": "0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1",
+      "decimals": 18
+    },
+    "address": "0xe046ff0b61aad32420ce44fb7dd9480a96961c66",
+    "version": "v2",
+    "liquidity": 2.00,
+    "trades": 0,
+    "categories": ["Infrastructure", "Food", "Climate", "Education", "Health"],
+    "impactScore": 5,
+    "lastUpdated": "2025-06-27T15:52:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "DRTv4",
+      "address": "0x4B9DD9091bD9B232925e98259344c3ac44aA2C8D",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "DRTv2",
+      "address": "0x36C5183e972A46109A97774551328e1948AaD64b",
+      "decimals": 18
+    },
+    "address": "0xc2c50846fa7200a855a0e01dbe1f7b66df8e273e",
+    "version": "v2",
+    "liquidity": 2.00,
+    "trades": 0,
+    "categories": ["Infrastructure", "Food", "Climate", "Education", "Health"],
+    "impactScore": 5,
+    "lastUpdated": "2025-06-27T16:55:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "SPE",
+      "address": "0x4b91dfa774acde7ed70e93a6438363feaaa40f54",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "ELEC",
+      "address": "0xd49ff13661451313ca1553fd6954bd1d9b6e02b9",
+      "decimals": 18
+    },
+    "address": "0xb8694529eb2759b38d1052bee9675a73904f7360",
+    "version": "v2",
+    "liquidity": 2.00,
+    "trades": 0,
+    "category": "Climate",
+    "impactScore": 4.5,
+    "lastUpdated": "2025-06-27T00:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "DRTv1",
+      "address": "0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "ELEC",
+      "address": "0xd49ff13661451313ca1553fd6954bd1d9b6e02b9",
+      "decimals": 18
+    },
+    "address": "0xa1c54911ed3f08c8653f9fd3b08eb9abce518fbd",
+    "version": "v2",
+    "liquidity": 2.00,
+    "trades": 0,
+    "category": "Climate",
+    "impactScore": 4.5,
+    "lastUpdated": "2025-06-27T00:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "ODE",
+      "address": "0xbf52f2ab39e26e0951d2a02b49b7702abe30406a",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "STC",
+      "address": "0x15b543e986b8c34074dfc9901136d9355a537e7e",
+      "decimals": 18
+    },
+    "address": "0x64c95092fc4f3dd79a29c77a1340ad7ab573998c",
+    "version": "v2",
+    "liquidity": 2.00,
+    "trades": 0,
+    "category": "Education",
+    "impactScore": 4,
+    "lastUpdated": "2025-06-27T21:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "DRTv1",
+      "address": "0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "ODE",
+      "address": "0x64c95092fc4f3dd79a29c77a1340ad7ab573998c",
+      "decimals": 18
+    },
+    "address": "0xaafa975f3da9ee3932ff520c067d7fb1015185d5",
+    "version": "v2",
+    "liquidity": 2.00,
+    "trades": 0,
+    "category": "Education",
+    "impactScore": 4,
+    "lastUpdated": "2025-06-27T21:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "DRTv4",
+      "address": "0x4B9DD9091bD9B232925e98259344c3ac44aA2C8D",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "sETH",
+      "address": "0x98c29b3a30a118351d56589dd3622b89551e2da3",
+      "decimals": 18
+    },
+    "address": "0x4a81308F2075fEcb3C4e2af75089C62817d01FB4",
+    "version": "v2",
+    "liquidity": 2.00,
+    "trades": 0,
+    "category": ["Infrastructure", "Food", "Climate", "Education", "Health"],
+    "impactScore": 5,
+    "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "DRTv2",
+      "address": "0x36C5183e972A46109A97774551328e1948AaD64b",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "DRTv4",
+      "address": "0x4B9DD9091bD9B232925e98259344c3ac44aA2C8D",
+      "decimals": 18
+    },
+    "address": "0xC2c50846fa7200A855A0e01dBE1f7b66Df8E273E",
+    "version": "v2",
+    "liquidity": 0.02,
+    "trades": 0,
+    "category": ["Infrastructure", "Food", "Climate", "Education", "Health"],
+    "impactScore": 5,
+    "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "DRTv3",
+      "address": "0xBe7355ffa9c87925FE8d47AcC2E901453609E09E",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "DRTv4",
+      "address": "0x4B9DD9091bD9B232925e98259344c3ac44aA2C8D",
+      "decimals": 18
+    },
+    "address": "0xC2c50846fa7200A855A0e01dBE1f7b66Df8E273E",
+    "version": "v3",
+    "liquidity": 0.02,
+    "trades": 0,
+    "category": ["Infrastructure", "Food", "Climate", "Education", "Health"],
+    "impactScore": 5,
+    "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "DRTv1",
+      "address": "0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "sETH",
+      "address": "0x98c29b3a30a118351d56589dd3622b89551e2da3",
+      "decimals": 18
+    },
+    "address": "0xeb86279439b667ca70fd1bda7460cd8f92ae5e35",
+    "version": "v3",
+    "liquidity": 27790000.00,
+    "trades": 0,
+    "category": ["Infrastructure", "Food", "Climate", "Education", "Health"],
+    "impactScore": 5,
+    "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "DRTv2",
+      "address": "0x36C5183e972A46109A97774551328e1948AaD64b",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "sETH",
+      "address": "0x98c29b3a30a118351d56589dd3622b89551e2da3",
+      "decimals": 18
+    },
+    "address": "0xcf16af815808bd58b19403237c1a819684e6ac84",
+    "version": "v3",
+    "liquidity": 24310000.00,
+    "trades": 0,
+    "category": ["Infrastructure", "Food", "Climate", "Education", "Health"],
+    "impactScore": 5,
+    "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "DRTv1",
+      "address": "0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "WETH",
+      "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "decimals": 18
+    },
+    "address": "0xe1c76fbf1b373165822b564c6f3accf78c5a344a",
+    "version": "v3",
+    "liquidity": 32.00,
+    "trades": 0,
+    "category": ["Infrastructure", "Food", "Climate", "Education", "Health"],
+    "impactScore": 5,
+    "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "DRTv2",
+      "address": "0x36C5183e972A46109A97774551328e1948AaD64b",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "WETH",
+      "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "decimals": 18
+    },
+    "address": "0x732715C246A0A887e976c7c1145FbDec3FC646ac",
+    "version": "v3",
+    "liquidity": 24.00,
+    "trades": 0,
+    "category": ["Infrastructure", "Food", "Climate", "Education", "Health"],
+    "impactScore": 5,
+    "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "DRTv1",
+      "address": "0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "DRTv2",
+      "address": "0x36C5183e972A46109A97774551328e1948AaD64b",
+      "decimals": 18
+    },
+    "address": "0x6e5A733D0BA2F3Ec150aC6e5DC08be8C58BED41d",
+    "version": "v3",
+    "liquidity": 100000000.00,
+    "trades": 0,
+    "category": ["Infrastructure", "Food", "Climate", "Education", "Health"],
+    "impactScore": 5,
+    "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "sETH",
+      "address": "0x98c29b3a30a118351d56589dd3622b89551e2da3",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "WETH",
+      "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "decimals": 18
+    },
+    "address": "0x60446ef0d652d9ca6c6a379945ac9096521da29a",
+    "version": "v3",
+    "liquidity": 2.00,
+    "trades": 0,
+    "category": ["Infrastructure"],
+    "impactScore": 3,
+    "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+    "tokenA": {
+      "symbol": "DRTv3",
+      "address": "0xBe7355ffa9c87925FE8d47AcC2E901453609E09E",
+      "decimals": 18
+    },
+    "tokenB": {
+      "symbol": "WETH",
+      "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "decimals": 18
+    },
+    "address": "0xb6262d43C0075365A8A5e813C073a79BEcd0f3F",
+    "version": "v2",
+    "liquidity": 0.02,
+    "trades": 0,
+    "category": ["Infrastructure"],
+    "impactScore": 5,
+    "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+  "tokenA": {
+    "symbol": "DRTv4",
+    "address": "0x4B9DD9091bD9B232925e98259344c3ac44aA2C8D",
+    "decimals": 18
+  },
+  "tokenB": {
+    "symbol": "DRTv3",
+    "address": "0xBe7355ffa9c87925FE8d47AcC2E901453609E09E",
+    "decimals": 18
+  },
+  "address": "0x3A3AD9775b063F6791B635e38b1deF36F507353B",
+  "version": "v2",
+  "liquidity": 20000,
+  "trades": 0,
+  "category": ["Infrastructure"],
+  "impactScore": 5,
+  "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+  "tokenA": {
+    "symbol": "BDG",
+    "address": "0x1961B3331969eD52770751fC718ef530838b6dEE",
+    "decimals": 18
+  },
+  "tokenB": {
+    "symbol": "IQ",
+    "address": "0x579CEa1889991f68aCc35Ff5c3dd0621fF29b0C9",
+    "decimals": 18
+  },
+  "address": "0xE524399F3453cb3E339ed9B7a9cDC7B15a8a08b0",
+  "version": "v2",
+  "liquidity": 2.00,
+  "trades": 0,
+  "category": ["Education"],
+  "impactScore": 4,
+  "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+  "tokenA": {
+    "symbol": "BDG",
+    "address": "0x1961B3331969eD52770751fC718ef530838b6dEE",
+    "decimals": 18
+  },
+  "tokenB": {
+    "symbol": "DRTv2",
+    "address": "0x36C5183e972A46109A97774551328e1948AaD64b",
+    "decimals": 18
+  },
+  "address": "0xA903559C66bEBdFE2ff97a701Bc68F2275E52a18",
+  "version": "v2",
+  "liquidity": 2.00,
+  "trades": 0,
+  "category": ["Education"],
+  "impactScore": 4,
+  "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+  "tokenA": {
+    "symbol": "1EARTH",
+    "address": "0x9e04F519b094F5F8210441e285f603f4d2b50084",
+    "decimals": 18
+  },
+  "tokenB": {
+    "symbol": "RPL",
+    "address": "0xD33526068D116cE69F19A9ee46F0bd304F21A51f",
+    "decimals": 18
+  },
+  "address": "0xC3BA8A10A48A770575aA5a8136052AC8A51f2b0D",
+  "version": "v2", 
+  "liquidity": 1.00,
+  "trades": 0,
+  "category": ["Climate, Education"],
+  "impactScore": 4,
+  "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+  "tokenA": {
+    "symbol": "RPL",
+    "address": "0xD33526068D116cE69F19A9ee46F0bd304F21A51f",
+    "decimals": 18
+  },
+  "tokenB": {
+    "symbol": "DRTv2",
+    "address": "0x36C5183e972A46109A97774551328e1948AaD64b",
+    "decimals": 18
+  },
+  "address": "0x5E594d9A20DBcd44c7dc2a71A68EE8593315d0D9",
+  "version": "v2",
+  "liquidity": 2.00,
+  "trades": 0,
+  "category": ["Education, Infrastructure"],
+  "impactScore": 4,
+  "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+  "tokenA": {
+    "symbol": "POWR",
+    "address": "0x595832F8FC6BF59c85C527fEC3740A1b7a361269",
+    "decimals": 18
+  },
+  "tokenB": {
+    "symbol": "ARTX",
+    "address": "0x741b0428Efdf4372A8DF6FB54B018dB5e5aB7710",
+    "decimals": 18
+  },
+  "address": "0xd97d2C53FF7D14a1cd16539729e8901d454aAa31",
+  "version": "v2",
+  "liquidity": 2.00,
+  "trades": 0,
+  "category": ["Climate, Education, Infrastructure"],
+  "impactScore": 3,
+  "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+  "tokenA": {
+    "symbol": "POWR",
+    "address": "0x595832F8FC6BF59c85C527fEC3740A1b7a361269",
+    "decimals": 18
+  },
+  "tokenB": {
+    "symbol": "DRTv1",
+    "address": "0x2c899a490902352aFa33baFb7fe89c9Dd142f9D1",
+    "decimals": 18
+  },
+  "address": "0x1a7a74f11C30D89645A0151A59230be139b6cC32",
+  "version": "v2",
+  "liquidity": 2.00,
+  "trades": 0,
+  "category": ["Climate, Education, Infrastructure"],
+  "impactScore": 4,
+  "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+  "tokenA": {
+    "symbol": "BCDT",
+    "address": "0xAcfa209Fb73bF3Dd5bBfb1101B9Bc999C49062a5",
+    "decimals": 18
+  },
+  "tokenB": {
+    "symbol": "LEARN",
+    "address": "0xf6AD4965F7779C6b8ae4d25BF2a2E009A47C3dAe",
+    "decimals": 18
+  },
+  "address": "0xF4645584Cb511674d59eEFD73df5Bc815e4DB8D2",
+  "version": "v2",
+  "liquidity": 2.00,
+  "trades": 0,
+  "category": ["Education"],
+  "impactScore": 4,
+  "lastUpdated": "2025-07-02T21:00:00Z"
+  },
+  {
+  "tokenA": {
+    "symbol": "DRTv2",
+    "address": "0x36C5183e972A46109A97774551328e1948AaD64b",
+    "decimals": 18
+  },
+  "tokenB": {
+    "symbol": "LEARN",
+    "address": "0xf6AD4965F7779C6b8ae4d25BF2a2E009A47C3dAe",
+    "decimals": 18
+  },
+  "address": "0x1afF7f70CA04b7C10829BDc781259d8d96234B8b",
+  "version": "v2",
+  "liquidity": 2.00,
+  "trades": 0,
+  "category": ["Education"],
+  "impactScore": 4,
+  "lastUpdated": "2025-07-02T21:00:00Z"
+  }
+]
