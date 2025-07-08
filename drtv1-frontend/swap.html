@@ -166,40 +166,41 @@
 
       try {
         const tokenInContract = new web3.eth.Contract([
-          { "constant": false, "inputs": [
-            { "name": "_spender", "type": "address" },
-            { "name": "_value", "type": "uint256" }
-          ], "name": "approve", "outputs": [{ "name": "", "type": "bool" }], "type": "function" }
+          {
+            "constant": false,
+            "inputs": [
+              { "name": "_spender", "type": "address" },
+              { "name": "_value", "type": "uint256" }
+            ],
+            "name": "approve",
+            "outputs": [{ "name": "", "type": "bool" }],
+            "type": "function"
+          }
         ], tokenIn.address);
 
         await tokenInContract.methods.approve(routerAddress, amtWei).send({ from: walletAddress });
 
-        const flatPath = [tokenIn.address];
-        for (let i = 0; i < 28; i++) {
-          const hop = tokenRegistry[i % tokenRegistry.length];
-          if (!flatPath.includes(hop.address) && hop.address !== tokenOut.address) {
-            flatPath.push(hop.address);
-          }
-        }
-        flatPath.push(tokenOut.address);
+        // 🌐 Get optimal route and pools from AI backend
+        const routeRes = await fetch(`https://drtv1-backend.onrender.com/mesh-route?tokenIn=${tokenIn.address}&tokenOut=${tokenOut.address}`);
+        const routeData = await routeRes.json();
 
-        const pathSegments = [];
-        for (let i = 0; i < flatPath.length - 1; i++) {
-          pathSegments.push([flatPath[i], flatPath[i + 1]]);
+        if (!routeData.path || !routeData.pools) {
+          throw new Error("No route found");
         }
 
-        const res = await fetch("https://drtv1-backend.onrender.com/api/meshSwap", {
+        const swapRes = await fetch("https://drtv1-backend.onrender.com/api/meshSwap", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             tokenIn: tokenIn.address,
             tokenOut: tokenOut.address,
             amountIn: amount,
-            paths: [flatPath] // ✅ this is the only correct structure
+            paths: [routeData.path],
+            pools: [routeData.pools]
           })
         });
 
-        const result = await res.json();
+        const result = await swapRes.json();
         if (result.success) {
           status.textContent = `✅ Swap successful! TX: ${result.txHash}`;
           updateImpactPoints(5);
