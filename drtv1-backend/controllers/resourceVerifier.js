@@ -10,7 +10,7 @@ const DRT_ABI = require('../DRT_abi.json');
 
 const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 const signer = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
-const contract = new ethers.Contract(process.env.DRT_CONTRACT_ADDRESS, DRT_ABI, signer);
+const contract = new ethers.Contract(process.env.WETH_CONTRACT_ADDRESS, DRT_ABI, signer);
 // Track last submission per wallet (in-memory)
 const lastSubmissionTime = {};
 const SUBMISSION_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes
@@ -127,9 +127,6 @@ async function verifyAndMint(req, res) {
       console.warn('⚠️ Invalid or negative value. Defaulting to 0.');
       valueEstimate = 0;
     }
-
-    const DOLLAR_TO_DRT_RATIO = 1_000_000;
-    const tokensToMint = Math.min(valueEstimate / DOLLAR_TO_DRT_RATIO, 100);
     const mintAmount = ethers.parseUnits(tokensToMint.toString(), 18);
 
     console.log(`💡 Value Estimate: $${valueEstimate}`);
