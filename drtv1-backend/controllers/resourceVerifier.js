@@ -127,15 +127,12 @@ async function verifyAndMint(req, res) {
       console.warn('⚠️ Invalid or negative value. Defaulting to 0.');
       valueEstimate = 0;
     }
-    const openaiValue = parseFloat(response); // or response.data depending on your structure
-    if (isNaN(openaiValue)) {
-      throw new Error("OpenAI returned a non-numeric value");
-    }
-    const tokensToMint = openaiValue;
+    const DOLLAR_TO_WETH_RATIO = 1;
+    const tokensToMint = Math.min(valueEstimate / DOLLAR_TO_WETH_RATIO, 100);
     const mintAmount = ethers.parseUnits(tokensToMint.toString(), 18);
 
     console.log(`💡 Value Estimate: $${valueEstimate}`);
-    console.log(`🪙 Minting ${tokensToMint} DRT to ${walletAddress}...`);
+    console.log(`🪙 Minting ${tokensToMint} WETH to ${walletAddress}...`);
 
     let tx;
     try {
