@@ -127,6 +127,8 @@ async function verifyAndMint(req, res) {
       console.warn('⚠️ Invalid or negative value. Defaulting to 0.');
       valueEstimate = 0;
     }
+    const tokensToMint = parseFloat(openaiValue); // or parseInt if that's what your contract expects
+
     const mintAmount = ethers.parseUnits(tokensToMint.toString(), 18);
 
     console.log(`💡 Value Estimate: $${valueEstimate}`);
