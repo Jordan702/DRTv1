@@ -196,7 +196,7 @@
             let isRunning = false;
             let SIMULATED_MODE = true; // True for simulation, false for live (placeholder)
             let currentBalance = INITIAL_BALANCE;
-            let netProfitLoss = 0;
+            let netProfitLoss = i;
             let currentEthPrice = 3000; // Initial simulated ETH price in USD
             let epsilon = 0.9; // Initial epsilon for exploration
             let tradeIntervalId = null;
@@ -532,40 +532,34 @@
                 SIMULATED_MODE = !modeToggle.checked; // If checked, it means "Live" (false for SIMULATED_MODE)
                 if (!SIMULATED_MODE) {
                     showMessage('Live Mode (Placeholder) selected. No real blockchain interaction will occur. This is for demonstration of the toggle only.', 'warning');
-                    // In a real live mode:
-                    // 1. You would initialize web3.js/ethers.js here.
-                    // 2. Connect to a Web3 provider (e.g., MetaMask, Infura).
-                    // 3. Handle wallet connection and account selection.
-                    // 4. Replace simulated functions (getSimulatedEthPrice, sendSimulatedTransaction)
-                    //    with actual blockchain interaction functions.
-                    // Example (conceptual, not functional):
-                    /*
-                    // import { ethers } from 'ethers'; // Would need to be imported
-                    // const provider = new ethers.BrowserProvider(window.ethereum);
-                    // const signer = await provider.getSigner();
-                    // const uniswapRouterAddress = '0x7a250d5630B4cF539739dF2C5dF60F73Ce422Ff4'; // Uniswap V2 Router
-                    // const uniswapRouterABI = [...]; // Uniswap Router ABI
-                    // const uniswapRouter = new ethers.Contract(uniswapRouterAddress, uniswapRouterABI, signer);
+                    In a real live mode:
+                    1. You would initialize web3.js/ethers.js here.
+                    2. Connect to a Web3 provider (e.g., MetaMask, Infura).
+                    3. Handle wallet connection and account selection.
+                    4. Replace simulated functions (getSimulatedEthPrice, sendSimulatedTransaction)
+                        with actual blockchain interaction functions.
+                    Example (conceptual, not functional):
+                    
+                    import { ethers } from 'ethers'; // Would need to be imported
+                    const provider = new ethers.BrowserProvider(window.ethereum);
+                    const signer = await provider.getSigner();
+                    const uniswapRouterAddress = '0x7a250d5630B4cF539739dF2C5dF60F73Ce422Ff4'; // Uniswap V2 Router
+                    const uniswapRouterABI = [...]; // Uniswap Router ABI
+                    const uniswapRouter = new ethers.Contract(uniswapRouterAddress, uniswapRouterABI, signer);
 
-                    // async function getLiveEthPrice() {
-                    //    // Fetch price from a DEX or oracle
-                    //    // const price = await uniswapRouter.getAmountsOut(ethers.parseEther('1'), [WETH_ADDRESS, USDC_ADDRESS]);
-                    //    // return parseFloat(ethers.formatUnits(price[1], 6));
-                    // }
+                    async function getLiveEthPrice() {
+                        const price = await uniswapRouter.getAmountsOut(ethers.parseEther('1'), [WETH_ADDRESS, USDC_ADDRESS]);
+                        return parseFloat(ethers.formatUnits(price[1], 6));
+                    }
 
-                    // async function sendLiveTransaction(type, amountUSD, currentPrice) {
-                    //    // Implement actual swap logic using uniswapRouter
-                    //    // const amountIn = ethers.parseUnits(amountUSD.toString(), 6); // Assuming USDC
-                    //    // const tx = await uniswapRouter.swapExactTokensForETH(amountIn, 0, [USDC_ADDRESS, WETH_ADDRESS], signer.address, Date.now() + 60 * 10);
-                    //    // await tx.wait();
-                    //    // return { success: true, actualAmountEth: ..., actualPrice: ..., fee: ... };
-                    // }
-                    */
-                }
-                updateUI();
-            });
-
-            // Initial UI update
+                    async function sendLiveTransaction(type, amountUSD, currentPrice) {
+                        const amountIn = ethers.parseUnits(amountUSD.toString(), 6); // Assuming USDC
+                        onst tx = await uniswapRouter.swapExactTokensForETH(amountIn, 0, [USDC_ADDRESS, WETH_ADDRESS], signer.address, Date.now() + 60 * 10);
+                        await tx.wait();
+                        return { success: true, actualAmountEth: ..., actualPrice: ..., fee: ... };
+                    }
+                    updateUI();
+                });
             updateUI();
         });
     </script>
