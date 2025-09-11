@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DMOS – Digitized Cash Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>💵 DMOS – Digitized Cash Portal</h1>
+    <p>Test digitization and rebate collection through Digitize.sol + Vault.sol</p>
+
+    <!-- Digitize Section -->
+    <section>
+      <h2>Digitize Cash</h2>
+      <input id="digitizeAmount" type="number" placeholder="Amount in DRTv2 units" />
+      <input id="recipient" type="text" placeholder="Recipient Wallet Address" />
+      <button onclick="digitize()">Digitize</button>
+      <p id="digitizeStatus"></p>
+    </section>
+
+    <hr>
+
+    <!-- Claim Section -->
+    <section>
+      <h2>Claim Disposal Rebate</h2>
+      <input id="claimer" type="text" placeholder="Your Wallet Address" />
+      <button onclick="claim()">Claim Rebate</button>
+      <p id="claimStatus"></p>
+    </section>
+
+    <hr>
+
+    <!-- Vault State -->
+    <section>
+      <h2>Vault Status</h2>
+      <button onclick="getVault()">Refresh</button>
+      <pre id="vaultInfo">Loading...</pre>
+    </section>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin; // works with local + render
+
+    async function digitize() {
+      const amount = document.getElementById("digitizeAmount").value;
+      const recipient = document.getElementById("recipient").value;
+      try {
+        const res = await axios.post(`${API_BASE}/dmos/digitize`, { amount, recipient });
+        document.getElementById("digitizeStatus").innerText =
+          `✅ Digitized ${amount} to ${recipient}. Tx: ${res.data.txHash}`;
+      } catch (err) {
+        document.getElementById("digitizeStatus").innerText =
+          `❌ Error: ${err.response?.data?.error || err.message}`;
+      }
+    }
+
+    async function claim() {
+      const claimer = document.getElementById("claimer").value;
+      try {
+        const res = await axios.post(`${API_BASE}/dmos/claim`, { claimer });
+        document.getElementById("claimStatus").innerText =
+          `✅ Rebate claimed! Tx: ${res.data.txHash}`;
+      } catch (err) {
+        document.getElementById("claimStatus").innerText =
+          `❌ Error: ${err.response?.data?.error || err.message}`;
+      }
+    }
+
+    async function getVault() {
+      try {
+        const res = await axios.get(`${API_BASE}/dmos/vault`);
+        document.getElementById("vaultInfo").innerText =
+          JSON.stringify(res.data, null, 2);
+      } catch (err) {
+        document.getElementById("vaultInfo").innerText =
+          `❌ Error: ${err.response?.data?.error || err.message}`;
+      }
+    }
+
+    // auto-load vault on page load
+    getVault();
+  </script>
+</body>
+</html>
