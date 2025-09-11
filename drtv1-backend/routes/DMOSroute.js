@@ -1,9 +1,10 @@
-import express from "express";
-import { mintDigitized, creditRebate, claimRebate } from "./DMOScontroller.js";
+// routes/DMOSroute.js
+const express = require("express");
+const { mintDigitized, creditRebate, claimRebate } = require("../controllers/DMOScontroller");
 
 const router = express.Router();
 
-// Mint digitized credits
+// Mint digitized tokens
 router.post("/mint", async (req, res) => {
   try {
     const { to, amount } = req.body;
@@ -14,7 +15,7 @@ router.post("/mint", async (req, res) => {
   }
 });
 
-// Assign rebate to a collector
+// Credit rebate
 router.post("/credit-rebate", async (req, res) => {
   try {
     const { collector, amount } = req.body;
@@ -34,5 +35,7 @@ router.post("/claim", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+module.exports = router;
 
 export default router;
