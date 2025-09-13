@@ -24,6 +24,8 @@ async function mintDRTv1(req, res) {
 
     // Connect to the DRTv1 contract with wallet as signer
     const contract = new ethers.Contract(DRTv1_ADDRESS, DRTv1_ABI, wallet);
+    // Convert string/BigInt amount to ethers.BigNumber
+    const mintAmount = ethers.BigNumber.from(amount);
 
     let tx;
     try {
