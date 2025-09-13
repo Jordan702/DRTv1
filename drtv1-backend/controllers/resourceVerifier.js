@@ -10,7 +10,7 @@ const DRT_ABI = require('../DRT_abi.json');
 
 const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 const signer = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
-const contract = new ethers.Contract(process.env.WETH_CONTRACT_ADDRESS, DRT_ABI, signer);
+const contract = new ethers.Contract(process.env.DRT_CONTRACT_ADDRESS, DRT_ABI, signer);
 // Track last submission per wallet (in-memory)
 const lastSubmissionTime = {};
 const SUBMISSION_COOLDOWN_MS = 2 * 60 * 1000; // 2 minutes
