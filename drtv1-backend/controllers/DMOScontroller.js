@@ -5,8 +5,8 @@ require("dotenv").config();
 const digitizeAbi = require("../abi/Digitize_abi.json");
 const vaultAbi = require("../abi/Vault_abi.json");
 
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
+const wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 
 const digitize = new ethers.Contract(process.env.DIGITIZE_ADDR, digitizeAbi, wallet);
 const vault = new ethers.Contract(process.env.VAULT_ADDR, vaultAbi, wallet);
