@@ -1,8 +1,8 @@
+// routes/mint.js
 const express = require("express");
 const router = express.Router();
-const { mintTokens } = require("../controllers/MintController");
+const { mintDRTv1 } = require("../controllers/MintController");
 
-// POST /api/mint
-router.post("/", mintTokens);
+router.post("/", mintDRTv1);
 
 module.exports = router;
