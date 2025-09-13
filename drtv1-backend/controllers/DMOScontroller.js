@@ -2,8 +2,8 @@
 const { ethers } = require("ethers");
 require("dotenv").config();
 
-const digitizeAbi = require("../abi/Digitize.json");
-const vaultAbi = require("../abi/Vault.json");
+const digitizeAbi = require("../abi/Digitize_abi.json");
+const vaultAbi = require("../abi/Vault_abi.json");
 
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
