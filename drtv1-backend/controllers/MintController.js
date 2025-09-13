@@ -6,7 +6,7 @@ const DRTv1_ABI = [
   "function mint(address to, uint256 amount) external"
 ];
 
-const DRTv1_ADDRESS = process.env.DRTV1_ADDRESS; // Your deployed DRTv1 contract address
+const DRTv1_ADDRESS = process.env.DRT_CONTRACT_ADDRESS; // Your deployed DRTv1 contract address
 
 /**
  * Handles minting DRTv1 tokens
