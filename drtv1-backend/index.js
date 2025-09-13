@@ -52,10 +52,10 @@ const upload = multer({
 });
 
 // ✅ Ethereum provider + wallet
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
 let wallet;
-if (process.env.PRIVATE_KEY) {
-  wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+if (process.env.MINTER_PRIVATE_KEY) {
+  wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 }
 
 // ✅ Attach provider/wallet globally in req
