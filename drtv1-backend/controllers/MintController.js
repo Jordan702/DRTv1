@@ -5,7 +5,7 @@ const DRTv1_ABI = [
   "function mint(address to, uint256 amount) external"
 ];
 
-const DRTv1_ADDRESS = process.env.DRT_CONTRACT_ADDRESS;
+const DRTv1_ADDRESS = process.env.DRT_CONTRACT_ADDRESS; // Your DRTv1 contract address
 
 async function mintDRTv1(req, res) {
   try {
@@ -17,27 +17,31 @@ async function mintDRTv1(req, res) {
 
     console.log(`[MintController] Preparing to mint ${amount} DRTv1 to ${recipient}...`);
 
-    // ✅ Get wallet from middleware
-    const { wallet } = req;
-    if (!wallet) {
-      return res.status(500).json({ error: "Wallet not initialized" });
+    const { wallet, provider } = req;
+    if (!wallet || !provider) {
+      return res.status(500).json({ error: "Wallet or provider not initialized" });
     }
 
-    // ✅ Connect contract with wallet (signer)
-    const drtv1 = new ethers.Contract(DRTv1_ADDRESS, DRTv1_ABI, wallet);
+    // Connect to the DRTv1 contract with wallet as signer
+    const contract = new ethers.Contract(DRTv1_ADDRESS, DRTv1_ABI, wallet);
 
-    // ✅ Send mint transaction
-    const tx = await drtv1.mint(recipient, ethers.BigNumber.from(amount));
-    console.log("[MintController] Transaction sent:", tx.hash);
+    // Convert amount to BigNumber
+    const mintAmount = ethers.BigNumber.from(amount);
 
-    // ✅ Wait for confirmation
-    const receipt = await tx.wait();
-    console.log("[MintController] Mint confirmed:", receipt.transactionHash);
+    let tx;
+    try {
+      tx = await contract.mint(recipient, mintAmount);
+      await tx.wait();
+      console.log(`✅ Minted successfully. TX Hash: ${tx.hash}`);
+      return res.json({ txHash: tx.hash });
+    } catch (mintErr) {
+      console.error('❌ Minting failed:', mintErr.message);
+      return res.status(500).json({ error: 'Blockchain mint failed', details: mintErr.message });
+    }
 
-    return res.json({ status: "ok", txHash: receipt.transactionHash });
   } catch (err) {
-    console.error("[MintController] Minting error:", err);
-    return res.status(500).json({ error: err.message });
+    console.error('[MintController] Unexpected error:', err.message);
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
 }
 
