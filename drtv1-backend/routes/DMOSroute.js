@@ -1,6 +1,6 @@
 // routes/DMOSroute.js
-const express = require("express");
-const { mintDigitized, creditRebate, claimRebate } = require("../controllers/DMOScontroller");
+import express from "express";
+import { mintDigitized, creditRebate, claimRebate } from "../controllers/DMOScontroller.js";
 
 const router = express.Router();
 
@@ -34,6 +34,9 @@ router.post("/claim", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+export default router;
 });
 
 module.exports = router;
