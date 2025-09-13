@@ -2,11 +2,13 @@
 require("dotenv").config();
 const { ethers } = require("ethers");
 
+// Minimal DRTv1 ABI
 const DRTv1_ABI = [
   "function mint(address to, uint256 amount) external"
 ];
 
-const DRTv1_ADDRESS = process.env.DRT_CONTRACT_ADDRESS; // Your deployed DRTv1 contract address
+// Contract address from .env
+const DRTv1_ADDRESS = process.env.DRT_CONTRACT_ADDRESS;
 
 /**
  * Handles minting DRTv1 tokens
@@ -23,32 +25,27 @@ async function mintDRTv1(req, res) {
 
     console.log(`[MintController] Preparing to mint ${amount} DRTv1 to ${recipient}...`);
 
-    // Get wallet and provider from req (attached in index.js middleware)
+    // Get wallet and provider from middleware
     const { wallet, provider } = req;
     if (!wallet || !provider) {
+      console.error("[MintController] Wallet or provider not initialized");
       return res.status(500).json({ error: "Wallet or provider not initialized" });
     }
 
-    // Connect to the DRTv1 contract
+    // Connect to DRTv1 contract with wallet as signer
     const drtv1 = new ethers.Contract(DRTv1_ADDRESS, DRTv1_ABI, wallet);
 
-    // Send mint transaction
+    console.log("[MintController] Sending mint transaction...");
     const tx = await drtv1.mint(recipient, ethers.BigNumber.from(amount));
-    console.log(`[MintController] Mint transaction sent. TxHash: ${tx.hash}`);
 
-    // Wait for confirmation
-    const receipt = await tx.wait();
-    console.log(`[MintController] Mint transaction confirmed. BlockNumber: ${receipt.blockNumber}`);
+    console.log(`[MintController] Transaction sent. Hash: ${tx.hash}`);
+    await tx.wait();
+    console.log("[MintController] Transaction confirmed!");
 
-    return res.json({
-      success: true,
-      txHash: tx.hash,
-      blockNumber: receipt.blockNumber,
-      message: `Minted ${amount} DRTv1 to ${recipient}`
-    });
+    return res.json({ status: "ok", txHash: tx.hash });
   } catch (err) {
-    console.error("[MintController] Minting error:", err);
-    return res.status(500).json({ error: err.message || "Mint failed" });
+    console.error("[MintController] Mint error:", err);
+    return res.status(500).json({ error: err.message });
   }
 }
 
