@@ -73,8 +73,10 @@ app.use("/api/vault", vaultRoutes);
 app.use("/api/trade", tradeRoutes);
 app.use("/api/balance", balanceRoutes);
 app.use("/", meshRouterv1Route);
-// ✅ Mount mint API
+
+// Mount mint API
 app.use("/api/mint", mintRoute);
+
 
 // ✅ Mount mesh plugin
 app.use("/mesh-plugin", mountMeshRouterPlugin());
