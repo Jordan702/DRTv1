@@ -1,36 +1,55 @@
-// SPDX-License-Identifier: MIT
+// root/drtv1-backend/controllers/MintController.js
+require("dotenv").config();
 const { ethers } = require("ethers");
-const DRTv1_ABI = require("../abis/DRTv1.json"); // your DRTv1 ABI
 
-// Set up provider and wallet
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
-const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+const DRTv1_ABI = [
+  "function mint(address to, uint256 amount) external"
+];
 
-// Contract instance
-const drtv1 = new ethers.Contract(process.env.DRTV1_ADDRESS, DRTv1_ABI, wallet);
+const DRTv1_ADDRESS = process.env.DRTV1_ADDRESS; // Your deployed DRTv1 contract address
 
-async function mintTokens(req, res) {
-    try {
-        const { recipient, amount } = req.body;
+/**
+ * Handles minting DRTv1 tokens
+ * @param {Request} req 
+ * @param {Response} res 
+ */
+async function mintDRTv1(req, res) {
+  try {
+    const { recipient, amount } = req.body;
 
-        if (!recipient || !amount) {
-            return res.status(400).json({ error: "recipient and amount required" });
-        }
-
-        // Convert amount to BigNumber (18 decimals)
-        const mintAmount = ethers.parseUnits(amount.toString(), 18);
-
-        // Call mint() on the contract
-        const tx = await drtv1.mint(recipient, mintAmount);
-        await tx.wait();
-
-        return res.status(200).json({ success: true, txHash: tx.hash });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: err.message });
+    if (!recipient || !amount) {
+      return res.status(400).json({ error: "Recipient address and amount are required" });
     }
+
+    console.log(`[MintController] Preparing to mint ${amount} DRTv1 to ${recipient}...`);
+
+    // Get wallet and provider from req (attached in index.js middleware)
+    const { wallet, provider } = req;
+    if (!wallet || !provider) {
+      return res.status(500).json({ error: "Wallet or provider not initialized" });
+    }
+
+    // Connect to the DRTv1 contract
+    const drtv1 = new ethers.Contract(DRTv1_ADDRESS, DRTv1_ABI, wallet);
+
+    // Send mint transaction
+    const tx = await drtv1.mint(recipient, ethers.BigNumber.from(amount));
+    console.log(`[MintController] Mint transaction sent. TxHash: ${tx.hash}`);
+
+    // Wait for confirmation
+    const receipt = await tx.wait();
+    console.log(`[MintController] Mint transaction confirmed. BlockNumber: ${receipt.blockNumber}`);
+
+    return res.json({
+      success: true,
+      txHash: tx.hash,
+      blockNumber: receipt.blockNumber,
+      message: `Minted ${amount} DRTv1 to ${recipient}`
+    });
+  } catch (err) {
+    console.error("[MintController] Minting error:", err);
+    return res.status(500).json({ error: err.message || "Mint failed" });
+  }
 }
 
-module.exports = {
-    mintTokens,
-};
+module.exports = { mintDRTv1 };
