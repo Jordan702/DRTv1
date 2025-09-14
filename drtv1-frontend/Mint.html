@@ -22,7 +22,6 @@
   Mint Tokens
 </h1>
 
-<!-- Single Mint Form -->
 <form id="mintForm">
   <label>Recipient Address:</label>
   <input type="text" id="recipient" placeholder="0x..." required>
@@ -33,9 +32,8 @@
   <button type="submit">Mint</button>
 </form>
 
-<!-- Batch Mint Form -->
 <div class="batch-mint">
-  <h3>Batch Mint 100 DRTv2 Tokens</h3>
+  <h3>Batch Mint DRTv2 Tokens</h3>
   <input id="batchRecipient" type="text" placeholder="Recipient Address" />
   <input id="batchTimes" type="number" placeholder="Number of times (e.g. 200)" />
   <button onclick="doBatchMint()">Batch Mint</button>
@@ -52,7 +50,7 @@ document.getElementById("mintForm").addEventListener("submit", async (e) => {
     if (!recipient || !amountInput) { alert("Please fill in both fields!"); return; }
 
     try {
-        const amount = BigInt(amountInput) * 10n ** 18n;
+        const amount = BigInt(amountInput); // No longer need to multiply by 10^18 on the frontend
         document.getElementById("status").innerText = `⏳ Minting ${amountInput} tokens...`;
 
         const res = await axios.post("https://drtv1-backend.onrender.com/api/mint", {
@@ -67,29 +65,24 @@ document.getElementById("mintForm").addEventListener("submit", async (e) => {
     }
 });
 
-// Batch mint using the existing /api/mint
+// Batch mint using the correct /api/batch-mint endpoint
 async function doBatchMint() {
     const recipient = document.getElementById("batchRecipient").value.trim();
     const times = parseInt(document.getElementById("batchTimes").value);
     if (!recipient || !times || times <= 0) { alert("Please enter valid recipient and number of times!"); return; }
 
-    const txHashes = [];
-    document.getElementById("status").innerText = `⏳ Batch minting ${times} x 100 tokens...`;
+    document.getElementById("status").innerText = `⏳ Sending batch request to server for ${times} mints...`;
 
     try {
-        for (let i = 0; i < times; i++) {
-            const res = await axios.post("https://drtv1-backend.onrender.com/api/mint", {
-                recipient,
-                amount: (100n * 10n ** 18n).toString() // 100 tokens in wei
-            });
-            txHashes.push(res.data.txHash);
+        // Correctly call the backend's batch-mint endpoint
+        const res = await axios.post("https://drtv1-backend.onrender.com/api/batch-mint", {
+            recipient,
+            times
+        });
+        
+        const txHashes = res.data.txHashes;
 
-            // Update status every 10 mints
-            if ((i + 1) % 10 === 0 || i + 1 === times) {
-                document.getElementById("status").innerText = `⏳ Minted ${i + 1}/${times} x 100 tokens...`;
-            }
-        }
-        document.getElementById("status").innerText = `✅ Batch mint complete!\n${times} x 100 tokens minted.\nFirst 5 TxHashes:\n${txHashes.slice(0,5).join("\n")}\n...and ${txHashes.length - 5} more.`;
+        document.getElementById("status").innerText = `✅ Batch mint complete!\n${times} x 99 tokens minted.\nFirst 5 TxHashes:\n${txHashes.slice(0,5).join("\n")}\n...and ${txHashes.length - 5} more.`;
     } catch (err) {
         console.error("[Frontend] Batch mint error:", err.response?.data || err.message);
         document.getElementById("status").innerText = `❌ Batch mint failed: ${err.response?.data?.error || err.message}`;
