@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const { mintsETH, doBatchMint } = require("../controllers/MintController");
 
 // Single mint endpoint
