@@ -6,6 +6,7 @@ const DRTv1_ABI = [
 ];
 
 const DRTv1_ADDRESS = process.env.DRT_CONTRACT_ADDRESS; // Your DRTv1 contract address
+const TOKEN_DECIMALS = 18; // Make sure to use the correct number of decimals for your token
 
 async function mintDRTv1(req, res) {
   try {
@@ -24,8 +25,16 @@ async function mintDRTv1(req, res) {
 
     // Connect to the DRTv1 contract with wallet as signer
     const contract = new ethers.Contract(DRTv1_ADDRESS, DRTv1_ABI, wallet);
-    // Convert string/BigInt amount to ethers.BigNumber
-    const mintAmount = ethers.BigNumber.from(amount);
+
+    // This is the fix. Use parseUnits to convert the human-readable amount
+    // to the correct BigNumber representation with the right number of decimals.
+    let mintAmount;
+    try {
+      mintAmount = ethers.utils.parseUnits(amount.toString(), TOKEN_DECIMALS);
+    } catch (parseErr) {
+      console.error('❌ Failed to parse amount:', parseErr.message);
+      return res.status(400).json({ error: 'Invalid amount format', details: 'The amount could not be converted to a valid token value.' });
+    }
 
     let tx;
     try {
