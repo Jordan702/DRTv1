@@ -18,7 +18,7 @@ const balanceRoutes = require("./routes/balanceRoutes");
 const meshSwapHandler = require("./controllers/meshSwapController");
 const meshRouterv1Route = require("./routes/meshRouterv1Route");
 const mountMeshRouterPlugin = require("./mesh-router-plugin/index");
-const mintRoute = require("./routes/mint"); // ✅ DRTv1 mint API
+const mintRoute = require("./routes/mint"); // ✅ sETH mint API
 
 
 // ✅ New DMOS routes
