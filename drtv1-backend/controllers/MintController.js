@@ -8,7 +8,7 @@ const DRTv2_ABI = [
   "function mint(address to, uint256 amount) external"
 ];
 
-const DRTv2_ADDRESS = process.env.DRTV2_ADDRESS; // Your DRTv2 contract
+const DRTv2_ADDRESS = process.env.DRT_V2_CONTRACT_ADDRESS; // Your DRTv2 contract
 const TOKEN_DECIMALS = 18;
 
 // ---------- Single Mint (for sETH or DRTv2 if you want) ----------
