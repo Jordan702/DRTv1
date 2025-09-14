@@ -5,7 +5,7 @@ const sETH_ABI = [
   "function mint(address to, uint256 amount) external"
 ];
 
-const sETH_ADDRESS = process.env.sETH_ADDRESS; // Your sETHcontract address
+const sETH_ADDRESS = process.env.SETH_ADDRESS; // Your sETHcontract address
 const TOKEN_DECIMALS = 18; // Make sure to use the correct number of decimals for your token
 
 async function mintsETH(req, res) {
