@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>DRTv1 Mint Portal</title>
+<title>sETH Mint Portal</title>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <style>
   body {
@@ -50,8 +50,8 @@
 <body>
 
 <h1>
-  <img src="../Logos/DRTv1.png" alt="DRTv1 Logo" class="logo">
-  Mint DRTv1 Tokens
+  <img src="../Logos/sETH.png" alt="sETH Logo" class="logo">
+  Mint sETH Tokens
 </h1>
 
 <form id="mintForm">
@@ -81,7 +81,7 @@ document.getElementById("mintForm").addEventListener("submit", async (e) => {
     try {
         // Convert large number input to BigInt string
         const amount = BigInt(amountInput) * 10n ** 18n;
-        console.log(`[Frontend] Minting ${amount} DRTv1 to ${recipient}...`);
+        console.log(`[Frontend] Minting ${amount} sETH to ${recipient}...`);
 
         const res = await axios.post("https://drtv1-backend.onrender.com/api/mint", {
             recipient,
