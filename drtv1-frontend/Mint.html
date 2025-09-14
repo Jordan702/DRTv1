@@ -34,6 +34,7 @@
 
 <div class="batch-mint">
   <h3>Batch Mint DRTv2 Tokens</h3>
+  <img src="../Logos/DRTv2 Logo.png" alt="DRTv2 Logo" class="logo">
   <input id="batchRecipient" type="text" placeholder="Recipient Address" />
   <input id="batchTimes" type="number" placeholder="Number of times (e.g. 200)" />
   <button onclick="doBatchMint()">Batch Mint</button>
@@ -53,7 +54,7 @@ document.getElementById("mintForm").addEventListener("submit", async (e) => {
         const amount = BigInt(amountInput); // No longer need to multiply by 10^18 on the frontend
         document.getElementById("status").innerText = `⏳ Minting ${amountInput} tokens...`;
 
-        const res = await axios.post("https://drtv1-backend.onrender.com/api/mint", {
+        const res = await axios.post("https://drtv1-backend.onrender.com/api/mint/batch-mint", {
             recipient,
             amount: amount.toString()
         });
