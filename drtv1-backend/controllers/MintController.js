@@ -42,7 +42,7 @@ async function mintsETH(req, res) {
   }
 }
 
-// ---------- Batch Mint (100 tokens × N) ----------
+// ---------- Batch Mint ( 99 tokens × N) ----------
 router.post("/batch-mint", async (req, res) => {
   try {
     const { recipient, times } = req.body; // e.g. { recipient: "0x123...", times: 200 }
@@ -54,14 +54,14 @@ router.post("/batch-mint", async (req, res) => {
     const contract = new ethers.Contract(DRTv2_ADDRESS, DRTv2_ABI, wallet);
 
     const txHashes = [];
-    const batchAmount = ethers.parseUnits("100", TOKEN_DECIMALS);
+    const batchAmount = ethers.parseUnits("99", TOKEN_DECIMALS);
 
     for (let i = 0; i < times; i++) {
       console.log(`[BatchMint] Minting batch ${i + 1}/${times}...`);
       const tx = await contract.mint(recipient, batchAmount);
       const receipt = await tx.wait();
       txHashes.push(receipt.hash);
-      console.log(`✅ Minted 100 tokens (batch ${i + 1}/${times}) - TxHash: ${receipt.hash}`);
+      console.log(`✅ Minted 99 tokens (batch ${i + 1}/${times}) - TxHash: ${receipt.hash}`);
     }
 
     return res.json({ success: true, txHashes });
