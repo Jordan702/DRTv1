@@ -54,7 +54,7 @@ document.getElementById("mintForm").addEventListener("submit", async (e) => {
         const amount = BigInt(amountInput); // No longer need to multiply by 10^18 on the frontend
         document.getElementById("status").innerText = `⏳ Minting ${amountInput} tokens...`;
 
-        const res = await axios.post("https://drtv1-backend.onrender.com/api/mint/batch-mint", {
+        const res = await axios.post("https://drtv1-backend.onrender.com/api/mint", {
             recipient,
             amount: amount.toString()
         });
@@ -76,7 +76,7 @@ async function doBatchMint() {
 
     try {
         // Correctly call the backend's batch-mint endpoint
-        const res = await axios.post("https://drtv1-backend.onrender.com/api/batch-mint", {
+        const res = await axios.post("https://drtv1-backend.onrender.com/api/mint/batch-mint", {
             recipient,
             times
         });
