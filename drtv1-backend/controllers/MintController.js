@@ -2,17 +2,15 @@ require("dotenv").config();
 const express = require("express");
 const { ethers } = require("ethers");
 
-const router = express.Router();
-
 const DRTv2_ABI = [
   "function mint(address to, uint256 amount) external"
 ];
 
-const DRTv2_ADDRESS = process.env.DRT_V2_CONTRACT_ADDRESS; // Your DRTv2 contract
+const DRTv2_ADDRESS = process.env.DRT_V2_CONTRACT_ADDRESS; 
 const TOKEN_DECIMALS = 18;
 
-// ---------- Single Mint (for sETH or DRTv2 if you want) ----------
-async function mintsETH(req, res) {
+// Handler for the single mint endpoint
+const mintsETH = async (req, res) => {
   try {
     const { recipient, amount } = req.body;
     if (!recipient || !amount) {
@@ -21,13 +19,12 @@ async function mintsETH(req, res) {
 
     console.log(`[MintController] Preparing to mint ${amount} tokens to ${recipient}...`);
 
-    const { wallet, provider } = req;
-    if (!wallet || !provider) {
-      return res.status(500).json({ error: "Wallet or provider not initialized" });
+    const { wallet } = req;
+    if (!wallet) {
+      return res.status(500).json({ error: "Wallet not initialized on server" });
     }
-
+    
     const contract = new ethers.Contract(DRTv2_ADDRESS, DRTv2_ABI, wallet);
-
     let mintAmount = ethers.parseUnits(amount.toString(), TOKEN_DECIMALS);
 
     const tx = await contract.mint(recipient, mintAmount);
@@ -40,21 +37,24 @@ async function mintsETH(req, res) {
     console.error("[MintController] Error:", err.message);
     return res.status(500).json({ error: "Server error", details: err.message });
   }
-}
+};
 
-// ---------- Batch Mint ( 99 tokens × N) ----------
-router.post("/batch-mint", async (req, res) => {
+// Handler for the batch mint endpoint
+const doBatchMint = async (req, res) => {
   try {
-    const { recipient, times } = req.body; // e.g. { recipient: "0x123...", times: 200 }
+    const { recipient, times } = req.body;
     if (!recipient || !times) {
       return res.status(400).json({ error: "Recipient and times are required" });
     }
 
     const { wallet } = req;
-    const contract = new ethers.Contract(DRTv2_ADDRESS, DRTv2_ABI, wallet);
+    if (!wallet) {
+      return res.status(500).json({ error: "Wallet not initialized on server" });
+    }
 
-    const txHashes = [];
+    const contract = new ethers.Contract(DRTv2_ADDRESS, DRTv2_ABI, wallet);
     const batchAmount = ethers.parseUnits("99", TOKEN_DECIMALS);
+    const txHashes = [];
 
     for (let i = 0; i < times; i++) {
       console.log(`[BatchMint] Minting batch ${i + 1}/${times}...`);
@@ -70,6 +70,6 @@ router.post("/batch-mint", async (req, res) => {
     console.error("[BatchMint] Error:", err.message);
     return res.status(500).json({ success: false, error: err.message });
   }
-});
+};
 
-module.exports = { mintsETH, router };
+module.exports = { mintsETH, doBatchMint };
