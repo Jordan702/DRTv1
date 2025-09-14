@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>sETH Mint Portal</title>
+<title>sETH & DRTv2 Mint Portal</title>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <style>
   body {
@@ -13,7 +13,7 @@
     align-items: center;
     padding: 40px;
   }
-  h1 {
+  h1, h3 {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -58,43 +58,91 @@
   <label>Recipient Address:</label>
   <input type="text" id="recipient" placeholder="0x..." required>
 
-  <label>Amount (like 11000000000000):</label>
-  <input type="text" id="amount" placeholder="Amount" required>
+  <label>Amount (whole tokens):</label>
+  <input type="text" id="amount" placeholder="Amount (e.g., 11000000000000)" required>
 
   <button type="submit">Mint</button>
 </form>
 
 <div id="status"></div>
 
+<h3>Batch Mint DRTv2</h3>
+<input id="batchRecipient" type="text" placeholder="Recipient Address" />
+<input id="batchTimes" type="number" placeholder="Number of times (e.g., 200)" />
+<button onclick="doBatchMint()">Batch Mint</button>
+
 <script>
-document.getElementById("mintForm").addEventListener("submit", async (e) => {
+  // ----------------------
+  // Client-side batchMint function
+  // ----------------------
+  async function batchMint(recipient, times) {
+    const response = await axios.post("https://drtv1-backend.onrender.com/api/batch-mint", {
+      recipient,
+      times
+    });
+    return response.data;
+  }
+
+  // ----------------------
+  // Batch mint handler
+  // ----------------------
+  async function doBatchMint() {
+    const recipient = document.getElementById("batchRecipient").value.trim();
+    const times = parseInt(document.getElementById("batchTimes").value);
+
+    if (!recipient || !times || times <= 0) {
+      alert("Please enter a valid recipient and number of times!");
+      return;
+    }
+
+    document.getElementById("status").innerText = `⏳ Batch minting ${times} x 100 DRTv2 tokens...`;
+
+    try {
+      const res = await batchMint(recipient, times);
+      if (res.success) {
+        const shownHashes = res.txHashes.slice(0, 5).join("\n");
+        document.getElementById("status").innerText = `✅ Batch mint successful!\nMinted ${times} x 100 DRTv2 tokens.\nFirst TxHashes:\n${shownHashes}\n...and ${res.txHashes.length - 5} more`;
+      } else {
+        document.getElementById("status").innerText = `❌ Error: ${res.error}`;
+      }
+    } catch (err) {
+      console.error("[Frontend] Batch mint error:", err.response?.data || err.message);
+      document.getElementById("status").innerText = `❌ Batch mint failed: ${err.response?.data?.error || err.message}`;
+    }
+  }
+
+  // ----------------------
+  // Single sETH mint form
+  // ----------------------
+  document.getElementById("mintForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const recipient = document.getElementById("recipient").value.trim();
     const amountInput = document.getElementById("amount").value.trim();
 
     if (!recipient || !amountInput) {
-        alert("Please fill in both fields!");
-        return;
+      alert("Please fill in both fields!");
+      return;
     }
 
     try {
-        // Convert large number input to BigInt string
-        const amount = BigInt(amountInput) * 10n ** 18n;
-        console.log(`[Frontend] Minting ${amount} sETH to ${recipient}...`);
+      // Convert user input to token amount in wei
+      const amount = BigInt(amountInput) * 10n ** 18n;
 
-        const res = await axios.post("https://drtv1-backend.onrender.com/api/mint", {
-            recipient,
-            amount: amount.toString()
-        });
+      document.getElementById("status").innerText = `⏳ Minting ${amountInput} sETH to ${recipient}...`;
 
-        console.log("[Frontend] Backend response:", res.data);
-        document.getElementById("status").innerText = `✅ Mint successful! TxHash: ${res.data.txHash}`;
+      const res = await axios.post("https://drtv1-backend.onrender.com/api/mint", {
+        recipient,
+        amount: amount.toString()
+      });
+
+      console.log("[Frontend] Backend response:", res.data);
+      document.getElementById("status").innerText = `✅ Mint successful! TxHash: ${res.data.txHash}`;
     } catch (err) {
-        console.error("[Frontend] Mint error:", err.response?.data || err.message);
-        document.getElementById("status").innerText = `❌ Error: ${err.response?.data?.error || err.message}`;
+      console.error("[Frontend] Mint error:", err.response?.data || err.message);
+      document.getElementById("status").innerText = `❌ Error: ${err.response?.data?.error || err.message}`;
     }
-});
+  });
 </script>
 
 </body>
