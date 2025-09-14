@@ -1,14 +1,14 @@
 require("dotenv").config();
 const { ethers } = require("ethers");
 
-const DRTv1_ABI = [
+const sETH_ABI = [
   "function mint(address to, uint256 amount) external"
 ];
 
-const DRTv1_ADDRESS = process.env.DRT_CONTRACT_ADDRESS; // Your DRTv1 contract address
+const sETH_ADDRESS = process.env.sETH_ADDRESS; // Your sETHcontract address
 const TOKEN_DECIMALS = 18; // Make sure to use the correct number of decimals for your token
 
-async function mintDRTv1(req, res) {
+async function mintsETH(req, res) {
   try {
     const { recipient, amount } = req.body;
 
@@ -16,15 +16,15 @@ async function mintDRTv1(req, res) {
       return res.status(400).json({ error: "Recipient address and amount are required" });
     }
 
-    console.log(`[MintController] Preparing to mint ${amount} DRTv1 to ${recipient}...`);
+    console.log(`[MintController] Preparing to mint ${amount} sETH to ${recipient}...`);
 
     const { wallet, provider } = req;
     if (!wallet || !provider) {
       return res.status(500).json({ error: "Wallet or provider not initialized" });
     }
 
-    // Connect to the DRTv1 contract with wallet as signer
-    const contract = new ethers.Contract(DRTv1_ADDRESS, DRTv1_ABI, wallet);
+    // Connect to the sETH contract with wallet as signer
+    const contract = new ethers.Contract(sETH_ADDRESS, sETH_ABI, wallet);
 
     // FIX: Call parseUnits directly from the ethers object
     let mintAmount;
@@ -52,4 +52,4 @@ async function mintDRTv1(req, res) {
   }
 }
 
-module.exports = { mintDRTv1 };
+module.exports = { mintsETH };
