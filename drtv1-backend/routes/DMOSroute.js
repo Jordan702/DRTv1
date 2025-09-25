@@ -1,6 +1,6 @@
 // routes/DMOSroute.js
 const express = require("express");
-const { mintDigitized, creditRebate, claimRebate } = require("../controllers/DMOScontroller");
+const { mintDigitized, creditRebate, claimRebate, getVaultStatus } = require("../controllers/DMOScontroller");
 
 const router = express.Router();
 
@@ -31,6 +31,16 @@ router.post("/claim", async (req, res) => {
   try {
     const receipt = await claimRebate();
     res.json({ status: "ok", txHash: receipt.hash });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ✅ CORRECTED: Added the missing /vault route
+router.get("/vault", async (req, res) => {
+  try {
+    const vaultData = await getVaultStatus();
+    res.json(vaultData);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
