@@ -38,13 +38,13 @@
   </div>
 
   <script>
-    const API_BASE = window.location.origin; // works with local + render
+    // ✅ Hardcoded to your specific Render deployment URL
+    const API_BASE = "https://drtv1-backend.onrender.com";
 
     async function digitize() {
       const amount = document.getElementById("digitizeAmount").value;
       const recipient = document.getElementById("recipient").value;
       try {
-        // ✅ Corrected URL to match the backend /dmos/mint route
         const res = await axios.post(`${API_BASE}/dmos/mint`, { amount, recipient });
         document.getElementById("digitizeStatus").innerText =
           `✅ Digitized ${amount} to ${recipient}. Tx: ${res.data.txHash}`;
