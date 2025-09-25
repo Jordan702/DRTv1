@@ -68,7 +68,7 @@ app.use((req, res, next) => {
 app.use("/api/transactions", transactionsRoute);
 app.use("/api/swap", drtradeRoutes);
 app.use("/api/verify", submitRoute);
-app.use("/api/vault", vaultRoutes);
+// Re-order the vault route to be after the DMOS route to avoid conflicts
 app.use("/api/trade", tradeRoutes);
 app.use("/api/balance", balanceRoutes);
 app.use("/", meshRouterv1Route);
@@ -82,6 +82,9 @@ app.get("/test-route", (req, res) => {
 
 // Mount DMOS API - Correctly positioned here
 app.use("/dmos", DMOSroute);
+
+// Place the vault route after the DMOS route
+app.use("/api/vault", vaultRoutes);
 
 // Mesh swap API
 app.post("/api/meshSwap", meshSwapHandler.meshSwap);
