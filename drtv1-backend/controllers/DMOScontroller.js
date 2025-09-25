@@ -23,5 +23,18 @@ module.exports = {
   claimRebate: async () => {
     const tx = await vault.claimRebate();
     return await tx.wait();
+  },
+  // ✅ NEW: Add this function to get the vault status
+  getVaultStatus: async () => {
+    // These functions must exist in your Vault_abi.json
+    const owner = await vault.owner();
+    const token = await vault.token();
+    // You'll need to add more calls here to get the data you want to display
+    // e.g., const balance = await vault.balanceOf(...);
+    
+    return {
+      owner: owner,
+      token: token,
+    };
   }
 };
