@@ -11,7 +11,6 @@
     <h1>💵 DMOS – Digitized Cash Portal</h1>
     <p>Test digitization and rebate collection through Digitize.sol + Vault.sol</p>
 
-    <!-- Digitize Section -->
     <section>
       <h2>Digitize Cash</h2>
       <input id="digitizeAmount" type="number" placeholder="Amount in DRTv2 units" />
@@ -22,7 +21,6 @@
 
     <hr>
 
-    <!-- Claim Section -->
     <section>
       <h2>Claim Disposal Rebate</h2>
       <input id="claimer" type="text" placeholder="Your Wallet Address" />
@@ -32,7 +30,6 @@
 
     <hr>
 
-    <!-- Vault State -->
     <section>
       <h2>Vault Status</h2>
       <button onclick="getVault()">Refresh</button>
@@ -47,7 +44,8 @@
       const amount = document.getElementById("digitizeAmount").value;
       const recipient = document.getElementById("recipient").value;
       try {
-        const res = await axios.post(`${API_BASE}/dmos/digitize`, { amount, recipient });
+        // ✅ Corrected URL to match the backend /dmos/mint route
+        const res = await axios.post(`${API_BASE}/dmos/mint`, { amount, recipient });
         document.getElementById("digitizeStatus").innerText =
           `✅ Digitized ${amount} to ${recipient}. Tx: ${res.data.txHash}`;
       } catch (err) {
