@@ -28,7 +28,7 @@ module.exports = {
   getVaultStatus: async () => {
     // These functions must exist in your Vault_abi.json
     const owner = await vault.owner();
-    const token = await vault.token();
+    const token = await vault.dUSD();
     // You'll need to add more calls here to get the data you want to display
     // e.g., const balance = await vault.balanceOf(...);
     
