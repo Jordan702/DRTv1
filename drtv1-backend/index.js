@@ -195,7 +195,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ DRTv1 backend running on port ${PORT}`);
 });
-});
 
 app.get("/api/swap", (req, res) => {
   const logPath = path.resolve(__dirname, "logs/swap.json");
