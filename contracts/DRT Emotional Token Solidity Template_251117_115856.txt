@@ -1,113 +1,32 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-/// @title DRTv5 - Happiness (Mint-on-demand, immutable AliveAI minter)
-/// @notice 18 decimals, initial seed = 1000 tokens minted to owner at deploy.
-/// Owner is immutable (permanent minter) — only owner can call mint().
-contract DRTv5 {
-    // Token metadata
-    string public constant NAME = "Happiness";  // edit if you want another display name
-    string public constant SYMBOL = "DRTv5";    // edit if you want another symbol
-    uint8 public constant decimals = 18;
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-    // Supply and balances
-    uint256 public totalSupply;
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
-
-    // Permanent owner (immutable) — this address is the only minter forever (Option A)
-    address public immutable owner;
-
-    // Events
-    event Transfer(address indexed from, address indexed to, uint256 amount);
-    event Approval(address indexed ownerAddr, address indexed spender, uint256 amount);
-    event Mint(address indexed to, uint256 amount);
-    event Burn(address indexed from, uint256 amount);
-
-    /// @notice Restrict to the permanent owner
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only owner can call");
-        _;
-    }
-
+/// @title DRTv21 - Happiness (Mint-on-demand, immutable AliveAI minter)
+/// @notice 18 decimals, initial seed = 1000 tokens minted to owner at deploy
+contract DRTv21 is ERC20, Ownable {
     /// @param _owner The AliveAI wallet (neutral MetaMask) that will be the permanent minter/owner
-    constructor(address _owner) {
+    constructor(address _owner) ERC20("Happiness", "DRTv21") Ownable() {
         require(_owner != address(0), "Owner cannot be zero address");
-        owner = _owner;
+
+        // Transfer ownership to the AliveAI wallet
+        transferOwnership(_owner);
 
         // Initial seed: mint 1000 tokens (with 18 decimals) to owner
-        uint256 seed = 1000 * 10**uint256(decimals);
+        uint256 seed = 1000 * 10**decimals();
         _mint(_owner, seed);
     }
 
-    // ---------------------
-    // Internal mint/burn
-    // ---------------------
-    function _mint(address to, uint256 amount) internal {
-        totalSupply += amount;
-        balanceOf[to] += amount;
-        emit Transfer(address(0), to, amount);
-        emit Mint(to, amount);
-    }
-
-    function _burn(address from, uint256 amount) internal {
-        require(balanceOf[from] >= amount, "Insufficient balance to burn");
-        unchecked {
-            balanceOf[from] -= amount;
-            totalSupply -= amount;
-        }
-        emit Transfer(from, address(0), amount);
-        emit Burn(from, amount);
-    }
-
-    // ---------------------
-    // Owner-only external mint (mint-on-demand)
-    // ---------------------
+    /// @notice Mint-on-demand by the immutable owner
     function mint(address to, uint256 amount) external onlyOwner {
         require(to != address(0), "Cannot mint to zero address");
         _mint(to, amount);
     }
 
-    // ---------------------
-    // Public burn (holders can burn their tokens)
-    // ---------------------
+    /// @notice Public burn (holders can burn their tokens)
     function burn(uint256 amount) external {
         _burn(msg.sender, amount);
-    }
-
-    // ---------------------
-    // ERC-20 basic operations
-    // ---------------------
-    function transfer(address to, uint256 amount) external returns (bool) {
-        require(to != address(0), "Transfer to zero address");
-        require(balanceOf[msg.sender] >= amount, "Insufficient balance");
-        unchecked {
-            balanceOf[msg.sender] -= amount;
-            balanceOf[to] += amount;
-        }
-        emit Transfer(msg.sender, to, amount);
-        return true;
-    }
-
-    function approve(address spender, uint256 amount) external returns (bool) {
-        require(spender != address(0), "Approve to zero address");
-        allowance[msg.sender][spender] = amount;
-        emit Approval(msg.sender, spender, amount);
-        return true;
-    }
-
-    function transferFrom(address from, address to, uint256 amount) external returns (bool) {
-        require(from != address(0) && to != address(0), "Invalid address");
-        require(balanceOf[from] >= amount, "Insufficient balance");
-        require(allowance[from][msg.sender] >= amount, "Allowance exceeded");
-
-        unchecked {
-            balanceOf[from] -= amount;
-            balanceOf[to] += amount;
-            allowance[from][msg.sender] -= amount;
-        }
-
-        emit Transfer(from, to, amount);
-        return true;
     }
 }
