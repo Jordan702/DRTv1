@@ -63,14 +63,14 @@ const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
 let last10E = [];
 
 // Controller core functions
-async function mintEmotion(axis, amount, fromAddress) {
+async function mintEmotion(axis, amount, fromAddress = contracts.AliveAI) {
     const tokenAddress = tokens[axis];
     if (!tokenAddress) throw new Error(`Unknown emotional token: ${axis}`);
     const tx = await EmotionalBase.methods.mint(tokenAddress, amount).send({ from: fromAddress });
     return tx;
 }
 
-async function swapEmotion(tokenIn, tokenOut, fromAddress) {
+async function swapEmotion(tokenIn, tokenOut, fromAddress = contracts.AliveAI) {
     const pool = pools.find(p => p.pair.includes(tokenIn) && p.pair.includes(tokenOut));
     if (!pool) throw new Error(`No pool found for ${tokenIn}/${tokenOut}`);
     const path = uniswapVSPath(tokenIn, tokenOut);
