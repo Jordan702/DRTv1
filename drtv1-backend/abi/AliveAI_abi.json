@@ -171,6 +171,19 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "g",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -206,6 +219,11 @@
 			{
 				"internalType": "int256",
 				"name": "S",
+				"type": "int256"
+			},
+			{
+				"internalType": "int256",
+				"name": "ES",
 				"type": "int256"
 			},
 			{
