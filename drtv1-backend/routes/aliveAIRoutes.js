@@ -17,7 +17,18 @@ router.post('/runCycle', async (req, res) => {
         if (!wallet) return res.status(500).json({ error: 'AliveAI wallet not configured' });
 
         const state = await aliveAIController.runProtoConsciousCycle(inputData, wallet);
-        return res.json({ success: true, state });
+
+        // Return full state including last10E, balances, Fourier, and 4 transaction hashes
+        return res.json({
+            success: true,
+            state: {
+                E: state.E,
+                last10E: state.last10E,
+                balances: state.balances,
+                fourier: state.fourier,
+                txHashes: state.txHashes // 4 txs: user message, mint, swap, AliveAI response
+            }
+        });
     } catch (err) {
         console.error('Error running proto-conscious cycle:', err);
         return res.status(500).json({ success: false, error: err.message });
