@@ -5,7 +5,6 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const axios = require("axios");
-const Web3 = require("web3");
 const { ethers } = require("ethers");
 
 // Import routes
@@ -35,35 +34,39 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
+// Ensure necessary directories exist
 const ensureDirectoryExists = (dir) => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
-  }
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 };
-
 ensureDirectoryExists(path.join(__dirname, "logs"));
 ensureDirectoryExists(path.join(__dirname, "uploads"));
 
+// Multer for file uploads
 const upload = multer({
   dest: "uploads/",
   limits: { fileSize: 20 * 1024 * 1024 },
 });
 
-// Ethereum provider + wallet
+// Ethereum provider
 const provider = new ethers.JsonRpcProvider(process.env.MAINNET_RPC_URL);
+
+// Regular minter wallet (if exists)
 let wallet;
 if (process.env.MINTER_PRIVATE_KEY) {
   wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 }
 
-// ✅ AliveAI wallet from .env
-const aliveAIWallet = process.env.ALIVEAI_WALLET;
+// ✅ AliveAI wallet from AI_MINTER_PRIVATE_KEY
+let aliveAIWallet;
+if (process.env.AI_MINTER_PRIVATE_KEY) {
+  aliveAIWallet = new ethers.Wallet(process.env.AI_MINTER_PRIVATE_KEY, provider);
+}
 
-// Attach provider/wallet globally in req
+// Attach provider/wallets to requests
 app.use((req, res, next) => {
   req.provider = provider;
-  req.wallet = wallet;
-  req.aliveAIWallet = aliveAIWallet; // available to controller
+  req.wallet = wallet; // regular minter
+  req.aliveAIWallet = aliveAIWallet; // AliveAI wallet
   next();
 });
 
@@ -85,16 +88,16 @@ app.use("/api/aliveAI", aliveAIRoutes);
 // Mesh swap API
 app.post("/api/meshSwap", meshSwapHandler.meshSwap);
 
-// Liquidity cache access
+// Liquidity cache
 app.get("/api/liquidity", async (req, res) => {
   try {
     if (!global.liquidityCache || Object.keys(global.liquidityCache).length === 0) {
       return res.status(500).json({ error: "❌ Liquidity data unavailable." });
     }
-    return res.status(200).json(global.liquidityCache);
+    res.status(200).json(global.liquidityCache);
   } catch (error) {
     console.error("❌ Liquidity Fetch Error:", error);
-    return res.status(500).json({ error: "❌ Failed to retrieve liquidity data." });
+    res.status(500).json({ error: "❌ Failed to retrieve liquidity data." });
   }
 });
 
@@ -107,13 +110,9 @@ app.get(["/approve", "/swap"], (req, res) => {
   res.sendFile(path.join(frontendPath, "drtrade.html"));
 });
 
-// Health
-app.get("/health", (req, res) => {
-  res.send("✅ DRTv1 Backend API is live 🚀");
-});
-app.get("/health/aliveAI", (req, res) => {
-  res.send("✅ AliveAI endpoints are live!");
-});
+// Health endpoints
+app.get("/health", (req, res) => res.send("✅ DRTv1 Backend API is live 🚀"));
+app.get("/health/aliveAI", (req, res) => res.send("✅ AliveAI endpoints are live!"));
 
 // Logs
 app.get("/api/dashboard", (req, res) => {
@@ -160,13 +159,9 @@ app.post("/pools", (req, res) => {
   const poolsPath = path.join(__dirname, "../drtv1-frontend/pools.json");
 
   try {
-    const currentPools = fs.existsSync(poolsPath)
-      ? JSON.parse(fs.readFileSync(poolsPath))
-      : [];
-
+    const currentPools = fs.existsSync(poolsPath) ? JSON.parse(fs.readFileSync(poolsPath)) : [];
     currentPools.push(newPool);
     fs.writeFileSync(poolsPath, JSON.stringify(currentPools, null, 2));
-
     res.status(200).json({ success: true, message: "✅ Pool added to pools.json" });
   } catch (err) {
     console.error("❌ Failed to append pool:", err);
@@ -174,7 +169,7 @@ app.post("/pools", (req, res) => {
   }
 });
 
-// GET pools.json for frontend rendering
+// GET pools.json for frontend
 app.get("/pools", (req, res) => {
   const poolsPath = path.join(__dirname, "../drtv1-frontend/pools.json");
   try {
@@ -194,6 +189,4 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ DRTv1 backend running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`✅ DRTv1 backend running on port ${PORT}`));
