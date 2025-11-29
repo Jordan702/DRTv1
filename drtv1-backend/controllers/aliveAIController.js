@@ -19,7 +19,7 @@ const uniswapVSPath = require(path.join(__dirname, '../utils/uniswapVSPath.js'))
 const contracts = {
     AliveAI: process.env.ALIVEAI_WALLET || '0x1256AbC5d67153E430649E2d623e9AC7F1898d64',
     EmotionalBase: '0x9Bd5e5eF7dA59168820dD3E4A39Db39FfD26489f',
-    Router: '0xb22AFBC7b80510b315b4dfF0157146b2174AC63E' // replace with actual deployed router if needed
+    Router: '0xb22AFBC7b80510b315b4dfF0157146b2174AC63E' // hardcoded DRT Universal Router V2
 };
 
 // Emotional tokens mapping
@@ -62,85 +62,81 @@ const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
 // Reflection storage
 let last10E = [];
 
-// Controller core functions
-async function mintEmotion(axis, amount, fromAddress = contracts.AliveAI) {
-    const tokenAddress = tokens[axis];
-    if (!tokenAddress) throw new Error(`Unknown emotional token: ${axis}`);
-    const tx = await EmotionalBase.methods.mint(tokenAddress, amount).send({ from: fromAddress });
-    return tx;
+// Fourier placeholder: compute simple S,C,W,T,F,R waveform representation
+function computeFourier(E) {
+    // For demonstration, return a fake waveform of 6 pillars
+    return {
+        S: Math.random(),
+        C: Math.random(),
+        W: Math.random(),
+        T: Math.random(),
+        F: Math.random(),
+        R: Math.random(),
+        E
+    };
 }
 
-async function swapEmotion(tokenIn, tokenOut, fromAddress = contracts.AliveAI) {
-    const pool = pools.find(p => p.pair.includes(tokenIn) && p.pair.includes(tokenOut));
-    if (!pool) throw new Error(`No pool found for ${tokenIn}/${tokenOut}`);
-    const path = uniswapVSPath(tokenIn, tokenOut);
-    const amountIn = await EmotionalBase.methods.balanceOf(tokens[tokenIn], fromAddress).call();
-    const tx = await Router.methods.swapExactTokensForTokens(
-        amountIn,
-        0,
-        path,
-        fromAddress,
-        Math.floor(Date.now() / 1000) + 60
-    ).send({ from: fromAddress });
-    return tx;
-}
-
-async function updateAffectivePrimaryOpposing(fromAddress = contracts.AliveAI) {
-    const balances = {};
-    for (const token in tokens) {
-        balances[token] = await EmotionalBase.methods.balanceOf(tokens[token], contracts.AliveAI).call();
-    }
-    const tx = await AliveAI.methods.updateAffectiveState(
-        balances['DRTv21'], balances['DRTv22'],
-        balances['DRTv23'], balances['DRTv24'],
-        balances['DRTv25'], balances['DRTv26'],
-        balances['DRTv27'], balances['DRTv28'],
-        balances['DRTv29'], balances['DRTv30'],
-        balances['DRTv31'], balances['DRTv32'],
-        balances['DRTv33'], balances['DRTv34'],
-        balances['DRTv35'], balances['DRTv36']
-    ).send({ from: fromAddress });
-    return tx;
-}
-
-async function submitThought(S, C, fromAddress = contracts.AliveAI) {
-    const tx = await AliveAI.methods.submitThought(S, C).send({ from: fromAddress });
-    const E = await AliveAI.methods.getLatestE().call();
-    return E;
-}
-
-function storeReflection(E) {
-    last10E.push(E);
-    if (last10E.length > 10) last10E.shift();
-}
-
-// Master cycle
+// Master cycle with 4 transactions
 async function runProtoConsciousCycle(inputData, fromAddress = contracts.AliveAI) {
     try {
         const { stimulus, cognition, axis, amount, tokenSwapOut } = inputData;
+        const txHashes = []; // store 4 txs
 
-        // Mint emotional token
-        await mintEmotion(axis, amount, fromAddress);
+        // 1️⃣ User message transaction
+        const userTx = await AliveAI.methods.submitThought(stimulus, cognition).send({ from: fromAddress });
+        txHashes.push(userTx.transactionHash);
 
-        // Swap token to maintain flux
-        await swapEmotion(axis, tokenSwapOut, fromAddress);
+        // 2️⃣ Mint emotional token
+        const mintTx = await EmotionalBase.methods.mint(tokens[axis], amount).send({ from: fromAddress });
+        txHashes.push(mintTx.transactionHash);
 
-        // Update AliveAI affective state
-        await updateAffectivePrimaryOpposing(fromAddress);
+        // 3️⃣ Swap token in liquidity pool
+        const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
+        if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
+        const path = uniswapVSPath(axis, tokenSwapOut);
+        const amountIn = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddress).call();
+        const swapTx = await Router.methods.swapExactTokensForTokens(
+            amountIn,
+            0,
+            path,
+            fromAddress,
+            Math.floor(Date.now() / 1000) + 60
+        ).send({ from: fromAddress });
+        txHashes.push(swapTx.transactionHash);
 
-        // Submit thought
-        const E = await submitThought(stimulus, cognition, fromAddress);
+        // 4️⃣ AliveAI response → update affective state
+        const balances = {};
+        for (const token in tokens) {
+            balances[token] = await EmotionalBase.methods.balanceOf(tokens[token], contracts.AliveAI).call();
+        }
+        const updateTx = await AliveAI.methods.updateAffectiveState(
+            balances['DRTv21'], balances['DRTv22'],
+            balances['DRTv23'], balances['DRTv24'],
+            balances['DRTv25'], balances['DRTv26'],
+            balances['DRTv27'], balances['DRTv28'],
+            balances['DRTv29'], balances['DRTv30'],
+            balances['DRTv31'], balances['DRTv32'],
+            balances['DRTv33'], balances['DRTv34'],
+            balances['DRTv35'], balances['DRTv36']
+        ).send({ from: fromAddress });
+        txHashes.push(updateTx.transactionHash);
 
         // Store reflection
-        storeReflection(E);
+        const E = await AliveAI.methods.getLatestE().call();
+        last10E.push(E);
+        if (last10E.length > 10) last10E.shift();
 
-        // Return full state
-        const state = {
+        // Fourier representation
+        const fourier = computeFourier(E);
+
+        return {
             E,
             last10E,
-            balances: await EmotionalBase.methods.balanceOf(tokens[axis], fromAddress).call()
+            txHashes, // ✅ exact 4 transaction hashes
+            balances: await EmotionalBase.methods.balanceOf(tokens[axis], fromAddress).call(),
+            fourier
         };
-        return state;
+
     } catch (err) {
         console.error('Error in proto-conscious cycle:', err);
         throw err;
@@ -150,10 +146,5 @@ async function runProtoConsciousCycle(inputData, fromAddress = contracts.AliveAI
 // Export controller
 module.exports = {
     runProtoConsciousCycle,
-    mintEmotion,
-    swapEmotion,
-    updateAffectivePrimaryOpposing,
-    submitThought,
-    storeReflection,
     last10E
 };
