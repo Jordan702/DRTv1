@@ -19,7 +19,7 @@ const uniswapVSPath = require(path.join(__dirname, '../utils/uniswapVSPath.js'))
 const contracts = {
     AliveAI: process.env.ALIVEAI_WALLET || '0x1256AbC5d67153E430649E2d623e9AC7F1898d64',
     EmotionalBase: '0x9Bd5e5eF7dA59168820dD3E4A39Db39FfD26489f',
-    Router: '0xDRTUniversalRouterV2Address' // replace with actual deployed router if needed
+    Router: '0xb22AFBC7b80510b315b4dfF0157146b2174AC63E' // replace with actual deployed router if needed
 };
 
 // Emotional tokens mapping
