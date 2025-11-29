@@ -9,25 +9,39 @@
         font-family: Arial, sans-serif;
         background: #121212;
         color: #fff;
+        margin: 0;
         display: flex;
         flex-direction: column;
         height: 100vh;
+    }
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: #1e1e1e;
+        border-bottom: 1px solid #333;
+    }
+    header h1 {
         margin: 0;
+        font-size: 1.5em;
+    }
+    #status {
+        font-size: 0.9em;
+        color: #ffa500;
     }
     #chat-container {
         flex: 1;
         overflow-y: auto;
         padding: 20px;
-        background: #1e1e1e;
-        display: flex;
-        flex-direction: column;
+        background: #1b1b1b;
     }
     .message {
         margin: 10px 0;
         padding: 10px 15px;
         border-radius: 10px;
         max-width: 70%;
-        word-wrap: break-word;
+        word-break: break-word;
     }
     .user {
         background: #0d6efd;
@@ -40,122 +54,106 @@
     .tx-hashes {
         font-size: 0.8em;
         margin-top: 5px;
-        color: #ccc;
         word-break: break-all;
     }
     #input-container {
         display: flex;
-        flex-wrap: wrap;
         padding: 10px;
         background: #222;
     }
-    #input-container input {
-        margin: 5px;
+    #message {
+        flex: 1;
         padding: 10px;
         border-radius: 5px;
         border: none;
     }
-    #stimulus, #cognition {
-        flex: 2 1 150px;
-    }
-    #axis, #amount, #tokenSwapOut {
-        flex: 1 1 100px;
-    }
     button {
         padding: 10px 20px;
+        margin-left: 10px;
         border: none;
         border-radius: 5px;
         background: #0d6efd;
         color: #fff;
         cursor: pointer;
-        flex: 1 1 100px;
-        margin: 5px;
     }
 </style>
 </head>
 <body>
 
+<header>
+    <h1>AliveAI</h1>
+    <span id="status">Pending...</span>
+</header>
+
 <div id="chat-container"></div>
 
 <div id="input-container">
-    <input type="text" id="stimulus" placeholder="Stimulus" />
-    <input type="text" id="cognition" placeholder="Cognition" />
-    <input type="text" id="axis" placeholder="Axis" />
-    <input type="number" id="amount" placeholder="Amount" />
-    <input type="text" id="tokenSwapOut" placeholder="Swap To" />
+    <input type="text" id="message" placeholder="Type your message here..." />
     <button id="sendBtn">Send</button>
 </div>
 
 <script>
-const chatContainer = document.getElementById('chat-container');
-const sendBtn = document.getElementById('sendBtn');
+    const chatContainer = document.getElementById('chat-container');
+    const sendBtn = document.getElementById('sendBtn');
+    const statusEl = document.getElementById('status');
 
-function appendMessage(text, className, txHashes = []) {
-    const msgDiv = document.createElement('div');
-    msgDiv.className = `message ${className}`;
-    msgDiv.innerHTML = text;
+    function appendMessage(text, className, txHashes = []) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${className}`;
+        msgDiv.innerHTML = text;
 
-    if (txHashes.length > 0) {
-        const hashesDiv = document.createElement('div');
-        hashesDiv.className = 'tx-hashes';
-        hashesDiv.innerHTML = txHashes
-            .map((h, i) => `<b>Tx${i + 1}:</b> ${h}`)
-            .join('<br>');
-        msgDiv.appendChild(hashesDiv);
-    }
-
-    chatContainer.appendChild(msgDiv);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-}
-
-async function sendMessage() {
-    const stimulus = document.getElementById('stimulus').value;
-    const cognition = document.getElementById('cognition').value;
-    const axis = document.getElementById('axis').value;
-    const amount = parseFloat(document.getElementById('amount').value);
-    const tokenSwapOut = document.getElementById('tokenSwapOut').value;
-
-    if (!stimulus || !cognition || !axis || !amount || !tokenSwapOut) {
-        return alert('Fill all fields!');
-    }
-
-    appendMessage(`<b>You:</b> ${stimulus} / ${cognition}`, 'user');
-
-    try {
-        const res = await fetch('/api/aliveAI/runCycle', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ stimulus, cognition, axis, amount, tokenSwapOut })
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-            const { state } = data;
-            const txHashes = state.txHashes || []; // 4 TXs: user, mint, swap, AI response
-            appendMessage(`<b>AliveAI:</b> ${state.E}`, 'ai', txHashes);
-        } else {
-            appendMessage(`<b>AliveAI Error:</b> ${data.error}`, 'ai');
+        if (txHashes.length > 0) {
+            const hashesDiv = document.createElement('div');
+            hashesDiv.className = 'tx-hashes';
+            hashesDiv.innerHTML = txHashes.map((h, i) => `Tx${i+1}: ${h}`).join('<br>');
+            msgDiv.appendChild(hashesDiv);
         }
-    } catch (err) {
-        console.error(err);
-        appendMessage(`<b>AliveAI Error:</b> ${err.message}`, 'ai');
+
+        chatContainer.appendChild(msgDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    // Clear inputs
-    document.getElementById('stimulus').value = '';
-    document.getElementById('cognition').value = '';
-    document.getElementById('axis').value = '';
-    document.getElementById('amount').value = '';
-    document.getElementById('tokenSwapOut').value = '';
-}
+    async function sendMessage() {
+        const message = document.getElementById('message').value.trim();
+        if (!message) return;
 
-sendBtn.addEventListener('click', sendMessage);
+        appendMessage(`<b>You:</b> ${message}`, 'user');
+        document.getElementById('message').value = '';
+        statusEl.textContent = 'Pending...';
 
-// Optional: allow pressing Enter to send
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') sendMessage();
-});
+        try {
+            const res = await fetch('/api/aliveAI/runCycle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    stimulus: message,
+                    cognition: '',    // optional if you want to keep cognition separate
+                    axis: 'DRTv21',  // placeholder, backend handles actual axis logic
+                    amount: 1,       // backend default mint amount
+                    tokenSwapOut: 'DRTv22' // backend swap
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                const { state } = data;
+                const txHashes = state.txHashes || [];
+                appendMessage(`<b>AliveAI:</b> ${state.E}`, 'ai', txHashes);
+                statusEl.textContent = 'Idle';
+            } else {
+                appendMessage(`<b>AliveAI Error:</b> ${data.error}`, 'ai');
+                statusEl.textContent = 'Error';
+            }
+        } catch (err) {
+            console.error(err);
+            appendMessage(`<b>AliveAI Error:</b> ${err.message}`, 'ai');
+            statusEl.textContent = 'Error';
+        }
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    document.getElementById('message').addEventListener('keypress', e => {
+        if (e.key === 'Enter') sendMessage();
+    });
 </script>
 
 </body>
