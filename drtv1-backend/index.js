@@ -56,10 +56,14 @@ if (process.env.MINTER_PRIVATE_KEY) {
   wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 }
 
+// ✅ AliveAI wallet from .env
+const aliveAIWallet = process.env.ALIVEAI_WALLET;
+
 // Attach provider/wallet globally in req
 app.use((req, res, next) => {
   req.provider = provider;
   req.wallet = wallet;
+  req.aliveAIWallet = aliveAIWallet; // available to controller
   next();
 });
 
@@ -106,6 +110,9 @@ app.get(["/approve", "/swap"], (req, res) => {
 // Health
 app.get("/health", (req, res) => {
   res.send("✅ DRTv1 Backend API is live 🚀");
+});
+app.get("/health/aliveAI", (req, res) => {
+  res.send("✅ AliveAI endpoints are live!");
 });
 
 // Logs
