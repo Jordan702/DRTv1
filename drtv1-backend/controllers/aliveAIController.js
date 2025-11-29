@@ -74,7 +74,7 @@ async function swapEmotion(tokenIn, tokenOut, fromAddress) {
     const pool = pools.find(p => p.pair.includes(tokenIn) && p.pair.includes(tokenOut));
     if (!pool) throw new Error(`No pool found for ${tokenIn}/${tokenOut}`);
     const path = uniswapVSPath(tokenIn, tokenOut); // utility function to encode swap path
-    const amountIn = await EmotionalBase.methods.balanceOf(tokenIn, fromAddress).call();
+    const amountIn = await EmotionalBase.methods.balanceOf(tokens[tokenIn], fromAddress).call();
     const tx = await Router.methods.swapExactTokensForTokens(
         amountIn,
         0,
@@ -85,24 +85,27 @@ async function swapEmotion(tokenIn, tokenOut, fromAddress) {
     return tx;
 }
 
-async function updateAffectivePrimaryOpposing() {
+async function updateAffectivePrimaryOpposing(fromAddress) {
     const balances = {};
     for (const token in tokens) {
         balances[token] = await EmotionalBase.methods.balanceOf(tokens[token], contracts.AliveAI).call();
     }
-    // Call AliveAI contract to update affective state
+    // Call AliveAI contract to update all affective axes
     const tx = await AliveAI.methods.updateAffectiveState(
         balances['DRTv21'], balances['DRTv22'],
         balances['DRTv23'], balances['DRTv24'],
         balances['DRTv25'], balances['DRTv26'],
-        balances['DRTv27'], balances['DRTv28']
-        // add all other axes as needed
-    ).send({ from: contracts.AliveAI });
+        balances['DRTv27'], balances['DRTv28'],
+        balances['DRTv29'], balances['DRTv30'],
+        balances['DRTv31'], balances['DRTv32'],
+        balances['DRTv33'], balances['DRTv34'],
+        balances['DRTv35'], balances['DRTv36']
+    ).send({ from: fromAddress });
     return tx;
 }
 
-async function submitThought(S, C) {
-    const tx = await AliveAI.methods.submitThought(S, C).send({ from: contracts.AliveAI });
+async function submitThought(S, C, fromAddress) {
+    const tx = await AliveAI.methods.submitThought(S, C).send({ from: fromAddress });
     const E = await AliveAI.methods.getLatestE().call();
     return E;
 }
@@ -123,11 +126,11 @@ async function runProtoConsciousCycle(inputData, fromAddress) {
         // Swap token to maintain flux
         await swapEmotion(axis, tokenSwapOut, fromAddress);
 
-        // Update AliveAI affective state
-        await updateAffectivePrimaryOpposing();
+        // Update AliveAI affective state with all 16 axes
+        await updateAffectivePrimaryOpposing(fromAddress);
 
         // Submit thought to AliveAI
-        const E = await submitThought(stimulus, cognition);
+        const E = await submitThought(stimulus, cognition, fromAddress);
 
         // Store reflection for recursion
         storeReflection(E);
