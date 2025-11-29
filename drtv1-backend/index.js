@@ -19,9 +19,8 @@ const meshSwapHandler = require("./controllers/meshSwapController");
 const meshRouterv1Route = require("./routes/meshRouterv1Route");
 const mountMeshRouterPlugin = require("./mesh-router-plugin/index");
 const mintRoute = require("./routes/mint");
-
-// New DMOS routes
 const DMOSroute = require("./routes/DMOSroute");
+const aliveAIRoutes = require("./routes/aliveAIRoutes"); // ✅ AliveAI API
 
 const app = express();
 
@@ -68,23 +67,16 @@ app.use((req, res, next) => {
 app.use("/api/transactions", transactionsRoute);
 app.use("/api/swap", drtradeRoutes);
 app.use("/api/verify", submitRoute);
-// Re-order the vault route to be after the DMOS route to avoid conflicts
 app.use("/api/trade", tradeRoutes);
 app.use("/api/balance", balanceRoutes);
 app.use("/", meshRouterv1Route);
 app.use("/api/mint", mintRoute);
 app.use("/mesh-plugin", mountMeshRouterPlugin());
-
-// The test route to verify your router setup
-app.get("/test-route", (req, res) => {
-  res.send("✅ Test route is working!");
-});
-
-// Mount DMOS API - Correctly positioned here
 app.use("/dmos", DMOSroute);
-
-// Place the vault route after the DMOS route
 app.use("/api/vault", vaultRoutes);
+
+// ✅ Mount AliveAI API routes
+app.use("/api/aliveAI", aliveAIRoutes);
 
 // Mesh swap API
 app.post("/api/meshSwap", meshSwapHandler.meshSwap);
@@ -138,20 +130,20 @@ app.get("/api/swap", (req, res) => {
 });
 
 // Price API
-app.get('/price', async (req, res) => {
+app.get("/price", async (req, res) => {
   const cmcId = req.query.cmc_id;
-  if (!cmcId) return res.status(400).json({ error: 'Missing cmc_id' });
+  if (!cmcId) return res.status(400).json({ error: "Missing cmc_id" });
 
   try {
     const response = await axios.get(
       `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?id=${cmcId}`,
-      { headers: { 'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY } }
+      { headers: { "X-CMC_PRO_API_KEY": process.env.CMC_API_KEY } }
     );
     const price = response.data.data[cmcId].quote.USD.price;
     res.json({ price });
   } catch (error) {
-    console.error('CMC API Error:', error.response?.data || error.message);
-    res.status(500).json({ error: 'Failed to fetch price from CMC' });
+    console.error("CMC API Error:", error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to fetch price from CMC" });
   }
 });
 
@@ -193,7 +185,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: "Internal Server Error" });
 });
 
-// Start
+// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ DRTv1 backend running on port ${PORT}`);
