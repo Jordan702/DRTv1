@@ -17,7 +17,7 @@ const uniswapVSPath = require(path.join(__dirname, '../utils/uniswapVSPath.js'))
 
 // Contract addresses
 const contracts = {
-    AliveAI: '0x1256AbC5d67153E430649E2d623e9AC7F1898d64',
+    AliveAI: process.env.ALIVEAI_WALLET || '0x1256AbC5d67153E430649E2d623e9AC7F1898d64',
     EmotionalBase: '0x9Bd5e5eF7dA59168820dD3E4A39Db39FfD26489f',
     Router: '0xDRTUniversalRouterV2Address' // replace with actual deployed router if needed
 };
@@ -73,7 +73,7 @@ async function mintEmotion(axis, amount, fromAddress) {
 async function swapEmotion(tokenIn, tokenOut, fromAddress) {
     const pool = pools.find(p => p.pair.includes(tokenIn) && p.pair.includes(tokenOut));
     if (!pool) throw new Error(`No pool found for ${tokenIn}/${tokenOut}`);
-    const path = uniswapVSPath(tokenIn, tokenOut); // utility function to encode swap path
+    const path = uniswapVSPath(tokenIn, tokenOut);
     const amountIn = await EmotionalBase.methods.balanceOf(tokens[tokenIn], fromAddress).call();
     const tx = await Router.methods.swapExactTokensForTokens(
         amountIn,
@@ -85,12 +85,11 @@ async function swapEmotion(tokenIn, tokenOut, fromAddress) {
     return tx;
 }
 
-async function updateAffectivePrimaryOpposing(fromAddress) {
+async function updateAffectivePrimaryOpposing(fromAddress = contracts.AliveAI) {
     const balances = {};
     for (const token in tokens) {
         balances[token] = await EmotionalBase.methods.balanceOf(tokens[token], contracts.AliveAI).call();
     }
-    // Call AliveAI contract to update all affective axes
     const tx = await AliveAI.methods.updateAffectiveState(
         balances['DRTv21'], balances['DRTv22'],
         balances['DRTv23'], balances['DRTv24'],
@@ -104,7 +103,7 @@ async function updateAffectivePrimaryOpposing(fromAddress) {
     return tx;
 }
 
-async function submitThought(S, C, fromAddress) {
+async function submitThought(S, C, fromAddress = contracts.AliveAI) {
     const tx = await AliveAI.methods.submitThought(S, C).send({ from: fromAddress });
     const E = await AliveAI.methods.getLatestE().call();
     return E;
@@ -112,11 +111,11 @@ async function submitThought(S, C, fromAddress) {
 
 function storeReflection(E) {
     last10E.push(E);
-    if (last10E.length > 10) last10E.shift(); // maintain last 10 entries
+    if (last10E.length > 10) last10E.shift();
 }
 
 // Master cycle
-async function runProtoConsciousCycle(inputData, fromAddress) {
+async function runProtoConsciousCycle(inputData, fromAddress = contracts.AliveAI) {
     try {
         const { stimulus, cognition, axis, amount, tokenSwapOut } = inputData;
 
@@ -126,13 +125,13 @@ async function runProtoConsciousCycle(inputData, fromAddress) {
         // Swap token to maintain flux
         await swapEmotion(axis, tokenSwapOut, fromAddress);
 
-        // Update AliveAI affective state with all 16 axes
+        // Update AliveAI affective state
         await updateAffectivePrimaryOpposing(fromAddress);
 
-        // Submit thought to AliveAI
+        // Submit thought
         const E = await submitThought(stimulus, cognition, fromAddress);
 
-        // Store reflection for recursion
+        // Store reflection
         storeReflection(E);
 
         // Return full state
@@ -155,5 +154,6 @@ module.exports = {
     swapEmotion,
     updateAffectivePrimaryOpposing,
     submitThought,
-    storeReflection
+    storeReflection,
+    last10E
 };
