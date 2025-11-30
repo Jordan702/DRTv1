@@ -1,48 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>AliveAI Fourier Analysis</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background: #121212;
-        color: #f0f0f0;
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-    }
-    h1 {
-        text-align: center;
-        margin: 20px 0;
-    }
-    #chart-container {
-        flex: 1;
-        width: 90%;
-        margin: auto;
-    }
-    button {
-        display: block;
-        margin: 20px auto;
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-        border: none;
-        border-radius: 5px;
-        background-color: #0d6efd;
-        color: #fff;
-    }
+  body { font-family: Arial, sans-serif; margin:0; padding:0; background:#121212; color:#f0f0f0; display:flex; flex-direction:column; height:100vh; }
+  h1 { text-align:center; margin:20px 0; }
+  #chart-container { flex:1; width:90%; margin:auto; }
+  button { display:block; margin:20px auto; padding:10px 20px; font-size:16px; cursor:pointer; border:none; border-radius:5px; background:#0d6efd; color:#fff; }
 </style>
 </head>
 <body>
 <h1>AliveAI Consciousness Fourier</h1>
-<div id="chart-container">
-    <canvas id="fourierChart"></canvas>
-</div>
+<div id="chart-container"><canvas id="fourierChart"></canvas></div>
 <button id="refreshBtn">Refresh Data</button>
 
 <script>
@@ -50,58 +22,58 @@ const ctx = document.getElementById('fourierChart').getContext('2d');
 let chart;
 
 async function fetchFourierData() {
-    try {
-        const res = await fetch('/api/aliveAI/fourier'); // backend endpoint must return JSON
-        if (!res.ok) throw new Error('Failed to fetch Fourier data');
-        const data = await res.json();
-        return data;
-    } catch (err) {
-        console.error(err);
-        return null;
+  try {
+    const res = await fetch('/api/aliveAI/fourier');
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch(e) {
+      console.error('Non-JSON response:', text);
+      return null;
     }
+    if (!data.success) return null;
+    return data.fourier;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
 }
 
 async function renderChart() {
-    const data = await fetchFourierData();
-    if (!data) return;
+  const data = await fetchFourierData();
+  if (!data) return;
 
-    const timestamps = data.timestamps || [];
-    const datasets = [
-        { label: 'S', data: data.S || [], borderColor: 'rgba(255, 255, 0, 1)', backgroundColor: 'rgba(255, 255, 0, 0.2)', tension: 0.2 },
-        { label: 'C', data: data.C || [], borderColor: 'rgba(0, 0, 255, 1)', backgroundColor: 'rgba(0, 0, 255, 0.2)', tension: 0.2 },
-        { label: 'W', data: data.W || [], borderColor: 'rgba(0, 255, 0, 1)', backgroundColor: 'rgba(0, 255, 0, 0.2)', tension: 0.2 },
-        { label: 'T', data: data.T || [], borderColor: 'rgba(255, 165, 0, 1)', backgroundColor: 'rgba(255, 165, 0, 0.2)', tension: 0.2 },
-        { label: 'F', data: data.F || [], borderColor: 'rgba(255, 0, 0, 1)', backgroundColor: 'rgba(255, 0, 0, 0.2)', tension: 0.2 },
-        { label: 'R', data: data.R || [], borderColor: 'rgba(128, 0, 128, 1)', backgroundColor: 'rgba(128, 0, 128, 0.2)', tension: 0.2 },
-    ];
+  const timestamps = data.timestamps || [];
+  const datasets = [
+    { label:'S', data: data.S || [], tension:0.2 },
+    { label:'C', data: data.C || [], tension:0.2 },
+    { label:'W', data: data.W || [], tension:0.2 },
+    { label:'T', data: data.T || [], tension:0.2 },
+    { label:'F', data: data.F || [], tension:0.2 },
+    { label:'R', data: data.R || [], tension:0.2 },
+  ];
 
-    if (chart) {
-        chart.data.labels = timestamps;
-        chart.data.datasets = datasets;
-        chart.update();
-    } else {
-        chart = new Chart(ctx, {
-            type: 'line',
-            data: { labels: timestamps, datasets },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'top' },
-                    title: { display: true, text: 'AliveAI E(t) - Six Pillars' }
-                },
-                scales: {
-                    x: { title: { display: true, text: 'Time (s)' } },
-                    y: { title: { display: true, text: 'E(t) Value' } }
-                }
-            }
-        });
-    }
+  // simple color palette
+  const colors = ['#FFD700','#1E90FF','#00FF7F','#FFA500','#FF4500','#8A2BE2'];
+  datasets.forEach((d,i)=>{ d.borderColor = colors[i]; d.backgroundColor = colors[i] + '33'; });
+
+  if (chart) {
+    chart.data.labels = timestamps;
+    chart.data.datasets = datasets;
+    chart.update();
+  } else {
+    chart = new Chart(ctx, {
+      type:'line',
+      data: { labels: timestamps, datasets },
+      options: {
+        responsive:true,
+        plugins: { legend:{position:'top'}, title:{display:true,text:'AliveAI E(t) - Six Pillars'} },
+        scales: { x:{ title:{display:true,text:'Time'} }, y:{ title:{display:true,text:'Value'} } }
+      }
+    });
+  }
 }
 
-// Event listener
 document.getElementById('refreshBtn').addEventListener('click', renderChart);
-
-// Initial render
 renderChart();
 </script>
 </body>
