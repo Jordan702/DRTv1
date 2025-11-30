@@ -1,4 +1,3 @@
-// aliveAIController.js
 require('dotenv').config();
 const Web3 = require('web3');
 const path = require('path');
@@ -10,7 +9,7 @@ const web3 = new Web3(process.env.MAINNET_RPC_URL || 'https://mainnet.infura.io/
 const AI_PRIVATE_KEY = process.env.AI_MINTER_PRIVATE_KEY;
 if (!AI_PRIVATE_KEY) console.error('❌ AI_MINTER_PRIVATE_KEY missing from env!');
 
-const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0');
+const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0'); 
 const fromAddr = signer.address || process.env.ALIVEAI_WALLET || null;
 if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
 
@@ -67,7 +66,7 @@ const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
 let last10E = [];
 let lastFourier = null;
 
-// Log messages off-chain
+// ---------- LOGGING ----------
 function logUserMessage(stimulus) {
   try {
     const logPath = path.join(__dirname, '..', 'logs', 'aliveai_messages.log');
@@ -78,7 +77,7 @@ function logUserMessage(stimulus) {
   }
 }
 
-// Fourier placeholder
+// ---------- FOURIER PLACEHOLDER ----------
 function computeFourier(E) {
   return {
     timestamps: [Date.now()],
@@ -92,7 +91,7 @@ function computeFourier(E) {
   };
 }
 
-// Helper to parse events
+// ---------- EVENT PARSER ----------
 function parseThoughtEvent(receipt) {
   try {
     if (!receipt || !receipt.events) return null;
@@ -109,46 +108,52 @@ function parseThoughtEvent(receipt) {
   }
 }
 
-// Dynamic gas send
-async function sendWithEstimatedGas(method, opts = {}) {
-  const gas = await method.estimateGas({ from: fromAddr, value: 0 });
-  const gasPrice = await web3.eth.getGasPrice();
-  return method.send({ from: fromAddr, gas, gasPrice, ...opts });
-}
-
-// MAIN CYCLE
+// ---------- MAIN CYCLE ----------
 async function runProtoConsciousCycle(inputData = {}) {
   try {
-    const { stimulus = '', axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData;
-    logUserMessage(stimulus);
+    const { stimulus = '', cognition = '', axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData;
 
+    logUserMessage(stimulus);
     const txHashes = [];
 
-    // 1) submitThought
-    const tx1 = await sendWithEstimatedGas(AliveAI.methods.submitThought());
+    // 1) submitThought()
+    const tx1 = await AliveAI.methods.submitThought().send({ from: fromAddr, gas: 500000 });
     txHashes.push(tx1.transactionHash);
 
-    // parse E/status
-    let evt1 = parseThoughtEvent(tx1);
-    let E_afterSubmit = evt1?.E || null;
-    let status_afterSubmit = evt1?.status || null;
+    const evt1 = parseThoughtEvent(tx1);
+    let E_afterSubmit = evt1?.E || evt1?.[0] || null;
+    let status_afterSubmit = evt1?.status || evt1?.[1] || null;
 
-    // 2) mint
+    if (!E_afterSubmit) {
+      const view = await AliveAI.methods.viewE().call();
+      E_afterSubmit = view[0];
+      status_afterSubmit = view[1];
+    }
+
+    // 2) mint emotional token
     if (!tokens[axis]) throw new Error(`Unknown axis token: ${axis}`);
-    const tx2 = await sendWithEstimatedGas(EmotionalBase.methods.mint(tokens[axis], amount));
+    const tx2 = await EmotionalBase.methods.mint(tokens[axis], amount).send({ from: fromAddr, gas: 500000 });
     txHashes.push(tx2.transactionHash);
 
-    // 3) swap
+    // 3) swap tokens (only if balance > 0)
     const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
-    if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
+    if (!pool) console.log(`⚠️ No pool for ${axis}/${tokenSwapOut}, skipping swap.`);
+
     const pathEncoded = uniswapVSPath(tokens[axis], tokens[tokenSwapOut]);
     const amountIn = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
-    const tx3 = await sendWithEstimatedGas(Router.methods.swapExactTokensForTokens(
-      amountIn, 0, pathEncoded, fromAddr, Math.floor(Date.now() / 1000) + 120
-    ));
-    txHashes.push(tx3.transactionHash);
 
-    // 4) updateAffective
+    if (Number(amountIn) > 0) {
+      const tx3 = await Router.methods.swapExactTokensForTokens(
+        amountIn,
+        0,
+        pathEncoded,
+        fromAddr,
+        Math.floor(Date.now() / 1000) + 120
+      ).send({ from: fromAddr, gas: 800000 });
+      txHashes.push(tx3.transactionHash);
+    } else console.log(`⚠️ No ${axis} tokens to swap, skipping swap.`);
+
+    // 4) updateAffectiveState / updateAffective
     const bals = {};
     for (const tokKey of Object.keys(tokens)) {
       try { bals[tokKey] = await EmotionalBase.methods.balanceOf(tokens[tokKey], contracts.AliveAI).call(); }
@@ -164,28 +169,27 @@ async function runProtoConsciousCycle(inputData = {}) {
       const keys = Object.keys(tokens);
       for (let i = 0; i < keys.length; i += 2) primary += Number(bals[keys[i]] || 0);
       for (let i = 1; i < keys.length; i += 2) opposing += Number(bals[keys[i]] || 0);
-      tx4 = await sendWithEstimatedGas(AliveAI.methods.updateAffective(primary, opposing));
+      tx4 = await AliveAI.methods.updateAffective(Math.floor(primary), Math.floor(opposing)).send({ from: fromAddr, gas: 700000 });
     } else if (hasUpdateAffectiveState) {
-      tx4 = await sendWithEstimatedGas(AliveAI.methods.updateAffectiveState(
-        bals.DRTv21, bals.DRTv22,
-        bals.DRTv23, bals.DRTv24,
-        bals.DRTv25, bals.DRTv26,
-        bals.DRTv27, bals.DRTv28,
-        bals.DRTv29, bals.DRTv30,
-        bals.DRTv31, bals.DRTv32,
-        bals.DRTv33, bals.DRTv34,
-        bals.DRTv35, bals.DRTv36
-      ));
+      tx4 = await AliveAI.methods.updateAffectiveState(
+        bals.DRTv21, bals.DRTv22, bals.DRTv23, bals.DRTv24,
+        bals.DRTv25, bals.DRTv26, bals.DRTv27, bals.DRTv28,
+        bals.DRTv29, bals.DRTv30, bals.DRTv31, bals.DRTv32,
+        bals.DRTv33, bals.DRTv34, bals.DRTv35, bals.DRTv36
+      ).send({ from: fromAddr, gas: 900000 });
     } else throw new Error('No updateAffective/updateAffectiveState method found.');
+
     txHashes.push(tx4.transactionHash);
 
-    // fetch final E/status
+    // 5) final fetch of E & status
     let E_final = null, status_final = null;
     try {
       const view = await AliveAI.methods.viewE().call();
-      E_final = view[0];
-      status_final = view[1];
-    } catch {}
+      E_final = view[0]; status_final = view[1];
+    } catch {
+      const evt4 = parseThoughtEvent(tx4);
+      if (evt4) { E_final = evt4.E || evt4[0]; status_final = evt4.status || evt4[1]; }
+    }
 
     if (E_final != null) { last10E.push(E_final); if (last10E.length > 10) last10E.shift(); }
     lastFourier = computeFourier(E_final);
@@ -198,6 +202,7 @@ async function runProtoConsciousCycle(inputData = {}) {
   }
 }
 
+// ---------- FOURIER HELPER ----------
 function getLastFourier() { return lastFourier || computeFourier(null); }
 
 module.exports = { runProtoConsciousCycle, last10E, getLastFourier };
