@@ -56,7 +56,7 @@ if (process.env.MINTER_PRIVATE_KEY) {
   wallet = new ethers.Wallet(process.env.MINTER_PRIVATE_KEY, provider);
 }
 
-// ✅ AliveAI wallet from AI_MINTER_PRIVATE_KEY
+// ✅ AliveAI wallet from AI_MINTER_PRIVATE_KEY (ethers Wallet)
 let aliveAIWallet;
 if (process.env.AI_MINTER_PRIVATE_KEY) {
   aliveAIWallet = new ethers.Wallet(process.env.AI_MINTER_PRIVATE_KEY, provider);
@@ -65,18 +65,17 @@ if (process.env.AI_MINTER_PRIVATE_KEY) {
 // Attach provider/wallets to requests
 app.use((req, res, next) => {
   req.provider = provider;
-  req.wallet = wallet; // regular minter
-  req.aliveAIWallet = aliveAIWallet; // AliveAI wallet
+  req.wallet = wallet; // regular minter (ethers Wallet or undefined)
+  req.aliveAIWallet = aliveAIWallet; // ethers Wallet or undefined
   next();
 });
 
-// Mount routes
+// Mount routes (APIs)
 app.use("/api/transactions", transactionsRoute);
 app.use("/api/swap", drtradeRoutes);
 app.use("/api/verify", submitRoute);
 app.use("/api/trade", tradeRoutes);
 app.use("/api/balance", balanceRoutes);
-app.use("/", meshRouterv1Route);
 app.use("/api/mint", mintRoute);
 app.use("/mesh-plugin", mountMeshRouterPlugin());
 app.use("/dmos", DMOSroute);
@@ -101,7 +100,7 @@ app.get("/api/liquidity", async (req, res) => {
   }
 });
 
-// Serve frontend
+// Serve frontend (static) - after mounting APIs (safety)
 const frontendPath = path.resolve(__dirname, "../drtv1-frontend");
 app.use(express.static(frontendPath));
 
@@ -184,7 +183,11 @@ app.get("/pools", (req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
   console.error("🌐 Global Error:", err);
-  res.status(500).json({ error: "Internal Server Error" });
+  // Always return JSON for API calls
+  if (req.path && req.path.startsWith('/api')) {
+    return res.status(500).json({ error: "Internal Server Error", details: String(err) });
+  }
+  next(err);
 });
 
 // Start server
