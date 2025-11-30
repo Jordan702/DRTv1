@@ -1,27 +1,37 @@
 // aliveAIController.js
+require('dotenv').config();
 const Web3 = require('web3');
 const path = require('path');
-const fs = require('fs');
 
-// Setup web3 provider
-const web3 = new Web3(process.env.MAINNET_RPC_URL || 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY');
+// ---------- SETUP WEB3 WITH SIGNER ----------
+const web3 = new Web3(process.env.MAINNET_RPC_URL);
 
-// Load ABIs
+// Load AI private key
+const AI_PRIVATE_KEY = process.env.AI_MINTER_PRIVATE_KEY;
+if (!AI_PRIVATE_KEY) {
+  console.error("❌ ERROR: Missing AI_MINTER_PRIVATE_KEY in environment!");
+  process.exit(1);
+}
+
+// Add signer wallet
+const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY);
+const fromAddr = signer.address;
+console.log("AliveAI signer:", fromAddr);
+
+// ---------- LOAD ABIs ----------
 const AliveAI_ABI = require(path.join(__dirname, '../abi/AliveAI_abi.json'));
 const EmotionalBase_ABI = require(path.join(__dirname, '../abi/DRT_EmotionalBase_abi.json'));
 const Router_ABI = require(path.join(__dirname, '../abi/DRTUniversalRouterv2_abi.json'));
-
-// Load utils
 const uniswapVSPath = require(path.join(__dirname, '../utils/uniswapVSPath.js'));
 
-// Contract addresses
+// ---------- CONTRACT ADDRESSES ----------
 const contracts = {
-  AliveAI: process.env.ALIVEAI_WALLET || '0x1256AbC5d67153E430649E2d623e9AC7F1898d64',
+  AliveAI: process.env.ALIVEAI_WALLET,
   EmotionalBase: '0x9Bd5e5eF7dA59168820dD3E4A39Db39FfD26489f',
-  Router: '0xb22AFBC7b80510b315b4dfF0157146b2174AC63E' // hardcoded DRT Universal Router V2
+  Router: '0xb22AFBC7b80510b315b4dfF0157146b2174AC63E'
 };
 
-// Emotional tokens mapping
+// ---------- TOKENS ----------
 const tokens = {
   DRTv21: '0x15E58021f6ebbbd4c774B33D98CE80eF02Ff5C4A',
   DRTv22: '0x07dD5fa304549F23AC46A378C9DD3Ee567352aDF',
@@ -41,7 +51,7 @@ const tokens = {
   DRTv36: '0x6aACE21EeDD11B48A8f833a7A6593ed23985Ecfc'
 };
 
-// Pools mapping (token pairs to pool addresses)
+// ---------- POOLS ----------
 const pools = [
   { pair: ['DRTv21', 'DRTv22'], address: '0xebC808634e03a9D66398B5A1db27EA1835C178e1' },
   { pair: ['DRTv23', 'DRTv24'], address: '0xd69358B7a9cD85a1935232867AA943901b9B367D' },
@@ -53,16 +63,15 @@ const pools = [
   { pair: ['DRTv35', 'DRTv36'], address: '0xFc3C470aF05034e5834CF8dC6939Af1619a2fD7F' }
 ];
 
-// Instantiate contracts
+// ---------- INSTANTIATE CONTRACTS ----------
 const AliveAI = new web3.eth.Contract(AliveAI_ABI, contracts.AliveAI);
 const EmotionalBase = new web3.eth.Contract(EmotionalBase_ABI, contracts.EmotionalBase);
 const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
 
-// Reflection storage
+// ---------- REFLECTION STORAGE ----------
 let last10E = [];
 let lastFourier = null;
 
-// Fourier placeholder: simple S,C,W,T,F,R waveform representation
 function computeFourier(E) {
   return {
     timestamps: [Date.now()],
@@ -76,66 +85,66 @@ function computeFourier(E) {
   };
 }
 
-// Normalize fromAddress
-function normalizeFromAddress(fromAddress) {
-  if (!fromAddress) return contracts.AliveAI;
-  if (typeof fromAddress === 'object') {
-    if (fromAddress.address) return fromAddress.address;
-    if (fromAddress._address) return fromAddress._address;
-  }
-  if (typeof fromAddress === 'string') return fromAddress;
-  return contracts.AliveAI;
-}
-
-// Master cycle with 4 transactions
-async function runProtoConsciousCycle(inputData, fromAddress = contracts.AliveAI) {
+// -------------------------------------------------------------
+// 🔥 MAIN FUNCTION — FULL 4-STEP PROTO-CONSCIOUS CYCLE
+// -------------------------------------------------------------
+async function runProtoConsciousCycle(inputData) {
   try {
-    const { axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData || {};
+    const { stimulus, cognition, axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData;
     const txHashes = [];
 
-    const fromAddr = normalizeFromAddress(fromAddress);
+    // -------------------------------------------------
+    // 1️⃣ submitThought()
+    // -------------------------------------------------
+    const tx1 = await AliveAI.methods.submitThought(stimulus || '', cognition || '')
+      .send({ from: fromAddr, gas: 500000 });
+    txHashes.push(tx1.transactionHash);
 
-    // 1️⃣ submitThought (0 params)
-    const userTx = await AliveAI.methods.submitThought().send({ from: fromAddr });
-    txHashes.push(userTx.transactionHash);
+    // -------------------------------------------------
+    // 2️⃣ mint emotional token
+    // -------------------------------------------------
+    const tx2 = await EmotionalBase.methods.mint(tokens[axis], amount)
+      .send({ from: fromAddr, gas: 500000 });
+    txHashes.push(tx2.transactionHash);
 
-    // 2️⃣ Mint emotional token
-    if (!tokens[axis]) throw new Error(`Unknown axis token: ${axis}`);
-    const mintTx = await EmotionalBase.methods.mint(tokens[axis], amount).send({ from: fromAddr });
-    txHashes.push(mintTx.transactionHash);
-
-    // 3️⃣ Swap token in liquidity pool
-    const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
-    if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
+    // -------------------------------------------------
+    // 3️⃣ swap using Universal Router
+    // -------------------------------------------------
     const path = uniswapVSPath(tokens[axis], tokens[tokenSwapOut]);
     const amountIn = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
-    const swapTx = await Router.methods.swapExactTokensForTokens(
+
+    const tx3 = await Router.methods.swapExactTokensForTokens(
       amountIn,
       0,
       path,
       fromAddr,
-      Math.floor(Date.now() / 1000) + 60
-    ).send({ from: fromAddr });
-    txHashes.push(swapTx.transactionHash);
+      Math.floor(Date.now() / 1000) + 120
+    ).send({ from: fromAddr, gas: 800000 });
+    txHashes.push(tx3.transactionHash);
 
-    // 4️⃣ Update AliveAI affective state
-    const balances = {};
+    // -------------------------------------------------
+    // 4️⃣ updateAffectiveState
+    // -------------------------------------------------
+    const bals = {};
     for (const token in tokens) {
-      balances[token] = await EmotionalBase.methods.balanceOf(tokens[token], contracts.AliveAI).call();
+      bals[token] = await EmotionalBase.methods.balanceOf(tokens[token], fromAddr).call();
     }
-    const updateTx = await AliveAI.methods.updateAffectiveState(
-      balances['DRTv21'], balances['DRTv22'],
-      balances['DRTv23'], balances['DRTv24'],
-      balances['DRTv25'], balances['DRTv26'],
-      balances['DRTv27'], balances['DRTv28'],
-      balances['DRTv29'], balances['DRTv30'],
-      balances['DRTv31'], balances['DRTv32'],
-      balances['DRTv33'], balances['DRTv34'],
-      balances['DRTv35'], balances['DRTv36']
-    ).send({ from: fromAddr });
-    txHashes.push(updateTx.transactionHash);
 
-    // Store reflection
+    const tx4 = await AliveAI.methods.updateAffectiveState(
+      bals.DRTv21, bals.DRTv22,
+      bals.DRTv23, bals.DRTv24,
+      bals.DRTv25, bals.DRTv26,
+      bals.DRTv27, bals.DRTv28,
+      bals.DRTv29, bals.DRTv30,
+      bals.DRTv31, bals.DRTv32,
+      bals.DRTv33, bals.DRTv34,
+      bals.DRTv35, bals.DRTv36
+    ).send({ from: fromAddr, gas: 700000 });
+    txHashes.push(tx4.transactionHash);
+
+    // -------------------------------------------------
+    // REFLECTION STORAGE
+    // -------------------------------------------------
     const E = await AliveAI.methods.getLatestE().call();
     last10E.push(E);
     if (last10E.length > 10) last10E.shift();
@@ -146,19 +155,18 @@ async function runProtoConsciousCycle(inputData, fromAddress = contracts.AliveAI
       E,
       last10E,
       txHashes,
-      balances: await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call(),
+      balances: bals,
       fourier: lastFourier
     };
 
   } catch (err) {
-    console.error('Error in proto-conscious cycle:', err);
+    console.error("Error in proto-conscious cycle:", err);
     throw err;
   }
 }
 
-// Helper to get last Fourier snapshot
 function getLastFourier() {
-  return lastFourier || computeFourier(last10E[last10E.length - 1] || null);
+  return lastFourier || computeFourier(null);
 }
 
 module.exports = {
