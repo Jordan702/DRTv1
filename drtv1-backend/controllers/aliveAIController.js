@@ -2,23 +2,22 @@
 require('dotenv').config();
 const Web3 = require('web3');
 const path = require('path');
+const fs = require('fs');
 
-// ---------- SETUP WEB3 WITH SIGNER ----------
-const web3 = new Web3(process.env.MAINNET_RPC_URL);
+// ---------- WEB3 + SIGNER ----------
+const web3 = new Web3(process.env.MAINNET_RPC_URL || 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY');
 
-// Load AI private key
 const AI_PRIVATE_KEY = process.env.AI_MINTER_PRIVATE_KEY;
 if (!AI_PRIVATE_KEY) {
-  console.error("❌ ERROR: Missing AI_MINTER_PRIVATE_KEY in environment!");
-  process.exit(1);
+  console.error('❌ AI_MINTER_PRIVATE_KEY missing from env!');
+  // don't kill process here; let the app surface the error where appropriate
 }
 
-// Add signer wallet
-const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY);
-const fromAddr = signer.address;
-console.log("AliveAI signer:", fromAddr);
+const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0'); // if missing, add a dummy to avoid crash; checks above
+const fromAddr = signer.address || process.env.ALIVEAI_WALLET || null;
+if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
 
-// ---------- LOAD ABIs ----------
+// ---------- ABIs & UTILS ----------
 const AliveAI_ABI = require(path.join(__dirname, '../abi/AliveAI_abi.json'));
 const EmotionalBase_ABI = require(path.join(__dirname, '../abi/DRT_EmotionalBase_abi.json'));
 const Router_ABI = require(path.join(__dirname, '../abi/DRTUniversalRouterv2_abi.json'));
@@ -26,12 +25,12 @@ const uniswapVSPath = require(path.join(__dirname, '../utils/uniswapVSPath.js'))
 
 // ---------- CONTRACT ADDRESSES ----------
 const contracts = {
-  AliveAI: process.env.ALIVEAI_WALLET,
-  EmotionalBase: '0x9Bd5e5eF7dA59168820dD3E4A39Db39FfD26489f',
-  Router: '0xb22AFBC7b80510b315b4dfF0157146b2174AC63E'
+  AliveAI: process.env.ALIVEAI_WALLET || '0x1256AbC5d67153E430649E2d623e9AC7F1898d64',
+  EmotionalBase: process.env.EMOTIONAL_BASE_WALLET || '0x9Bd5e5eF7dA59168820dD3E4A39Db39FfD26489f',
+  Router: process.env.DRT_UNIVERSAL_ROUTER || '0xb22AFBC7b80510b315b4dfF0157146b2174AC63E' // hardcoded fallback
 };
 
-// ---------- TOKENS ----------
+// ---------- TOKENS & POOLS (your addresses) ----------
 const tokens = {
   DRTv21: '0x15E58021f6ebbbd4c774B33D98CE80eF02Ff5C4A',
   DRTv22: '0x07dD5fa304549F23AC46A378C9DD3Ee567352aDF',
@@ -51,7 +50,6 @@ const tokens = {
   DRTv36: '0x6aACE21EeDD11B48A8f833a7A6593ed23985Ecfc'
 };
 
-// ---------- POOLS ----------
 const pools = [
   { pair: ['DRTv21', 'DRTv22'], address: '0xebC808634e03a9D66398B5A1db27EA1835C178e1' },
   { pair: ['DRTv23', 'DRTv24'], address: '0xd69358B7a9cD85a1935232867AA943901b9B367D' },
@@ -63,15 +61,27 @@ const pools = [
   { pair: ['DRTv35', 'DRTv36'], address: '0xFc3C470aF05034e5834CF8dC6939Af1619a2fD7F' }
 ];
 
-// ---------- INSTANTIATE CONTRACTS ----------
+// ---------- CONTRACT INSTANCES ----------
 const AliveAI = new web3.eth.Contract(AliveAI_ABI, contracts.AliveAI);
 const EmotionalBase = new web3.eth.Contract(EmotionalBase_ABI, contracts.EmotionalBase);
 const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
 
-// ---------- REFLECTION STORAGE ----------
+// ---------- LOCAL STORAGE ----------
 let last10E = [];
 let lastFourier = null;
 
+// Save incoming user messages to a local log for auditing (contract doesn't accept text)
+function logUserMessage(stimulus) {
+  try {
+    const logPath = path.join(__dirname, '..', 'logs', 'aliveai_messages.log');
+    const entry = `${new Date().toISOString()} | ${fromAddr || 'unknown'} | ${String(stimulus)}\n`;
+    fs.appendFileSync(logPath, entry);
+  } catch (e) {
+    console.warn('Failed to log user message:', e.message);
+  }
+}
+
+// Simple Fourier placeholder returning six pillars (for frontend charting)
 function computeFourier(E) {
   return {
     timestamps: [Date.now()],
@@ -85,86 +95,202 @@ function computeFourier(E) {
   };
 }
 
-// -------------------------------------------------------------
-// 🔥 MAIN FUNCTION — FULL 4-STEP PROTO-CONSCIOUS CYCLE
-// -------------------------------------------------------------
-async function runProtoConsciousCycle(inputData) {
+// Helper to safely extract event data from receipt
+function parseThoughtEvent(receipt) {
+  // web3 returns events keyed by name if ABI contains it
   try {
-    const { stimulus, cognition, axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData;
+    if (!receipt || !receipt.events) return null;
+    const evt = receipt.events['ThoughtGenerated'] || receipt.events['0'];
+    if (!evt) {
+      // try to find by iterating
+      for (const k of Object.keys(receipt.events)) {
+        if (k === 'ThoughtGenerated') return receipt.events[k].returnValues;
+      }
+      return null;
+    }
+    return evt.returnValues || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// MAIN PROTO-CONSCIOUS CYCLE
+async function runProtoConsciousCycle(inputData = {}) {
+  try {
+    // destructure with defaults
+    const {
+      stimulus = '',           // user's message text (will be logged off-chain)
+      cognition = '',          // optional
+      axis = 'DRTv21',
+      amount = 1,
+      tokenSwapOut = 'DRTv22'
+    } = inputData;
+
+    // Log the user message off-chain since submitThought() accepts no text
+    logUserMessage(stimulus);
+
     const txHashes = [];
 
-    // -------------------------------------------------
-    // 1️⃣ submitThought()
-    // -------------------------------------------------
-    const tx1 = await AliveAI.methods.submitThought(stimulus || '', cognition || '')
+    // -------------------------
+    // 1) submitThought() transaction — no args
+    // -------------------------
+    const tx1 = await AliveAI.methods.submitThought()
       .send({ from: fromAddr, gas: 500000 });
     txHashes.push(tx1.transactionHash);
 
-    // -------------------------------------------------
-    // 2️⃣ mint emotional token
-    // -------------------------------------------------
+    // attempt to parse the ThoughtGenerated event from receipt
+    const evt1 = parseThoughtEvent(tx1);
+    let E_afterSubmit = null;
+    let status_afterSubmit = null;
+    if (evt1) {
+      // event signature: ThoughtGenerated(int256 E, string status, uint256 timestamp)
+      // depending on web3, returnValues could be an array-like or object
+      // safe extraction:
+      E_afterSubmit = evt1.E || evt1[0] || null;
+      status_afterSubmit = evt1.status || evt1[1] || null;
+    } else {
+      // fallback: call viewE()
+      try {
+        const view = await AliveAI.methods.viewE().call();
+        // viewE returns (int256, string)
+        E_afterSubmit = view[0];
+        status_afterSubmit = view[1];
+      } catch (e) {
+        console.warn('Failed to fetch viewE after submit:', e.message);
+      }
+    }
+
+    // -------------------------
+    // 2) mint emotional token
+    // -------------------------
+    if (!tokens[axis]) throw new Error(`Unknown axis token: ${axis}`);
     const tx2 = await EmotionalBase.methods.mint(tokens[axis], amount)
       .send({ from: fromAddr, gas: 500000 });
     txHashes.push(tx2.transactionHash);
 
-    // -------------------------------------------------
-    // 3️⃣ swap using Universal Router
-    // -------------------------------------------------
-    const path = uniswapVSPath(tokens[axis], tokens[tokenSwapOut]);
+    // -------------------------
+    // 3) swap tokens (using path util)
+    // -------------------------
+    const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
+    if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
+
+    // uniswapVSPath should accept token addresses (not names); ensure it does
+    const pathEncoded = uniswapVSPath(tokens[axis], tokens[tokenSwapOut]);
+
+    // get amountIn from EmotionalBase token balance
     const amountIn = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
 
     const tx3 = await Router.methods.swapExactTokensForTokens(
       amountIn,
       0,
-      path,
+      pathEncoded,
       fromAddr,
       Math.floor(Date.now() / 1000) + 120
     ).send({ from: fromAddr, gas: 800000 });
     txHashes.push(tx3.transactionHash);
 
-    // -------------------------------------------------
-    // 4️⃣ updateAffectiveState
-    // -------------------------------------------------
+    // -------------------------
+    // 4) updateAffectiveState() — pass the balances currently held by AliveAI
+    // -------------------------
     const bals = {};
-    for (const token in tokens) {
-      bals[token] = await EmotionalBase.methods.balanceOf(tokens[token], fromAddr).call();
+    for (const tokKey of Object.keys(tokens)) {
+      try {
+        bals[tokKey] = await EmotionalBase.methods.balanceOf(tokens[tokKey], contracts.AliveAI).call();
+      } catch (e) {
+        // if a call fails, set to zero and warn
+        console.warn(`Failed to fetch balance for ${tokKey}:`, e.message);
+        bals[tokKey] = '0';
+      }
     }
 
-    const tx4 = await AliveAI.methods.updateAffectiveState(
-      bals.DRTv21, bals.DRTv22,
-      bals.DRTv23, bals.DRTv24,
-      bals.DRTv25, bals.DRTv26,
-      bals.DRTv27, bals.DRTv28,
-      bals.DRTv29, bals.DRTv30,
-      bals.DRTv31, bals.DRTv32,
-      bals.DRTv33, bals.DRTv34,
-      bals.DRTv35, bals.DRTv36
-    ).send({ from: fromAddr, gas: 700000 });
+    // call updateAffectiveState or updateAffective depending on your ABI
+    // Your Solidity named the function updateAffective (signature: updateAffective(uint256 p, uint256 o))
+    // But you earlier used updateAffectiveState; check ABI. We'll call updateAffective if present,
+    // otherwise attempt updateAffectiveState.
+    const hasUpdateAffective = typeof AliveAI.methods.updateAffective === 'function';
+    const hasUpdateAffectiveState = typeof AliveAI.methods.updateAffectiveState === 'function';
+
+    let tx4;
+    if (hasUpdateAffective) {
+      // compute primary/opposing from token groups — this is a heuristic: sum odd/even tokens
+      // You can replace this with a more meaningful mapping later
+      let primary = 0;
+      let opposing = 0;
+      const keys = Object.keys(tokens);
+      for (let i = 0; i < keys.length; i += 2) {
+        primary += Number(bals[keys[i]] || 0);
+      }
+      for (let i = 1; i < keys.length; i += 2) {
+        opposing += Number(bals[keys[i]] || 0);
+      }
+      // Ensure unsigned uint256
+      primary = primary >= 0 ? Math.floor(primary) : 0;
+      opposing = opposing >= 0 ? Math.floor(opposing) : 0;
+
+      tx4 = await AliveAI.methods.updateAffective(primary, opposing)
+        .send({ from: fromAddr, gas: 700000 });
+    } else if (hasUpdateAffectiveState) {
+      // If contract actually has updateAffectiveState(16 args) you can send them
+      tx4 = await AliveAI.methods.updateAffectiveState(
+        bals.DRTv21, bals.DRTv22,
+        bals.DRTv23, bals.DRTv24,
+        bals.DRTv25, bals.DRTv26,
+        bals.DRTv27, bals.DRTv28,
+        bals.DRTv29, bals.DRTv30,
+        bals.DRTv31, bals.DRTv32,
+        bals.DRTv33, bals.DRTv34,
+        bals.DRTv35, bals.DRTv36
+      ).send({ from: fromAddr, gas: 900000 });
+    } else {
+      throw new Error('No updateAffective/updateAffectiveState method found on AliveAI contract ABI.');
+    }
+
     txHashes.push(tx4.transactionHash);
 
-    // -------------------------------------------------
-    // REFLECTION STORAGE
-    // -------------------------------------------------
-    const E = await AliveAI.methods.getLatestE().call();
-    last10E.push(E);
-    if (last10E.length > 10) last10E.shift();
+    // -------------------------
+    // final: fetch the latest E & status via viewE()
+    // -------------------------
+    let E_final = null;
+    let status_final = null;
+    try {
+      const view = await AliveAI.methods.viewE().call();
+      E_final = view[0];
+      status_final = view[1];
+    } catch (e) {
+      console.warn('Failed to call viewE after update:', e.message);
+      // fallback: attempt to parse event from tx4 if the contract emits anything (unlikely)
+      const evt4 = parseThoughtEvent(tx4);
+      if (evt4) {
+        E_final = evt4.E || evt4[0];
+        status_final = evt4.status || evt4[1];
+      }
+    }
 
-    lastFourier = computeFourier(E);
+    // update last10E storage (local mirror)
+    if (E_final != null) {
+      last10E.push(E_final);
+      if (last10E.length > 10) last10E.shift();
+    }
+
+    lastFourier = computeFourier(E_final);
 
     return {
-      E,
+      E: E_final,
+      status: status_final,
       last10E,
-      txHashes,
+      txHashes, // [submitThought, mint, swap, update]
       balances: bals,
       fourier: lastFourier
     };
 
   } catch (err) {
-    console.error("Error in proto-conscious cycle:", err);
-    throw err;
+    console.error('Error in proto-conscious cycle:', err);
+    // surface helpful error message
+    throw new Error(err.message || String(err));
   }
 }
 
+// Helper to return last Fourier snapshot for the /fourier endpoint
 function getLastFourier() {
   return lastFourier || computeFourier(null);
 }
