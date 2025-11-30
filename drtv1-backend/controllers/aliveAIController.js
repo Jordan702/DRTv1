@@ -62,9 +62,8 @@ const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
 let last10E = [];
 let lastFourier = null;
 
-// Fourier placeholder: compute simple S,C,W,T,F,R waveform representation
+// Fourier placeholder: simple S,C,W,T,F,R waveform representation
 function computeFourier(E) {
-  // For demonstration, return a fake waveform of 6 pillars
   return {
     timestamps: [Date.now()],
     S: [Math.random()],
@@ -77,10 +76,9 @@ function computeFourier(E) {
   };
 }
 
-// normalizeFromAddress helper: accepts ethers Wallet or string or { address }
+// Normalize fromAddress
 function normalizeFromAddress(fromAddress) {
   if (!fromAddress) return contracts.AliveAI;
-  // ethers Wallet object
   if (typeof fromAddress === 'object') {
     if (fromAddress.address) return fromAddress.address;
     if (fromAddress._address) return fromAddress._address;
@@ -92,15 +90,13 @@ function normalizeFromAddress(fromAddress) {
 // Master cycle with 4 transactions
 async function runProtoConsciousCycle(inputData, fromAddress = contracts.AliveAI) {
   try {
-    const { stimulus, cognition, axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData || {};
-    const txHashes = []; // store 4 txs
+    const { axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData || {};
+    const txHashes = [];
 
-    // Normalize fromAddress to a simple address string for web3 .send({from: addr})
     const fromAddr = normalizeFromAddress(fromAddress);
 
-    // 1️⃣ User message transaction (submitThought)
-    // NOTE: contract method names and parameter types must match ABI
-    const userTx = await AliveAI.methods.submitThought(stimulus || '', cognition || '').send({ from: fromAddr });
+    // 1️⃣ submitThought (0 params)
+    const userTx = await AliveAI.methods.submitThought().send({ from: fromAddr });
     txHashes.push(userTx.transactionHash);
 
     // 2️⃣ Mint emotional token
@@ -111,7 +107,7 @@ async function runProtoConsciousCycle(inputData, fromAddress = contracts.AliveAI
     // 3️⃣ Swap token in liquidity pool
     const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
     if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
-    const path = uniswapVSPath(tokens[axis], tokens[tokenSwapOut]); // pass actual token addresses
+    const path = uniswapVSPath(tokens[axis], tokens[tokenSwapOut]);
     const amountIn = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
     const swapTx = await Router.methods.swapExactTokensForTokens(
       amountIn,
@@ -122,7 +118,7 @@ async function runProtoConsciousCycle(inputData, fromAddress = contracts.AliveAI
     ).send({ from: fromAddr });
     txHashes.push(swapTx.transactionHash);
 
-    // 4️⃣ AliveAI response → update affective state
+    // 4️⃣ Update AliveAI affective state
     const balances = {};
     for (const token in tokens) {
       balances[token] = await EmotionalBase.methods.balanceOf(tokens[token], contracts.AliveAI).call();
@@ -144,10 +140,8 @@ async function runProtoConsciousCycle(inputData, fromAddress = contracts.AliveAI
     last10E.push(E);
     if (last10E.length > 10) last10E.shift();
 
-    // Fourier representation (store for API)
     lastFourier = computeFourier(E);
 
-    // Return combined state
     return {
       E,
       last10E,
@@ -162,7 +156,7 @@ async function runProtoConsciousCycle(inputData, fromAddress = contracts.AliveAI
   }
 }
 
-// small helper to get the last Fourier snapshot
+// Helper to get last Fourier snapshot
 function getLastFourier() {
   return lastFourier || computeFourier(last10E[last10E.length - 1] || null);
 }
