@@ -4,23 +4,37 @@ const Web3 = require('web3');
 const path = require('path');
 const fs = require('fs');
 
-// ---------- WEB3 + SIGNER ----------
-const web3 = new Web3(process.env.MAINNET_RPC_URL || 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY');
+const RPC = process.env.MAINNET_RPC_URL || 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY';
+const web3 = new Web3(new Web3.providers.HttpProvider(RPC));
 
+// ---------- KEYS / ADDR ----------
 const AI_PRIVATE_KEY = process.env.AI_MINTER_PRIVATE_KEY;
 if (!AI_PRIVATE_KEY) console.error('❌ AI_MINTER_PRIVATE_KEY missing from env!');
 
-const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0'); 
-const fromAddr = signer.address || process.env.ALIVEAI_WALLET || null;
-if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
+// derive account & add to wallet properly
+let fromAddr = null;
+try {
+  const account = web3.eth.accounts.privateKeyToAccount(AI_PRIVATE_KEY || '');
+  web3.eth.accounts.wallet.add(account);
+  fromAddr = account.address;
+} catch (e) {
+  console.warn('⚠️ could not create account from AI_PRIVATE_KEY:', e.message);
+  fromAddr = process.env.ALIVEAI_WALLET || null;
+}
+if (!fromAddr) console.warn('⚠️ fromAddr not set — transactions will likely fail.');
 
 // ---------- GAS SETTINGS ----------
-const CUSTOM_GAS_PRICE = web3.utils.toWei('0.142', 'gwei'); // ultra cheap mainnet
+/**
+ * Requested manual gas price: 0.142 gwei
+ * web3.utils.toWei accepts 'gwei'
+ */
+const CUSTOM_GAS_PRICE_WEI = web3.utils.toWei('0.142', 'gwei'); // string in wei
 
-// ---------- ABIs & UTILS ----------
+// ---------- ABIs & UTIL ----------
 const AliveAI_ABI = require(path.join(__dirname, '../abi/AliveAI_abi.json'));
 const EmotionalBase_ABI = require(path.join(__dirname, '../abi/DRT_EmotionalBase_abi.json'));
 const Router_ABI = require(path.join(__dirname, '../abi/DRTUniversalRouterv2_abi.json'));
+const ERC20_ABI = require(path.join(__dirname, '../abi/ERC20_abi.json')); // include a standard ERC20 ABI in repo
 const uniswapVSPath = require(path.join(__dirname, '../utils/uniswapVSPath.js'));
 
 // ---------- CONTRACT ADDRESSES ----------
@@ -70,7 +84,7 @@ const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
 let last10E = [];
 let lastFourier = null;
 
-// Log user messages off-chain
+// Save incoming user messages to a local log (contract doesn't accept free-text)
 function logUserMessage(stimulus) {
   try {
     const logPath = path.join(__dirname, '..', 'logs', 'aliveai_messages.log');
@@ -81,7 +95,7 @@ function logUserMessage(stimulus) {
   }
 }
 
-// Fourier placeholder for charting
+// Fourier placeholder for frontend charting
 function computeFourier(E) {
   return {
     timestamps: [Date.now()],
@@ -95,24 +109,57 @@ function computeFourier(E) {
   };
 }
 
-// Parse ThoughtGenerated event
+// helper to parse ThoughtGenerated event from receipt (if emitted)
 function parseThoughtEvent(receipt) {
   try {
     if (!receipt || !receipt.events) return null;
     const evt = receipt.events['ThoughtGenerated'] || receipt.events['0'];
-    if (!evt) {
-      for (const k of Object.keys(receipt.events)) {
+    if (evt && evt.returnValues) return evt.returnValues;
+    // fallback iterate
+    for (const k of Object.keys(receipt.events || {})) {
+      if (receipt.events[k] && receipt.events[k].returnValues) {
         if (k === 'ThoughtGenerated') return receipt.events[k].returnValues;
       }
-      return null;
     }
-    return evt.returnValues || null;
+    return null;
   } catch (e) {
     return null;
   }
 }
 
-// MAIN PROTO-CONSCIOUS CYCLE
+// safe gas estimator (fallback to defaultGas if estimate fails)
+async function safeSend(method, opts = {}, defaultGas = 300000) {
+  const sendOpts = Object.assign({}, opts);
+  try {
+    if (!sendOpts.gas) {
+      const gasEstimate = await method.estimateGas({ from: sendOpts.from });
+      sendOpts.gas = Math.max(gasEstimate + Math.floor(gasEstimate * 0.2), defaultGas);
+    }
+  } catch (e) {
+    sendOpts.gas = defaultGas;
+  }
+  // ensure gasPrice present
+  if (!sendOpts.gasPrice) sendOpts.gasPrice = CUSTOM_GAS_PRICE_WEI;
+  return method.send(sendOpts);
+}
+
+// check & approve ERC20 if necessary (approve router to spend token on behalf of fromAddr)
+async function ensureApproved(tokenAddr, ownerAddr, spenderAddr, minAmount) {
+  try {
+    const erc = new web3.eth.Contract(ERC20_ABI, tokenAddr);
+    const allowance = await erc.methods.allowance(ownerAddr, spenderAddr).call();
+    if (web3.utils.toBN(allowance).gte(web3.utils.toBN(minAmount))) return null; // already approved
+    // send approve tx
+    const approveTx = await safeSend(erc.methods.approve(spenderAddr, minAmount), {
+      from: ownerAddr
+    }, 100000);
+    return approveTx;
+  } catch (e) {
+    throw new Error(`approve failed: ${e.message || String(e)}`);
+  }
+}
+
+// ---------- MAIN CYCLE ----------
 async function runProtoConsciousCycle(inputData = {}) {
   try {
     const { stimulus = '', cognition = '', axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData;
@@ -120,84 +167,150 @@ async function runProtoConsciousCycle(inputData = {}) {
 
     const txHashes = [];
 
-    // 1) submitThought
-    const tx1 = await AliveAI.methods.submitThought().send({
-      from: fromAddr,
-      gas: 300000,
-      gasPrice: CUSTOM_GAS_PRICE
-    });
+    // ---------- 1) submitThought() (no args in your contract)
+    // Solidity submitThought() has no params per your contract, so call with none.
+    const submitMethod = AliveAI.methods.submitThought();
+    const tx1 = await safeSend(submitMethod, { from: fromAddr }, 300000);
     txHashes.push(tx1.transactionHash);
     const evt1 = parseThoughtEvent(tx1);
     let E_afterSubmit = evt1?.E || null;
     let status_afterSubmit = evt1?.status || null;
 
-    // 2) mint emotional token
-    const tx2 = await EmotionalBase.methods.mint(tokens[axis], amount).send({
-      from: fromAddr,
-      gas: 300000,
-      gasPrice: CUSTOM_GAS_PRICE
-    });
-    txHashes.push(tx2.transactionHash);
-
-    // 3) swap token
-    const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
-    if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
-    const pathEncoded = uniswapVSPath(tokens[axis], tokens[tokenSwapOut]);
-    const amountIn = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
-
-    const tx3 = await Router.methods.swapExactTokensForTokens(
-      amountIn, 0, pathEncoded, fromAddr, Math.floor(Date.now()/1000)+120
-    ).send({
-      from: fromAddr,
-      gas: 400000,
-      gasPrice: CUSTOM_GAS_PRICE
-    });
-    txHashes.push(tx3.transactionHash);
-
-    // 4) updateAffectiveState
-    const bals = {};
-    for (const tokKey of Object.keys(tokens)) {
-      try { bals[tokKey] = await EmotionalBase.methods.balanceOf(tokens[tokKey], contracts.AliveAI).call(); }
-      catch (e) { bals[tokKey] = '0'; console.warn(`Failed to fetch balance for ${tokKey}:`, e.message); }
+    // If event wasn't emitted, try viewE fallback
+    if (E_afterSubmit == null) {
+      try {
+        const v = await AliveAI.methods.viewE().call();
+        E_afterSubmit = v[0];
+        status_afterSubmit = v[1];
+      } catch (e) {
+        // ignore, will continue
+      }
     }
 
-    const hasUpdateAffective = typeof AliveAI.methods.updateAffective === 'function';
-    const hasUpdateAffectiveState = typeof AliveAI.methods.updateAffectiveState === 'function';
+    // ---------- 2) Mint emotional token (call EmotionalBase.mint(tokenAddress, amount) )
+    if (!tokens[axis]) throw new Error(`Unknown axis token: ${axis}`);
+    // attempt mint via EmotionalBase contract; some ABIs differ — try mint(token,amount) or mint(amount,token)
+    let mintTx;
+    try {
+      mintTx = await safeSend(EmotionalBase.methods.mint(tokens[axis], amount), { from: fromAddr }, 300000);
+    } catch (e1) {
+      // try alternate param order (just in case)
+      try {
+        mintTx = await safeSend(EmotionalBase.methods.mint(amount, tokens[axis]), { from: fromAddr }, 300000);
+      } catch (e2) {
+        throw new Error('Mint failed: ' + (e1.message || e1) + ' | ' + (e2.message || e2));
+      }
+    }
+    txHashes.push(mintTx.transactionHash);
+
+    // ---------- 3) Approve router to spend minted token (ERC20 approve) if needed
+    // We will attempt to approve Router for amountIn (full balance) to avoid swap revert.
+    const tokenAddr = tokens[axis];
+    const erc20 = new web3.eth.Contract(ERC20_ABI, tokenAddr);
+    const balanceOfOwner = await erc20.methods.balanceOf(fromAddr).call();
+    const minAmountToSpend = balanceOfOwner || web3.utils.toBN(amount).toString();
+
+    // If allowance insufficient, send approve
+    const allowance = await erc20.methods.allowance(fromAddr, contracts.Router).call();
+    if (web3.utils.toBN(allowance).lt(web3.utils.toBN(minAmountToSpend))) {
+      const approveTx = await safeSend(erc20.methods.approve(contracts.Router, minAmountToSpend), { from: fromAddr }, 100000);
+      txHashes.push(approveTx.transactionHash); // include approve tx hash
+    }
+
+    // ---------- 4) Swap token using router
+    // Build path using uniswapVSPath utility — ensure it returns token-addresses array
+    const pathEncoded = uniswapVSPath(tokens[axis], tokens[tokenSwapOut]);
+    // fetch amountIn from EmotionalBase.balanceOf(tokenAddr, fromAddr) or ERC20 balance
+    let amountIn = '0';
+    try {
+      // Prefer EmotionalBase.balanceOf if that returns token balance mapping
+      amountIn = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
+    } catch (e) {
+      // fallback to ERC20 balanceOf
+      amountIn = await erc20.methods.balanceOf(fromAddr).call();
+    }
+
+    if (web3.utils.toBN(amountIn).isZero()) {
+      // nothing to swap — warn and skip swap
+      console.warn('No token balance to swap; skipping swap.');
+    } else {
+      // call router swapExactTokensForTokens(amountIn, 0, path, to, deadline)
+      const swapMethod = Router.methods.swapExactTokensForTokens(
+        amountIn,
+        0,
+        pathEncoded,
+        fromAddr,
+        Math.floor(Date.now() / 1000) + 120
+      );
+      const tx3 = await safeSend(swapMethod, { from: fromAddr }, 500000);
+      txHashes.push(tx3.transactionHash);
+    }
+
+    // ---------- 5) Update affective state on AliveAI (use updateAffective if present)
+    // compute minimal primary/opposing or call updateAffectiveState if ABI has it
+    const bals = {};
+    for (const tokKey of Object.keys(tokens)) {
+      try {
+        bals[tokKey] = await EmotionalBase.methods.balanceOf(tokens[tokKey], contracts.AliveAI).call();
+      } catch (e) {
+        try { // fallback to ERC20
+          const erc = new web3.eth.Contract(ERC20_ABI, tokens[tokKey]);
+          bals[tokKey] = await erc.methods.balanceOf(contracts.AliveAI).call();
+        } catch (e2) {
+          bals[tokKey] = '0';
+        }
+      }
+    }
+
+    // detect which update function exists on ABI
+    const hasUpdateAffective = !!AliveAI.methods.updateAffective;
+    const hasUpdateAffectiveState = !!AliveAI.methods.updateAffectiveState;
+
     let tx4;
-    if (hasUpdateAffective) {
-      let primary = 0, opposing = 0;
+    if (hasUpdateAffective && typeof AliveAI.methods.updateAffective === 'function') {
+      // simple heuristic: sum odd/even tokens
       const keys = Object.keys(tokens);
-      for (let i = 0; i < keys.length; i += 2) primary += Number(bals[keys[i]] || 0);
-      for (let i = 1; i < keys.length; i += 2) opposing += Number(bals[keys[i]] || 0);
-      tx4 = await AliveAI.methods.updateAffective(Math.floor(primary), Math.floor(opposing)).send({
-        from: fromAddr,
-        gas: 400000,
-        gasPrice: CUSTOM_GAS_PRICE
-      });
-    } else if (hasUpdateAffectiveState) {
-      tx4 = await AliveAI.methods.updateAffectiveState(
+      let primary = web3.utils.toBN('0'), opposing = web3.utils.toBN('0');
+      for (let i = 0; i < keys.length; i += 2) primary = primary.add(web3.utils.toBN(bals[keys[i]] || '0'));
+      for (let i = 1; i < keys.length; i += 2) opposing = opposing.add(web3.utils.toBN(bals[keys[i]] || '0'));
+      tx4 = await safeSend(AliveAI.methods.updateAffective(primary.toString(), opposing.toString()), { from: fromAddr }, 400000);
+    } else if (hasUpdateAffectiveState && typeof AliveAI.methods.updateAffectiveState === 'function') {
+      tx4 = await safeSend(AliveAI.methods.updateAffectiveState(
         bals.DRTv21, bals.DRTv22, bals.DRTv23, bals.DRTv24,
         bals.DRTv25, bals.DRTv26, bals.DRTv27, bals.DRTv28,
         bals.DRTv29, bals.DRTv30, bals.DRTv31, bals.DRTv32,
         bals.DRTv33, bals.DRTv34, bals.DRTv35, bals.DRTv36
-      ).send({ from: fromAddr, gas: 400000, gasPrice: CUSTOM_GAS_PRICE });
-    } else throw new Error('No updateAffective/updateAffectiveState method found on AliveAI contract ABI.');
-    txHashes.push(tx4.transactionHash);
+      ), { from: fromAddr }, 700000);
+    } else {
+      throw new Error('No updateAffective/updateAffectiveState method found on AliveAI contract ABI.');
+    }
+    if (tx4 && tx4.transactionHash) txHashes.push(tx4.transactionHash);
 
-    // Fetch final E & status
+    // ---------- 6) Finalize: fetch current E & status
     let E_final = null, status_final = null;
     try {
       const view = await AliveAI.methods.viewE().call();
-      E_final = view[0]; status_final = view[1];
-    } catch (e) { console.warn('Failed to call viewE after update:', e.message); }
+      E_final = view[0];
+      status_final = view[1];
+    } catch (e) {
+      console.warn('viewE failed:', e.message || e);
+    }
 
     if (E_final != null) { last10E.push(E_final); if (last10E.length > 10) last10E.shift(); }
     lastFourier = computeFourier(E_final);
 
-    return { E: E_final, status: status_final, last10E, txHashes, balances: bals, fourier: lastFourier };
+    return {
+      E: E_final,
+      status: status_final,
+      last10E,
+      txHashes, // includes approve tx if it was necessary
+      balances: bals,
+      fourier: lastFourier
+    };
 
   } catch (err) {
     console.error('Error in proto-conscious cycle:', err);
+    // Surface the most useful message
     throw new Error(err.message || String(err));
   }
 }
