@@ -15,7 +15,7 @@ const fromAddr = signer.address || process.env.ALIVEAI_WALLET || null;
 if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
 
 // ---------- GAS SETTINGS ----------
-const CUSTOM_GAS_PRICE = web3.utils.toWei('0.5', 'gwei'); // 0.5 gwei
+const CUSTOM_GAS_PRICE = web3.utils.toWei('1.0', 'gwei'); // ultra cheap mainnet
 
 // ---------- ABIs & UTILS ----------
 const AliveAI_ABI = require(path.join(__dirname, '../abi/AliveAI_abi.json'));
@@ -119,20 +119,13 @@ async function runProtoConsciousCycle(inputData = {}) {
     });
     txHashes.push(tx2.transactionHash);
 
-    // 2a) approve router to spend minted token
-    const balance = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
-    const approveTx = await EmotionalBase.methods.approve(contracts.Router, balance).send({
-      from: fromAddr,
-      gas: 100000,
-      gasPrice: CUSTOM_GAS_PRICE
-    });
-    txHashes.push(approveTx.transactionHash);
-
     // 3) multi-hop swap
     const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
     if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
 
+    const balance = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
     const paths = [pool.path]; // single path array for DRTUniversalRouterV2
+
     const tx3 = await Router.methods.multiHopSwap(
       tokens[axis],
       tokens[tokenSwapOut],
