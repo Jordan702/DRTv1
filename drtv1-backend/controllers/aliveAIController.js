@@ -4,6 +4,9 @@ const Web3 = require('web3');
 const path = require('path');
 const fs = require('fs');
 
+// --- CONSTANTS FOR ROBUST APPROVAL ---
+const MAX_UINT_256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
 // ---------- WEB3 + SIGNER ----------
 const web3 = new Web3(process.env.MAINNET_RPC_URL || 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY');
 
@@ -11,7 +14,9 @@ const AI_PRIVATE_KEY = process.env.AI_MINTER_PRIVATE_KEY;
 if (!AI_PRIVATE_KEY) console.error('❌ AI_MINTER_PRIVATE_KEY missing from env!');
 
 const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0'); 
-const fromAddr = signer.address || process.env.ALIVEAI_WALLET || null;
+
+// 🚨 FIXED: Rely only on the signer's address. Use a dedicated fallback env if needed (e.g., ALIVEAI_SENDER_WALLET), but avoid the conflicting ALIVEAI_WALLET.
+const fromAddr = signer.address || null; 
 if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
 
 // ---------- GAS SETTINGS ----------
@@ -24,7 +29,9 @@ const Router_ABI = require(path.join(__dirname, '../abi/DRTUniversalRouterv2_abi
 
 // ---------- CONTRACT ADDRESSES ----------
 const contracts = {
-  AliveAI: process.env.ALIVEAI_WALLET || '0x1256AbC5d67153E430649E2d623e9AC7F1898d64',
+  // 🚨 FIXED: Using a new, dedicated environment variable for the contract address.
+  AliveAI: process.env.ALIVEAI_CONTRACT_ADDRESS || '0x1256AbC5d67153E430649E2d623e9AC7F1898d64',
+  
   EmotionalBase: process.env.EMOTIONAL_BASE_WALLET || '0x9Bd5e5eF7dA59168820dD3E4A39Db39FfD26489f',
   Router: process.env.DRT_UNIVERSAL_ROUTER || '0xb22AFBC7b80510b315b4dfF0157146b2174AC63E'
 };
@@ -103,6 +110,7 @@ async function runProtoConsciousCycle(inputData = {}) {
     const txHashes = [];
 
     // 1) submitThought
+    console.log(`Sending submitThought from ${fromAddr} to AliveAI contract ${contracts.AliveAI}`);
     const tx1 = await AliveAI.methods.submitThought().send({
       from: fromAddr,
       gas: 300000,
@@ -118,13 +126,21 @@ async function runProtoConsciousCycle(inputData = {}) {
     });
     txHashes.push(tx2.transactionHash);
 
-    // --- APPROVE ROUTER TO SPEND TOKEN ---
+    // --- APPROVE ROUTER TO SPEND TOKEN (ROBUST CHECK) ---
     const balance = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
-    await EmotionalBase.methods.approve(contracts.Router, balance).send({
-      from: fromAddr,
-      gas: 100000,
-      gasPrice: CUSTOM_GAS_PRICE
-    });
+    const currentAllowance = await EmotionalBase.methods.allowance(tokens[axis], fromAddr, contracts.Router).call();
+    
+    // Check if current allowance is less than the balance we are about to spend (or just set max allowance)
+    if (web3.utils.toBN(currentAllowance).lt(web3.utils.toBN(balance))) {
+        console.log("Approving Router for maximum token spend to ensure multiHopSwap success.");
+        await EmotionalBase.methods.approve(contracts.Router, MAX_UINT_256).send({
+            from: fromAddr,
+            gas: 100000,
+            gasPrice: CUSTOM_GAS_PRICE
+        });
+    } else {
+        console.log("Router already has sufficient allowance. Skipping approval.");
+    }
 
     // 3) multi-hop swap
     const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
@@ -132,6 +148,7 @@ async function runProtoConsciousCycle(inputData = {}) {
 
     const paths = [pool.path]; // must be [ [tokenIn, tokenOut] ]
 
+    console.log(`Executing multiHopSwap for ${tokens[axis]} -> ${tokens[tokenSwapOut]} with amount ${balance}`);
     const tx3 = await Router.methods.multiHopSwap(
       tokens[axis],
       tokens[tokenSwapOut],
