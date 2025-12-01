@@ -15,13 +15,12 @@ const fromAddr = signer.address || process.env.ALIVEAI_WALLET || null;
 if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
 
 // ---------- GAS SETTINGS ----------
-const CUSTOM_GAS_PRICE = web3.utils.toWei('1.0', 'gwei'); // ultra cheap mainnet
+const CUSTOM_GAS_PRICE = web3.utils.toWei('1', 'gwei'); // 1 gwei mainnet
 
 // ---------- ABIs & UTILS ----------
 const AliveAI_ABI = require(path.join(__dirname, '../abi/AliveAI_abi.json'));
 const EmotionalBase_ABI = require(path.join(__dirname, '../abi/DRT_EmotionalBase_abi.json'));
 const Router_ABI = require(path.join(__dirname, '../abi/DRTUniversalRouterv2_abi.json'));
-const uniswapVSPath = require(path.join(__dirname, '../utils/uniswapVSPath.js'));
 
 // ---------- CONTRACT ADDRESSES ----------
 const contracts = {
@@ -119,12 +118,19 @@ async function runProtoConsciousCycle(inputData = {}) {
     });
     txHashes.push(tx2.transactionHash);
 
+    // --- APPROVE ROUTER TO SPEND TOKEN ---
+    const balance = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
+    await EmotionalBase.methods.approve(contracts.Router, balance).send({
+      from: fromAddr,
+      gas: 100000,
+      gasPrice: CUSTOM_GAS_PRICE
+    });
+
     // 3) multi-hop swap
     const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
     if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
 
-    const balance = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
-    const paths = [pool.path]; // single path array for DRTUniversalRouterV2
+    const paths = [pool.path]; // must be [ [tokenIn, tokenOut] ]
 
     const tx3 = await Router.methods.multiHopSwap(
       tokens[axis],
@@ -139,23 +145,22 @@ async function runProtoConsciousCycle(inputData = {}) {
     });
     txHashes.push(tx3.transactionHash);
 
-    // 4) updateAffectiveState
+    // 4) updateAffective (fetch balances)
     const bals = {};
     for (const tokKey of Object.keys(tokens)) {
       try { bals[tokKey] = await EmotionalBase.methods.balanceOf(tokens[tokKey], contracts.AliveAI).call(); }
       catch (e) { bals[tokKey] = '0'; console.warn(`Failed to fetch balance for ${tokKey}:`, e.message); }
     }
 
-    const hasUpdateAffectiveState = typeof AliveAI.methods.updateAffectiveState === 'function';
-    if (!hasUpdateAffectiveState) throw new Error('updateAffectiveState method missing on AliveAI');
-
-    const tx4 = await AliveAI.methods.updateAffectiveState(
-      bals.DRTv21, bals.DRTv22, bals.DRTv23, bals.DRTv24,
-      bals.DRTv25, bals.DRTv26, bals.DRTv27, bals.DRTv28,
-      bals.DRTv29, bals.DRTv30, bals.DRTv31, bals.DRTv32,
-      bals.DRTv33, bals.DRTv34, bals.DRTv35, bals.DRTv36
-    ).send({ from: fromAddr, gas: 400000, gasPrice: CUSTOM_GAS_PRICE });
-    txHashes.push(tx4.transactionHash);
+    // Skip if updateAffective method missing
+    if (typeof AliveAI.methods.updateAffective !== 'function') {
+      console.warn('updateAffective method missing on AliveAI, skipping.');
+    } else {
+      const tx4 = await AliveAI.methods.updateAffective(bals.DRTv21, bals.DRTv22).send({ 
+        from: fromAddr, gas: 200000, gasPrice: CUSTOM_GAS_PRICE 
+      });
+      txHashes.push(tx4.transactionHash);
+    }
 
     // Fetch final E
     let E_final = null;
