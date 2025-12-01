@@ -15,7 +15,7 @@ if (!AI_PRIVATE_KEY) console.error('❌ AI_MINTER_PRIVATE_KEY missing from env!'
 
 const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0'); 
 
-// 🚨 FIXED: Rely only on the signer's address. Use a dedicated fallback env if needed (e.g., ALIVEAI_SENDER_WALLET), but avoid the conflicting ALIVEAI_WALLET.
+// 🛠️ FIXED: Rely only on the signer's address.
 const fromAddr = signer.address || null; 
 if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
 
@@ -29,7 +29,7 @@ const Router_ABI = require(path.join(__dirname, '../abi/DRTUniversalRouterv2_abi
 
 // ---------- CONTRACT ADDRESSES ----------
 const contracts = {
-  // 🚨 FIXED: Using a new, dedicated environment variable for the contract address.
+  // 🛠️ FIXED: Using new, dedicated environment variable ALIVEAI_CONTRACT_ADDRESS
   AliveAI: process.env.ALIVEAI_CONTRACT_ADDRESS || '0x1256AbC5d67153E430649E2d623e9AC7F1898d64',
   
   EmotionalBase: process.env.EMOTIONAL_BASE_WALLET || '0x9Bd5e5eF7dA59168820dD3E4A39Db39FfD26489f',
@@ -108,10 +108,15 @@ async function runProtoConsciousCycle(inputData = {}) {
     logUserMessage(stimulus);
 
     const txHashes = [];
+    
+    // 🛠️ FIXED: Pass S (Stimulus) and C (Cognition) inputs to submitThought
+    // These should be scaled by 1e18 if the contract expects that, but for now we pass 0 for initialization.
+    const S_input = 0; 
+    const C_input = 0; 
 
     // 1) submitThought
     console.log(`Sending submitThought from ${fromAddr} to AliveAI contract ${contracts.AliveAI}`);
-    const tx1 = await AliveAI.methods.submitThought().send({
+    const tx1 = await AliveAI.methods.submitThought(S_input, C_input).send({
       from: fromAddr,
       gas: 300000,
       gasPrice: CUSTOM_GAS_PRICE
@@ -128,11 +133,14 @@ async function runProtoConsciousCycle(inputData = {}) {
 
     // --- APPROVE ROUTER TO SPEND TOKEN (ROBUST CHECK) ---
     const balance = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
+    
+    // Check if the current allowance is less than the token balance (we will approve max if so)
     const currentAllowance = await EmotionalBase.methods.allowance(tokens[axis], fromAddr, contracts.Router).call();
     
-    // Check if current allowance is less than the balance we are about to spend (or just set max allowance)
     if (web3.utils.toBN(currentAllowance).lt(web3.utils.toBN(balance))) {
         console.log("Approving Router for maximum token spend to ensure multiHopSwap success.");
+        
+        // 🛠️ FIXED: Using MAX_UINT_256 for robust, one-time approval
         await EmotionalBase.methods.approve(contracts.Router, MAX_UINT_256).send({
             from: fromAddr,
             gas: 100000,
