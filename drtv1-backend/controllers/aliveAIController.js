@@ -10,12 +10,12 @@ const web3 = new Web3(process.env.MAINNET_RPC_URL || 'https://mainnet.infura.io/
 const AI_PRIVATE_KEY = process.env.AI_MINTER_PRIVATE_KEY;
 if (!AI_PRIVATE_KEY) console.error('❌ AI_MINTER_PRIVATE_KEY missing from env!');
 
-const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0'); 
+const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0');
 const fromAddr = signer.address || process.env.ALIVEAI_WALLET || null;
 if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
 
 // ---------- GAS SETTINGS ----------
-const CUSTOM_GAS_PRICE = web3.utils.toWei('0.142', 'gwei'); // ultra cheap mainnet
+const CUSTOM_GAS_PRICE = web3.utils.toWei('0.5', 'gwei'); // ****** FIXED TO 0.5 gwei ******
 
 // ---------- ABIs & UTILS ----------
 const AliveAI_ABI = require(path.join(__dirname, '../abi/AliveAI_abi.json'));
@@ -30,7 +30,7 @@ const contracts = {
   Router: process.env.DRT_UNIVERSAL_ROUTER || '0xb22AFBC7b80510b315b4dfF0157146b2174AC63E'
 };
 
-// ---------- TOKENS & POOLS ----------
+// ---------- TOKENS ----------
 const tokens = {
   DRTv21: '0x15E58021f6ebbbd4c774B33D98CE80eF02Ff5C4A',
   DRTv22: '0x07dD5fa304549F23AC46A378C9DD3Ee567352aDF',
@@ -50,6 +50,7 @@ const tokens = {
   DRTv36: '0x6aACE21EeDD11B48A8f833a7A6593ed23985Ecfc'
 };
 
+// ---------- POOLS ----------
 const pools = [
   { pair: ['DRTv21', 'DRTv22'], path: [tokens.DRTv21, tokens.DRTv22] },
   { pair: ['DRTv23', 'DRTv24'], path: [tokens.DRTv23, tokens.DRTv24] },
@@ -70,7 +71,7 @@ const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
 let last10E = [];
 let lastFourier = null;
 
-// Log user messages off-chain
+// ---------- LOGGING USER MESSAGES ----------
 function logUserMessage(stimulus) {
   try {
     const logPath = path.join(__dirname, '..', 'logs', 'aliveai_messages.log');
@@ -81,7 +82,7 @@ function logUserMessage(stimulus) {
   }
 }
 
-// Fourier placeholder for charting
+// ---------- FOURIER PLACEHOLDER ----------
 function computeFourier(E) {
   return {
     timestamps: [Date.now()],
@@ -95,7 +96,9 @@ function computeFourier(E) {
   };
 }
 
-// MAIN PROTO-CONSCIOUS CYCLE
+// ===========================================================
+// ========== MAIN PROTO-CONSCIOUS CYCLE =====================
+// ===========================================================
 async function runProtoConsciousCycle(inputData = {}) {
   try {
     const { stimulus = '', axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData;
@@ -124,14 +127,14 @@ async function runProtoConsciousCycle(inputData = {}) {
     if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
 
     const balance = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
-    const paths = [pool.path]; // single path array for DRTUniversalRouterV2
+    const paths = [pool.path];
 
     const tx3 = await Router.methods.multiHopSwap(
       tokens[axis],
       tokens[tokenSwapOut],
       balance,
       paths,
-      Math.floor(Date.now()/1000) + 120
+      Math.floor(Date.now() / 1000) + 120
     ).send({
       from: fromAddr,
       gas: 500000,
@@ -146,25 +149,32 @@ async function runProtoConsciousCycle(inputData = {}) {
       catch (e) { bals[tokKey] = '0'; console.warn(`Failed to fetch balance for ${tokKey}:`, e.message); }
     }
 
-    const hasUpdateAffectiveState = typeof AliveAI.methods.updateAffectiveState === 'function';
-    if (!hasUpdateAffectiveState) throw new Error('updateAffectiveState method missing on AliveAI');
-
     const tx4 = await AliveAI.methods.updateAffectiveState(
       bals.DRTv21, bals.DRTv22, bals.DRTv23, bals.DRTv24,
       bals.DRTv25, bals.DRTv26, bals.DRTv27, bals.DRTv28,
       bals.DRTv29, bals.DRTv30, bals.DRTv31, bals.DRTv32,
       bals.DRTv33, bals.DRTv34, bals.DRTv35, bals.DRTv36
-    ).send({ from: fromAddr, gas: 400000, gasPrice: CUSTOM_GAS_PRICE });
+    ).send({
+      from: fromAddr,
+      gas: 400000,
+      gasPrice: CUSTOM_GAS_PRICE
+    });
     txHashes.push(tx4.transactionHash);
 
-    // Fetch final E
+    // FINAL E
     let E_final = null;
     try {
       const view = await AliveAI.methods.viewE().call();
       E_final = view[0];
-    } catch (e) { console.warn('Failed to call viewE after update:', e.message); }
+    } catch (e) {
+      console.warn('Failed to call viewE:', e.message);
+    }
 
-    if (E_final != null) { last10E.push(E_final); if (last10E.length > 10) last10E.shift(); }
+    if (E_final != null) {
+      last10E.push(E_final);
+      if (last10E.length > 10) last10E.shift();
+    }
+
     lastFourier = computeFourier(E_final);
 
     return { E: E_final, last10E, txHashes, balances: bals, fourier: lastFourier };
@@ -175,6 +185,8 @@ async function runProtoConsciousCycle(inputData = {}) {
   }
 }
 
-function getLastFourier() { return lastFourier || computeFourier(null); }
+function getLastFourier() {
+  return lastFourier || computeFourier(null);
+}
 
 module.exports = { runProtoConsciousCycle, last10E, getLastFourier };
