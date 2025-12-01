@@ -15,7 +15,6 @@ if (!AI_PRIVATE_KEY) console.error('❌ AI_MINTER_PRIVATE_KEY missing from env!'
 
 const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0'); 
 
-// 🛠️ FIXED: Rely only on the signer's address.
 const fromAddr = signer.address || null; 
 if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
 
@@ -29,9 +28,7 @@ const Router_ABI = require(path.join(__dirname, '../abi/DRTUniversalRouterv2_abi
 
 // ---------- CONTRACT ADDRESSES ----------
 const contracts = {
-  // 🛠️ FIXED: Using new, dedicated environment variable ALIVEAI_CONTRACT_ADDRESS
   AliveAI: process.env.ALIVEAI_CONTRACT_ADDRESS || '0x1256AbC5d67153E430649E2d623e9AC7F1898d64',
-  
   EmotionalBase: process.env.EMOTIONAL_BASE_WALLET || '0x9Bd5e5eF7dA59168820dD3E4A39Db39FfD26489f',
   Router: process.env.DRT_UNIVERSAL_ROUTER || '0xb22AFBC7b80510b315b4dfF0157146b2174AC63E'
 };
@@ -109,14 +106,11 @@ async function runProtoConsciousCycle(inputData = {}) {
 
     const txHashes = [];
     
-    // 🛠️ FIXED: Pass S (Stimulus) and C (Cognition) inputs to submitThought
-    // These should be scaled by 1e18 if the contract expects that, but for now we pass 0 for initialization.
-    const S_input = 0; 
-    const C_input = 0; 
-
     // 1) submitThought
     console.log(`Sending submitThought from ${fromAddr} to AliveAI contract ${contracts.AliveAI}`);
-    const tx1 = await AliveAI.methods.submitThought(S_input, C_input).send({
+    
+    // 🚨 FINAL FIX: Removed the S_input and C_input arguments based on the EVM error.
+    const tx1 = await AliveAI.methods.submitThought().send({
       from: fromAddr,
       gas: 300000,
       gasPrice: CUSTOM_GAS_PRICE
@@ -140,7 +134,6 @@ async function runProtoConsciousCycle(inputData = {}) {
     if (web3.utils.toBN(currentAllowance).lt(web3.utils.toBN(balance))) {
         console.log("Approving Router for maximum token spend to ensure multiHopSwap success.");
         
-        // 🛠️ FIXED: Using MAX_UINT_256 for robust, one-time approval
         await EmotionalBase.methods.approve(contracts.Router, MAX_UINT_256).send({
             from: fromAddr,
             gas: 100000,
