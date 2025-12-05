@@ -149,7 +149,7 @@
 		"name": "emotionalBase",
 		"outputs": [
 			{
-				"internalType": "contract DRT_EmotionalBase",
+				"internalType": "contract IDRT_EmotionalBase",
 				"name": "",
 				"type": "address"
 			}
