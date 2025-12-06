@@ -1,34 +1,54 @@
-// root/drtv1-backend/controllers/aliveAIController.js
 require('dotenv').config();
 const Web3 = require('web3');
 const path = require('path');
 const fs = require('fs');
 
-// ---------- CONFIG ----------
+// ----------------------
+//  CONSTANTS
+// ----------------------
 const MAX_UINT_256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-const DEFAULT_RPC = 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY';
-const web3 = new Web3(process.env.MAINNET_RPC_URL || DEFAULT_RPC);
+const RPC = process.env.MAINNET_RPC_URL;
+const web3 = new Web3(RPC);
 
-// ---------- SIGNER ----------
+// PRIVATE KEY + SIGNER
 const AI_PRIVATE_KEY = process.env.AI_MINTER_PRIVATE_KEY;
-if (!AI_PRIVATE_KEY) console.error('❌ AI_MINTER_PRIVATE_KEY missing from .env');
+const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY);
+const fromAddr = signer.address;
 
-const wallet = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0');
-const fromAddr = wallet.address || null;
-if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
+// ----------------------
+//  USE REAL-TIME GAS
+// ----------------------
+async function getAdaptiveGas() {
+  const block = await web3.eth.getBlock("pending");
+  const base = Number(block.baseFeePerGas);
 
-// ---------- ABIs ----------
+  // We ALWAYS stay slightly above the base so we NEVER get rejected
+  const tip = web3.utils.toWei("0.00000003", "ether"); // = 0.03 gwei
+  const maxPriorityFee = tip;
+
+  const maxFee = base + Number(tip);
+
+  return {
+    maxPriorityFeePerGas: web3.utils.toHex(maxPriorityFee),
+    maxFeePerGas: web3.utils.toHex(maxFee)
+  };
+}
+
+// ----------------------
+//  ABI CONTRACTS
+// ----------------------
 const AliveAI_ABI = require(path.join(__dirname, '../abi/AliveAI_abi.json'));
-const Router_ABI = require(path.join(__dirname, '../abi/DRTUniversalRouterv2_abi.json'));
-const ERC20_MINTABLE_ABI = require(path.join(__dirname, '../abi/DRTv15_abi.json')); // Use your mintable token ABI
+const Router_ABI   = require(path.join(__dirname, '../abi/DRTUniversalRouterv2_abi.json'));
+const ERC20_ABI    = require(path.join(__dirname, '../abi/DRTv15_abi.json'));
 
-// ---------- CONTRACT ADDRESSES (env overrides) ----------
 const contracts = {
-  AliveAI: process.env.ALIVEAI_CONTRACT_ADDRESS || '0x1256AbC5d67153E430649E2d623e9AC7F1898d64',
-  Router: process.env.DRT_UNIVERSAL_ROUTER || '0xb22AFBC7b80510b315b4dfF0157146b2174AC63E'
+  AliveAI: process.env.ALIVEAI_CONTRACT_ADDRESS,
+  Router:  process.env.DRT_UNIVERSAL_ROUTER
 };
 
-// ---------- TOKENS & POOLS ----------
+// ----------------------
+//  TOKEN + POOL TABLES
+// ----------------------
 const tokens = {
   DRTv21: '0x15E58021f6ebbbd4c774B33D98CE80eF02Ff5C4A',
   DRTv22: '0x07dD5fa304549F23AC46A378C9DD3Ee567352aDF',
@@ -48,6 +68,7 @@ const tokens = {
   DRTv36: '0x6aACE21EeDD11B48A8f833a7A6593ed23985Ecfc'
 };
 
+// Match pairs
 const pools = [
   { pair: ['DRTv21', 'DRTv22'], path: [tokens.DRTv21, tokens.DRTv22] },
   { pair: ['DRTv23', 'DRTv24'], path: [tokens.DRTv23, tokens.DRTv24] },
@@ -59,229 +80,120 @@ const pools = [
   { pair: ['DRTv35', 'DRTv36'], path: [tokens.DRTv35, tokens.DRTv36] }
 ];
 
-// ---------- CONTRACT INSTANCES ----------
-const AliveAI = new web3.eth.Contract(AliveAI_ABI, contracts.AliveAI);
-const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
+// ----------------------
+//  LOGGING
+// ----------------------
+function logStimulus(msg) {
+  const logPath = path.join(__dirname, '../logs/aliveai_messages.log');
+  const entry = `${new Date().toISOString()} | ${msg}\n`;
+  fs.appendFileSync(logPath, entry);
+}
 
-// ---------- HELPERS ----------
-function bn(val) { return web3.utils.toBN(val); }
-const SCALE_18 = web3.utils.toBN('1000000000000000000'); // 1e18
-
-function nowUnix() { return Math.floor(Date.now() / 1000); }
-
-function logToFile(filename, msg) {
+// ----------------------
+//  MAIN LOOP
+// ----------------------
+async function runProtoConsciousCycle(input = {}) {
   try {
-    fs.appendFileSync(path.join(__dirname, '..', 'logs', filename), `${new Date().toISOString()} | ${msg}\n`);
-  } catch (e) {
-    console.warn('logToFile failed:', e.message);
-  }
-}
+    const { stimulus = "", axis = "DRTv21", amount = 1, tokenSwapOut = "DRTv22" } = input;
 
-async function getDynamicGasPrice() {
-  try {
-    const gp = await web3.eth.getGasPrice(); // returns wei as string
-    return gp;
-  } catch (e) {
-    // fallback to 1 gwei if provider hiccups
-    return web3.utils.toWei('1', 'gwei');
-  }
-}
+    logStimulus(stimulus);
 
-// small utility: accept numeric amount (like 1) and scale to 18 decimals BN
-function scaleAmountDecimal18(amount) {
-  // allow amount to be BN/string/number; treat as whole tokens (not wei)
-  const a = web3.utils.toBN(String(amount));
-  return a.mul(SCALE_18);
-}
+    const AliveAI = new web3.eth.Contract(AliveAI_ABI, contracts.AliveAI);
 
-// Placeholder Fourier (same as your previous computeFourier)
-function computeFourier(E) {
-  return {
-    timestamps: [Date.now()],
-    S: [Math.random()],
-    C: [Math.random()],
-    W: [Math.random()],
-    T: [Math.random()],
-    F: [Math.random()],
-    R: [Math.random()],
-    E
-  };
-}
+    const gas = await getAdaptiveGas();
 
-// Log message submissions
-function logUserMessage(stimulus) {
-  try {
-    const logPath = path.join(__dirname, '..', 'logs', 'aliveai_messages.log');
-    const entry = `${new Date().toISOString()} | ${fromAddr || 'unknown'} | ${String(stimulus)}\n`;
-    fs.appendFileSync(logPath, entry);
-  } catch (e) {
-    console.warn('Failed to log user message:', e.message);
-  }
-}
-
-// ---------- MAIN PROTO-CONSCIOUS CYCLE ----------
-/**
- * inputData:
- *  - stimulus (string)   // logged off-chain
- *  - axis (string key)   // e.g. 'DRTv21'
- *  - amount (number)     // number of tokens to mint (whole tokens)
- *  - tokenSwapOut (string key) // e.g. 'DRTv22'
- */
-async function runProtoConsciousCycle(inputData = {}) {
-  try {
-    const { stimulus = '', axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData;
-    logUserMessage(stimulus);
-
-    // ensure token keys map to addresses
-    if (!tokens[axis]) throw new Error(`Unknown token axis key: ${axis}`);
-    if (!tokens[tokenSwapOut]) throw new Error(`Unknown tokenSwapOut key: ${tokenSwapOut}`);
-
-    const txHashes = [];
-
-    // dynamic gas price per tx
-    let gasPrice;
-
-    // ---------------- TX1: submitThought() on AliveAI ----------------
-    console.log(`TX1: Sending submitThought from ${fromAddr} -> AliveAI ${contracts.AliveAI}`);
-    gasPrice = await getDynamicGasPrice();
-    const tx1 = await AliveAI.methods.submitThought().send({
+    // --------------------------------------------------
+    // 1. submitThought()
+    // --------------------------------------------------
+    console.log("🔥 submitThought()");
+    await AliveAI.methods.submitThought().send({
       from: fromAddr,
-      gas: 300000,
-      gasPrice
+      gas: 150000,
+      ...gas
     });
-    txHashes.push(tx1.transactionHash);
-    console.log('TX1 OK:', tx1.transactionHash);
 
-    // ---------------- TX2: mint on the token contract ----------------
-    // Use token ABI instance for the specific token (you compiled these tokens with mint() owner-only)
-    const tokenAddr = tokens[axis];
-    const tokenInstance = new web3.eth.Contract(ERC20_MINTABLE_ABI, tokenAddr);
+    // --------------------------------------------------
+    // 2. Mint token
+    // --------------------------------------------------
+    const token = new web3.eth.Contract(ERC20_ABI, tokens[axis]);
 
-    // scale amount to 18 decimals
-    const amountScaled = scaleAmountDecimal18(amount);
-
-    console.log(`TX2: Minting ${amount} (${amountScaled.toString()}) of ${axis} (${tokenAddr}) to ${fromAddr}`);
-    gasPrice = await getDynamicGasPrice();
-
-    // call owner-only mint (requires fromAddr to equal token.owner)
-    const tx2 = await tokenInstance.methods.mint(fromAddr, amountScaled.toString()).send({
+    console.log(`🔥 Mint ${amount} ${axis}`);
+    await token.methods.mint(fromAddr, amount).send({
       from: fromAddr,
-      gas: 300000,
-      gasPrice
+      gas: 200000,
+      ...gas
     });
-    txHashes.push(tx2.transactionHash);
-    console.log('TX2 OK:', tx2.transactionHash);
 
-    // ---------------- Approve Router if needed ----------------
-    gasPrice = await getDynamicGasPrice();
-    const balanceAfterMint = web3.utils.toBN(await tokenInstance.methods.balanceOf(fromAddr).call());
-    const allowance = web3.utils.toBN(await tokenInstance.methods.allowance(fromAddr, contracts.Router).call());
+    // --------------------------------------------------
+    // 3. Approve router
+    // --------------------------------------------------
+    const balance = await token.methods.balanceOf(fromAddr).call();
+    const allowance = await token.methods.allowance(fromAddr, contracts.Router).call();
 
-    if (allowance.lt(balanceAfterMint)) {
-      console.log('Approving Router for max spend...');
-      const txApprove = await tokenInstance.methods.approve(contracts.Router, MAX_UINT_256).send({
+    if (web3.utils.toBN(allowance).lt(web3.utils.toBN(balance))) {
+      console.log("🔥 Approving router...");
+      await token.methods.approve(contracts.Router, MAX_UINT_256).send({
         from: fromAddr,
         gas: 120000,
-        gasPrice
+        ...gas
       });
-      console.log('Approve tx:', txApprove.transactionHash);
-      txHashes.push(txApprove.transactionHash); // note: this will make 5 txs if included — if you strictly want 4 txs, remove pushing approve (but it's safer to include)
-      // If you want exactly 4 txs including approve as part of TX3, you can combine logic, but keeping it separate is safer.
-    } else {
-      console.log('Router already approved.');
     }
 
-    // ---------------- TX3: multiHopSwap via Router ----------------
-    // find pool
-    const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
-    if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
+    // --------------------------------------------------
+    // 4. Multi-hop swap
+    // --------------------------------------------------
+    const pool = pools.find(p =>
+      p.pair.includes(axis) && p.pair.includes(tokenSwapOut)
+    );
+    if (!pool) throw new Error(`No pool for ${axis}/${tokenSwapOut}`);
 
-    // Set path as provided in pools; Router expects paths (array-of-arrays)
-    const paths = [pool.path];
+    const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
 
-    // Use the amount we actually have (balanceAfterMint)
-    const amountToSwap = balanceAfterMint.toString();
-
-    console.log(`TX3: multiHopSwap ${tokenAddr} -> ${tokens[tokenSwapOut]} amount ${amountToSwap}`);
-    gasPrice = await getDynamicGasPrice();
-
-    // instantiate fresh Router instance (safety)
-    const routerInstance = new web3.eth.Contract(Router_ABI, contracts.Router);
-
-    const deadline = Math.floor(Date.now() / 1000) + 120; // +2 minutes
-
-    const tx3 = await routerInstance.methods.multiHopSwap(
-      tokenAddr,
+    console.log(`🔥 Swap ${axis} → ${tokenSwapOut}`);
+    await Router.methods.multiHopSwap(
+      tokens[axis],
       tokens[tokenSwapOut],
-      amountToSwap,
-      paths,
-      deadline
+      balance,
+      [pool.path],
+      Math.floor(Date.now()/1000) + 120
     ).send({
       from: fromAddr,
-      gas: 800000,
-      gasPrice
+      gas: 400000,
+      ...gas
     });
-    txHashes.push(tx3.transactionHash);
-    console.log('TX3 OK:', tx3.transactionHash);
 
-    // ---------------- TX4: updateAffective on AliveAI ----------------
-    // Gather balances of tokens as they sit in AliveAI contract address
+    // --------------------------------------------------
+    // 5. Pull all balances + update affective
+    // --------------------------------------------------
     const bals = {};
-    for (const key of Object.keys(tokens)) {
-      try {
-        const inst = new web3.eth.Contract(ERC20_MINTABLE_ABI, tokens[key]);
-        const b = await inst.methods.balanceOf(contracts.AliveAI).call();
-        bals[key] = b;
-      } catch (e) {
-        bals[key] = '0';
-        console.warn(`Failed to fetch balance for ${key}:`, e.message);
-      }
+    for (const k of Object.keys(tokens)) {
+      const inst = new web3.eth.Contract(ERC20_ABI, tokens[k]);
+      bals[k] = await inst.methods.balanceOf(fromAddr).call();
     }
 
-    // Use first two tokens as a/b for updateAffective (mirrors your earlier usage)
-    if (typeof AliveAI.methods.updateAffective === 'function') {
-      gasPrice = await getDynamicGasPrice();
-      console.log(`TX4: updateAffective(${bals.DRTv21 || '0'}, ${bals.DRTv22 || '0'})`);
-      const tx4 = await AliveAI.methods.updateAffective(bals.DRTv21 || '0', bals.DRTv22 || '0').send({
+    if (AliveAI.methods.updateAffective) {
+      console.log("🔥 updateAffective()");
+      await AliveAI.methods.updateAffective(
+        bals.DRTv21, bals.DRTv22
+      ).send({
         from: fromAddr,
-        gas: 200000,
-        gasPrice
+        gas: 150000,
+        ...gas
       });
-      txHashes.push(tx4.transactionHash);
-      console.log('TX4 OK:', tx4.transactionHash);
-    } else {
-      console.warn('AliveAI.updateAffective() missing; skipping TX4 and still returning results.');
     }
 
-    // Final: compute viewE (best-effort)
-    let E_final = null;
-    try {
-      const view = await AliveAI.methods.viewE().call();
-      E_final = view[0];
-    } catch (e) {
-      console.warn('viewE call failed:', e.message);
-    }
+    // Return all
+    return {
+      success: true,
+      balances: bals
+    };
 
-    // maintain small in-memory history
-    if (E_final != null) {
-      last10E.push(E_final);
-      if (last10E.length > 10) last10E.shift();
-    }
-    lastFourier = computeFourier(E_final);
-
-    // Log success
-    logToFile('aliveai_cycles.log', `Cycle OK | from ${fromAddr} | txs ${txHashes.join(',')}`);
-
-    // Return results
-    return { E: E_final, last10E, txHashes, balances: bals, fourier: lastFourier };
   } catch (err) {
-    console.error('Error in proto-conscious cycle:', err);
-    // log and rethrow a readable error
-    logToFile('aliveai_errors.log', `${err.message || String(err)}`);
-    throw new Error(err.message || String(err));
+    console.error(err);
+    return { success: false, error: err.message };
   }
 }
 
-function getLastFourier() { return lastFourier || computeFourier(null); }
-
-module.exports = { runProtoConsciousCycle, last10E, getLastFourier };
+module.exports = {
+  runProtoConsciousCycle
+};
