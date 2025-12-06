@@ -1,4 +1,5 @@
-// aliveAIController.js
+// root/drtv1-backend/controllers/aliveAIController.js
+
 require('dotenv').config();
 const Web3 = require('web3');
 const path = require('path');
@@ -14,7 +15,6 @@ const AI_PRIVATE_KEY = process.env.AI_MINTER_PRIVATE_KEY;
 if (!AI_PRIVATE_KEY) console.error('❌ AI_MINTER_PRIVATE_KEY missing from env!');
 
 const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0'); 
-
 const fromAddr = signer.address || null; 
 if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
 
@@ -98,18 +98,16 @@ function computeFourier(E) {
   };
 }
 
-// MAIN PROTO-CONSCIOUS CYCLE
+// ---------- MAIN PROTO-CONSCIOUS CYCLE ----------
 async function runProtoConsciousCycle(inputData = {}) {
   try {
     const { stimulus = '', axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData;
     logUserMessage(stimulus);
 
     const txHashes = [];
-    
+
     // 1) submitThought
-    console.log(`Sending submitThought from ${fromAddr} to AliveAI contract ${contracts.AliveAI}`);
-    
-    // 🚨 FINAL FIX: Removed the S_input and C_input arguments based on the EVM error.
+    console.log(`TX1: Sending submitThought from ${fromAddr} to AliveAI contract ${contracts.AliveAI}`);
     const tx1 = await AliveAI.methods.submitThought().send({
       from: fromAddr,
       gas: 300000,
@@ -117,39 +115,42 @@ async function runProtoConsciousCycle(inputData = {}) {
     });
     txHashes.push(tx1.transactionHash);
 
-    // 2) mint emotional token
-    const tx2 = await EmotionalBase.methods.mint(tokens[axis], amount).send({
+    // 2) mint emotional token directly using wallet
+    const TokenContract = new web3.eth.Contract(
+      [
+        { "inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function" },
+        { "inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function" },
+        { "inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function" },
+        { "inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function" }
+      ],
+      tokens[axis]
+    );
+
+    console.log(`TX2: Minting ${amount} of ${axis} to ${fromAddr}`);
+    const tx2 = await TokenContract.methods.mint(fromAddr, amount).send({
       from: fromAddr,
       gas: 300000,
       gasPrice: CUSTOM_GAS_PRICE
     });
     txHashes.push(tx2.transactionHash);
 
-    // --- APPROVE ROUTER TO SPEND TOKEN (ROBUST CHECK) ---
-    const balance = await EmotionalBase.methods.balanceOf(tokens[axis], fromAddr).call();
-    
-    // Check if the current allowance is less than the token balance (we will approve max if so)
-    const currentAllowance = await EmotionalBase.methods.allowance(tokens[axis], fromAddr, contracts.Router).call();
-    
+    // --- APPROVE ROUTER TO SPEND TOKEN ---
+    const balance = await TokenContract.methods.balanceOf(fromAddr).call();
+    const currentAllowance = await TokenContract.methods.allowance(fromAddr, contracts.Router).call();
     if (web3.utils.toBN(currentAllowance).lt(web3.utils.toBN(balance))) {
-        console.log("Approving Router for maximum token spend to ensure multiHopSwap success.");
-        
-        await EmotionalBase.methods.approve(contracts.Router, MAX_UINT_256).send({
-            from: fromAddr,
-            gas: 100000,
-            gasPrice: CUSTOM_GAS_PRICE
-        });
-    } else {
-        console.log("Router already has sufficient allowance. Skipping approval.");
+      console.log("Approving Router for max token spend...");
+      await TokenContract.methods.approve(contracts.Router, MAX_UINT_256).send({
+        from: fromAddr,
+        gas: 100000,
+        gasPrice: CUSTOM_GAS_PRICE
+      });
     }
 
     // 3) multi-hop swap
     const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
     if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
-
-    const paths = [pool.path]; // must be [ [tokenIn, tokenOut] ]
-
-    console.log(`Executing multiHopSwap for ${tokens[axis]} -> ${tokens[tokenSwapOut]} with amount ${balance}`);
+    const paths = [pool.path];
+    console.log(`TX3: Executing multiHopSwap for ${tokens[axis]} -> ${tokens[tokenSwapOut]} with amount ${balance}`);
     const tx3 = await Router.methods.multiHopSwap(
       tokens[axis],
       tokens[tokenSwapOut],
@@ -163,29 +164,26 @@ async function runProtoConsciousCycle(inputData = {}) {
     });
     txHashes.push(tx3.transactionHash);
 
-    // 4) updateAffective (fetch balances)
+    // 4) updateAffective
     const bals = {};
     for (const tokKey of Object.keys(tokens)) {
-      try { bals[tokKey] = await EmotionalBase.methods.balanceOf(tokens[tokKey], contracts.AliveAI).call(); }
+      try { bals[tokKey] = await TokenContract.methods.balanceOf(tokens[tokKey], contracts.AliveAI).call(); }
       catch (e) { bals[tokKey] = '0'; console.warn(`Failed to fetch balance for ${tokKey}:`, e.message); }
     }
 
-    // Skip if updateAffective method missing
-    if (typeof AliveAI.methods.updateAffective !== 'function') {
-      console.warn('updateAffective method missing on AliveAI, skipping.');
-    } else {
+    if (typeof AliveAI.methods.updateAffective === 'function') {
       const tx4 = await AliveAI.methods.updateAffective(bals.DRTv21, bals.DRTv22).send({ 
         from: fromAddr, gas: 200000, gasPrice: CUSTOM_GAS_PRICE 
       });
       txHashes.push(tx4.transactionHash);
+    } else {
+      console.warn('updateAffective method missing on AliveAI, skipping.');
     }
 
-    // Fetch final E
+    // Compute final E
     let E_final = null;
-    try {
-      const view = await AliveAI.methods.viewE().call();
-      E_final = view[0];
-    } catch (e) { console.warn('Failed to call viewE after update:', e.message); }
+    try { E_final = (await AliveAI.methods.viewE().call())[0]; } 
+    catch (e) { console.warn('Failed to call viewE:', e.message); }
 
     if (E_final != null) { last10E.push(E_final); if (last10E.length > 10) last10E.shift(); }
     lastFourier = computeFourier(E_final);
