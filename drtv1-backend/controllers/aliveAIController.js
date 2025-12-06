@@ -3,52 +3,28 @@ const Web3 = require('web3');
 const path = require('path');
 const fs = require('fs');
 
-// ----------------------
-//  CONSTANTS
-// ----------------------
 const MAX_UINT_256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-const RPC = process.env.MAINNET_RPC_URL;
-const web3 = new Web3(RPC);
 
-// PRIVATE KEY + SIGNER
+const web3 = new Web3(process.env.MAINNET_RPC_URL || 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY');
+
 const AI_PRIVATE_KEY = process.env.AI_MINTER_PRIVATE_KEY;
-const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY);
-const fromAddr = signer.address;
+if (!AI_PRIVATE_KEY) console.error('❌ AI_MINTER_PRIVATE_KEY missing from env!');
 
-// ----------------------
-//  USE REAL-TIME GAS
-// ----------------------
-async function getAdaptiveGas() {
-  const block = await web3.eth.getBlock("pending");
-  const base = Number(block.baseFeePerGas);
+const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0'); 
+const fromAddr = signer.address || null; 
+if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
 
-  // We ALWAYS stay slightly above the base so we NEVER get rejected
-  const tip = web3.utils.toWei("0.00000003", "ether"); // = 0.03 gwei
-  const maxPriorityFee = tip;
+const CUSTOM_GAS_PRICE = web3.utils.toWei('0.05', 'gwei');
 
-  const maxFee = base + Number(tip);
-
-  return {
-    maxPriorityFeePerGas: web3.utils.toHex(maxPriorityFee),
-    maxFeePerGas: web3.utils.toHex(maxFee)
-  };
-}
-
-// ----------------------
-//  ABI CONTRACTS
-// ----------------------
 const AliveAI_ABI = require(path.join(__dirname, '../abi/AliveAI_abi.json'));
-const Router_ABI   = require(path.join(__dirname, '../abi/DRTUniversalRouterv2_abi.json'));
-const ERC20_ABI    = require(path.join(__dirname, '../abi/DRTv15_abi.json'));
+const Router_ABI = require(path.join(__dirname, '../abi/DRTUniversalRouterv2_abi.json'));
+const ERC20_ABI = require(path.join(__dirname, '../abi/DRTv15_abi.json')); // Mintable ERC20 ABI
 
 const contracts = {
-  AliveAI: process.env.ALIVEAI_CONTRACT_ADDRESS,
-  Router:  process.env.DRT_UNIVERSAL_ROUTER
+  AliveAI: process.env.ALIVEAI_CONTRACT_ADDRESS || '0x1256AbC5d67153E430649E2d623e9AC7F1898d64',
+  Router: process.env.DRT_UNIVERSAL_ROUTER || '0xb22AFBC7b80510b315b4dfF0157146b2174AC63E'
 };
 
-// ----------------------
-//  TOKEN + POOL TABLES
-// ----------------------
 const tokens = {
   DRTv21: '0x15E58021f6ebbbd4c774B33D98CE80eF02Ff5C4A',
   DRTv22: '0x07dD5fa304549F23AC46A378C9DD3Ee567352aDF',
@@ -68,7 +44,6 @@ const tokens = {
   DRTv36: '0x6aACE21EeDD11B48A8f833a7A6593ed23985Ecfc'
 };
 
-// Match pairs
 const pools = [
   { pair: ['DRTv21', 'DRTv22'], path: [tokens.DRTv21, tokens.DRTv22] },
   { pair: ['DRTv23', 'DRTv24'], path: [tokens.DRTv23, tokens.DRTv24] },
@@ -80,120 +55,131 @@ const pools = [
   { pair: ['DRTv35', 'DRTv36'], path: [tokens.DRTv35, tokens.DRTv36] }
 ];
 
-// ----------------------
-//  LOGGING
-// ----------------------
-function logStimulus(msg) {
-  const logPath = path.join(__dirname, '../logs/aliveai_messages.log');
-  const entry = `${new Date().toISOString()} | ${msg}\n`;
-  fs.appendFileSync(logPath, entry);
-}
+const AliveAI = new web3.eth.Contract(AliveAI_ABI, contracts.AliveAI);
 
-// ----------------------
-//  MAIN LOOP
-// ----------------------
-async function runProtoConsciousCycle(input = {}) {
+let last10E = [];
+let lastFourier = null;
+
+function logUserMessage(stimulus) {
   try {
-    const { stimulus = "", axis = "DRTv21", amount = 1, tokenSwapOut = "DRTv22" } = input;
-
-    logStimulus(stimulus);
-
-    const AliveAI = new web3.eth.Contract(AliveAI_ABI, contracts.AliveAI);
-
-    const gas = await getAdaptiveGas();
-
-    // --------------------------------------------------
-    // 1. submitThought()
-    // --------------------------------------------------
-    console.log("🔥 submitThought()");
-    await AliveAI.methods.submitThought().send({
-      from: fromAddr,
-      gas: 150000,
-      ...gas
-    });
-
-    // --------------------------------------------------
-    // 2. Mint token
-    // --------------------------------------------------
-    const token = new web3.eth.Contract(ERC20_ABI, tokens[axis]);
-
-    console.log(`🔥 Mint ${amount} ${axis}`);
-    await token.methods.mint(fromAddr, amount).send({
-      from: fromAddr,
-      gas: 200000,
-      ...gas
-    });
-
-    // --------------------------------------------------
-    // 3. Approve router
-    // --------------------------------------------------
-    const balance = await token.methods.balanceOf(fromAddr).call();
-    const allowance = await token.methods.allowance(fromAddr, contracts.Router).call();
-
-    if (web3.utils.toBN(allowance).lt(web3.utils.toBN(balance))) {
-      console.log("🔥 Approving router...");
-      await token.methods.approve(contracts.Router, MAX_UINT_256).send({
-        from: fromAddr,
-        gas: 120000,
-        ...gas
-      });
-    }
-
-    // --------------------------------------------------
-    // 4. Multi-hop swap
-    // --------------------------------------------------
-    const pool = pools.find(p =>
-      p.pair.includes(axis) && p.pair.includes(tokenSwapOut)
-    );
-    if (!pool) throw new Error(`No pool for ${axis}/${tokenSwapOut}`);
-
-    const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
-
-    console.log(`🔥 Swap ${axis} → ${tokenSwapOut}`);
-    await Router.methods.multiHopSwap(
-      tokens[axis],
-      tokens[tokenSwapOut],
-      balance,
-      [pool.path],
-      Math.floor(Date.now()/1000) + 120
-    ).send({
-      from: fromAddr,
-      gas: 400000,
-      ...gas
-    });
-
-    // --------------------------------------------------
-    // 5. Pull all balances + update affective
-    // --------------------------------------------------
-    const bals = {};
-    for (const k of Object.keys(tokens)) {
-      const inst = new web3.eth.Contract(ERC20_ABI, tokens[k]);
-      bals[k] = await inst.methods.balanceOf(fromAddr).call();
-    }
-
-    if (AliveAI.methods.updateAffective) {
-      console.log("🔥 updateAffective()");
-      await AliveAI.methods.updateAffective(
-        bals.DRTv21, bals.DRTv22
-      ).send({
-        from: fromAddr,
-        gas: 150000,
-        ...gas
-      });
-    }
-
-    // Return all
-    return {
-      success: true,
-      balances: bals
-    };
-
-  } catch (err) {
-    console.error(err);
-    return { success: false, error: err.message };
+    const logPath = path.join(__dirname, '..', 'logs', 'aliveai_messages.log');
+    const entry = `${new Date().toISOString()} | ${fromAddr || 'unknown'} | ${String(stimulus)}\n`;
+    fs.appendFileSync(logPath, entry);
+  } catch (e) {
+    console.warn('Failed to log user message:', e.message);
   }
 }
 
-module.exports = {
-  runProtoConsciousCycle
-};
+function computeFourier(E) {
+  return {
+    timestamps: [Date.now()],
+    S: [Math.random()],
+    C: [Math.random()],
+    W: [Math.random()],
+    T: [Math.random()],
+    F: [Math.random()],
+    R: [Math.random()],
+    E
+  };
+}
+
+async function runProtoConsciousCycle(inputData = {}) {
+  try {
+    const { stimulus = '', axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData;
+    logUserMessage(stimulus);
+
+    const txHashes = [];
+
+    console.log(`Sending submitThought from ${fromAddr} to AliveAI contract ${contracts.AliveAI}`);
+    const tx1 = await AliveAI.methods.submitThought().send({
+      from: fromAddr,
+      gas: 300000,
+      gasPrice: CUSTOM_GAS_PRICE
+    });
+    txHashes.push(tx1.transactionHash);
+
+    // --------- MINT TOKEN ---------
+    const tokenInstance = new web3.eth.Contract(ERC20_ABI, tokens[axis]);
+    console.log(`Minting ${amount} of ${axis} to ${fromAddr}`);
+    const tx2 = await tokenInstance.methods.mint(fromAddr, amount).send({
+      from: fromAddr,
+      gas: 300000,
+      gasPrice: CUSTOM_GAS_PRICE
+    });
+    txHashes.push(tx2.transactionHash);
+
+    // --------- APPROVE ROUTER ---------
+    const balance = await tokenInstance.methods.balanceOf(fromAddr).call();
+    const currentAllowance = await tokenInstance.methods.allowance(fromAddr, contracts.Router).call();
+
+    if (web3.utils.toBN(currentAllowance).lt(web3.utils.toBN(balance))) {
+      console.log("Approving Router for maximum token spend...");
+      await tokenInstance.methods.approve(contracts.Router, MAX_UINT_256).send({
+        from: fromAddr,
+        gas: 100000,
+        gasPrice: CUSTOM_GAS_PRICE
+      });
+    }
+
+    // --------- MULTIHOP SWAP ---------
+    const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
+    if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
+
+    const paths = [pool.path];
+    console.log(`Executing multiHopSwap for ${tokens[axis]} -> ${tokens[tokenSwapOut]} with amount ${balance}`);
+    const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
+    const tx3 = await Router.methods.multiHopSwap(
+      tokens[axis],
+      tokens[tokenSwapOut],
+      balance,
+      paths,
+      Math.floor(Date.now()/1000) + 120
+    ).send({
+      from: fromAddr,
+      gas: 500000,
+      gasPrice: CUSTOM_GAS_PRICE
+    });
+    txHashes.push(tx3.transactionHash);
+
+    // --------- UPDATE AFFECTIVE ---------
+    const bals = {};
+    for (const tokKey of Object.keys(tokens)) {
+      try { 
+        const instance = new web3.eth.Contract(ERC20_ABI, tokens[tokKey]);
+        bals[tokKey] = await instance.methods.balanceOf(fromAddr).call();
+      } catch (e) { 
+        bals[tokKey] = '0'; 
+        console.warn(`Failed to fetch balance for ${tokKey}:`, e.message); 
+      }
+    }
+
+    if (typeof AliveAI.methods.updateAffective === 'function') {
+      const tx4 = await AliveAI.methods.updateAffective(bals.DRTv21, bals.DRTv22).send({ 
+        from: fromAddr, gas: 200000, gasPrice: CUSTOM_GAS_PRICE 
+      });
+      txHashes.push(tx4.transactionHash);
+    }
+
+    let E_final = null;
+    try {
+      const view = await AliveAI.methods.viewE().call();
+      E_final = view[0];
+    } catch (e) { console.warn('Failed to call viewE after update:', e.message); }
+
+    if (E_final != null) { 
+      last10E.push(E_final); 
+      if (last10E.length > 10) last10E.shift(); 
+    }
+    lastFourier = computeFourier(E_final);
+
+    return { E: E_final, last10E, txHashes, balances: bals, fourier: lastFourier };
+
+  } catch (err) {
+    console.error('Error in proto-conscious cycle:', err);
+    throw new Error(err.message || String(err));
+  }
+}
+
+function getLastFourier() { return lastFourier || computeFourier(null); }
+
+module.exports = { runProtoConsciousCycle, last10E, getLastFourier };
