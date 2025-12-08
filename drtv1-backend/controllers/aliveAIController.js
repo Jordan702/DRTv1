@@ -14,7 +14,7 @@ const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0');
 const fromAddr = signer.address || null; 
 if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
 
-const CUSTOM_GAS_PRICE = web3.utils.toWei('0.5', 'gwei');
+const CUSTOM_GAS_PRICE = web3.utils.toWei('0.75', 'gwei');
 
 const AliveAI_ABI = require(path.join(__dirname, '../abi/AliveAI_abi.json'));
 const Router_ABI = require(path.join(__dirname, '../abi/DRTUniversalRouterv2_abi.json'));
