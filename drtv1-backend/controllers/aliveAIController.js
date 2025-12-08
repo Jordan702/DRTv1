@@ -60,7 +60,6 @@ const AliveAI = new web3.eth.Contract(AliveAI_ABI, contracts.AliveAI);
 let last10E = [];
 let lastFourier = null;
 
-// --- Logging ---
 function logUserMessage(stimulus) {
   try {
     const logPath = path.join(__dirname, '..', 'logs', 'aliveai_messages.log');
@@ -71,7 +70,6 @@ function logUserMessage(stimulus) {
   }
 }
 
-// --- Dummy Fourier computation ---
 function computeFourier(E) {
   return {
     timestamps: [Date.now()],
@@ -85,19 +83,6 @@ function computeFourier(E) {
   };
 }
 
-// --- Map numeric E to English emotion ---
-function describeEmotion(E) {
-  if (E === null || E === undefined) return "neutral";
-  if (E > 0.8) return "ecstatic";
-  if (E > 0.6) return "happy";
-  if (E > 0.3) return "curious";
-  if (E > 0) return "thoughtful";
-  if (E > -0.3) return "tired";
-  if (E > -0.6) return "frustrated";
-  return "confused";
-}
-
-// --- Main Proto-Conscious Cycle ---
 async function runProtoConsciousCycle(inputData = {}) {
   try {
     const { stimulus = '', axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData;
@@ -175,34 +160,19 @@ async function runProtoConsciousCycle(inputData = {}) {
       txHashes.push(tx4.transactionHash);
     }
 
-    // --- Human-readable output ---
     let E_final = null;
     try {
       const view = await AliveAI.methods.viewE().call();
       E_final = view[0];
     } catch (e) { console.warn('Failed to call viewE after update:', e.message); }
 
-    let emotionDescription = "neutral";
-    let emotionSentence = "AliveAI is feeling neutral for now.";
-
     if (E_final != null) { 
       last10E.push(E_final); 
       if (last10E.length > 10) last10E.shift(); 
-      lastFourier = computeFourier(E_final);
-
-      emotionDescription = describeEmotion(E_final);
-      emotionSentence = `AliveAI is feeling ${emotionDescription} after processing your message!`;
     }
+    lastFourier = computeFourier(E_final);
 
-    return { 
-      E: E_final, 
-      emotionDescription, 
-      emotionSentence, 
-      last10E, 
-      txHashes, 
-      balances: bals, 
-      fourier: lastFourier 
-    };
+    return { E: E_final, last10E, txHashes, balances: bals, fourier: lastFourier };
 
   } catch (err) {
     console.error('Error in proto-conscious cycle:', err);
