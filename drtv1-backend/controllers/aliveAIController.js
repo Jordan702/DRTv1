@@ -4,14 +4,13 @@ const path = require('path');
 const fs = require('fs');
 
 const MAX_UINT_256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-
 const web3 = new Web3(process.env.MAINNET_RPC_URL || 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY');
 
 const AI_PRIVATE_KEY = process.env.AI_MINTER_PRIVATE_KEY;
 if (!AI_PRIVATE_KEY) console.error('❌ AI_MINTER_PRIVATE_KEY missing from env!');
 
-const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0'); 
-const fromAddr = signer.address || null; 
+const signer = web3.eth.accounts.wallet.add(AI_PRIVATE_KEY || '0x0');
+const fromAddr = signer.address || null;
 if (!fromAddr) console.warn('⚠️ signer / fromAddr not set — transactions will likely fail.');
 
 const CUSTOM_GAS_PRICE = web3.utils.toWei('0.75', 'gwei');
@@ -44,6 +43,12 @@ const tokens = {
   DRTv36: '0x6aACE21EeDD11B48A8f833a7A6593ed23985Ecfc'
 };
 
+// Mapping from token addresses to labels for readability (if needed for debug)
+const tokenLabels = {};
+for (const [label, addr] of Object.entries(tokens)) {
+    tokenLabels[addr] = label;
+}
+
 const pools = [
   { pair: ['DRTv21', 'DRTv22'], path: [tokens.DRTv21, tokens.DRTv22] },
   { pair: ['DRTv23', 'DRTv24'], path: [tokens.DRTv23, tokens.DRTv24] },
@@ -60,47 +65,79 @@ const AliveAI = new web3.eth.Contract(AliveAI_ABI, contracts.AliveAI);
 let last10E = [];
 let lastFourier = null;
 
+// Log each user message for auditability
 function logUserMessage(stimulus) {
   try {
     const logPath = path.join(__dirname, '..', 'logs', 'aliveai_messages.log');
-    const entry = `${new Date().toISOString()} | ${fromAddr || 'unknown'} | ${String(stimulus)}\n`;
+    const entry = `${new Date().toISOString()} | ${fromAddr || 'unknown'} | ${String(stimulus)}\\n`;
     fs.appendFileSync(logPath, entry);
   } catch (e) {
     console.warn('Failed to log user message:', e.message);
   }
 }
 
-function computeFourier(E) {
-  return {
-    timestamps: [Date.now()],
-    S: [Math.random()],
-    C: [Math.random()],
-    W: [Math.random()],
-    T: [Math.random()],
-    F: [Math.random()],
-    R: [Math.random()],
-    E
-  };
+// Compute a simple Discrete Fourier Transform on the `last10E` array (returns freq, real, imag, magnitude)
+function computeFourier(data) {
+  const N = data.length;
+  if (N < 2) {
+    return { frequencies: [], real: [], imag: [], magnitudes: [] };
+  }
+  const result = { frequencies: [], real: [], imag: [], magnitudes: [] };
+  for (let k = 0; k < N; k++) {
+    let re = 0, im = 0;
+    for (let n = 0; n < N; n++) {
+      const angle = -2 * Math.PI * k * n / N;
+      re += data[n] * Math.cos(angle);
+      im += data[n] * Math.sin(angle);
+    }
+    result.frequencies.push(k);
+    result.real.push(re);
+    result.imag.push(im);
+    result.magnitudes.push(Math.sqrt(re*re + im*im));
+  }
+  return result;
 }
 
 async function runProtoConsciousCycle(inputData = {}) {
   try {
-    const { stimulus = '', axis = 'DRTv21', amount = 1, tokenSwapOut = 'DRTv22' } = inputData;
+    const { stimulus = '', amount = 1 } = inputData;
     logUserMessage(stimulus);
 
-    const txHashes = [];
+    // Determine emotion token axis based on message tone (simple keyword matching)
+    const text = String(stimulus || '').toLowerCase();
+    let axis = null;
+    if (text.match(/\\b(trust|faith|loyalty|sure|certain)\\b/)) axis = 'DRTv23';
+    else if (text.match(/\\b(fear|afraid|scared|panic|worried)\\b/)) axis = 'DRTv24';
+    else if (text.match(/\\b(anger|angry|mad|furious|rage)\\b/)) axis = 'DRTv25';
+    else if (text.match(/\\b(peace|calm|serene|tranquil)\\b/)) axis = 'DRTv26';
+    else if (text.match(/\\b(disgust|gross|nasty|repulsed)\\b/)) axis = 'DRTv27';
+    else if (text.match(/\\b(admire|esteem|respect|appreciate)\\b/)) axis = 'DRTv28';
+    else if (text.match(/\\b(surprise|astonish|amazed|startled)\\b/)) axis = 'DRTv29';
+    else if (text.match(/\\b(anticipate|expect|eager|anticipating)\\b/)) axis = 'DRTv30';
+    else if (text.match(/\\b(excited|thrilled|ecstatic)\\b/)) axis = 'DRTv31';
+    else if (text.match(/\\b(contempt|scorn|scornful)\\b/)) axis = 'DRTv32';
+    else if (text.match(/\\b(shame|guilty|embarrassed)\\b/)) axis = 'DRTv33';
+    else if (text.match(/\\b(pride|dignity|honor|vain)\\b/)) axis = 'DRTv34';
+    else if (text.match(/\\b(courage|brave|fearless)\\b/)) axis = 'DRTv35';
+    else if (text.match(/\\b(coward|cowardice|fearful)\\b/)) axis = 'DRTv36';
+    // Fallback: positive/negative
+    if (!axis) {
+      if (text.match(/\\b(happy|good|glad|joy|pleasure|delight|love|like|optimistic|cheerful)\\b/)) axis = 'DRTv21';
+      else if (text.match(/\\b(sad|bad|down|depress|unhappy|sorrow|cry|hate|lonely)\\b/)) axis = 'DRTv22';
+      else axis = 'DRTv21';
+    }
 
-    console.log(`Sending submitThought from ${fromAddr} to AliveAI contract ${contracts.AliveAI}`);
+    console.log(`Submitting thought to AliveAI (contract: ${contracts.AliveAI})`);
     const tx1 = await AliveAI.methods.submitThought().send({
       from: fromAddr,
       gas: 300000,
       gasPrice: CUSTOM_GAS_PRICE
     });
-    txHashes.push(tx1.transactionHash);
+    const txHashes = [tx1.transactionHash];
 
     // --------- MINT TOKEN ---------
     const tokenInstance = new web3.eth.Contract(ERC20_ABI, tokens[axis]);
-    console.log(`Minting ${amount} of ${axis} to ${fromAddr}`);
+    console.log(`Minting ${amount} of token ${axis} to ${fromAddr}`);
     const tx2 = await tokenInstance.methods.mint(fromAddr, amount).send({
       from: fromAddr,
       gas: 300000,
@@ -111,9 +148,8 @@ async function runProtoConsciousCycle(inputData = {}) {
     // --------- APPROVE ROUTER ---------
     const balance = await tokenInstance.methods.balanceOf(fromAddr).call();
     const currentAllowance = await tokenInstance.methods.allowance(fromAddr, contracts.Router).call();
-
     if (web3.utils.toBN(currentAllowance).lt(web3.utils.toBN(balance))) {
-      console.log("Approving Router for maximum token spend...");
+      console.log("Approving Router to spend tokens...");
       await tokenInstance.methods.approve(contracts.Router, MAX_UINT_256).send({
         from: fromAddr,
         gas: 100000,
@@ -122,17 +158,16 @@ async function runProtoConsciousCycle(inputData = {}) {
     }
 
     // --------- MULTIHOP SWAP ---------
-    const pool = pools.find(p => p.pair.includes(axis) && p.pair.includes(tokenSwapOut));
-    if (!pool) throw new Error(`No pool found for ${axis}/${tokenSwapOut}`);
-
-    const paths = [pool.path];
-    console.log(`Executing multiHopSwap for ${tokens[axis]} -> ${tokens[tokenSwapOut]} with amount ${balance}`);
+    const pool = pools.find(p => p.pair.includes(axis));
+    if (!pool) throw new Error(`No swap pool found for axis ${axis}`);
+    const tokenSwapOut = (pool.pair[0] === axis ? pool.pair[1] : pool.pair[0]);
+    console.log(`Swapping ${balance} of ${axis} to ${tokenSwapOut}`);
     const Router = new web3.eth.Contract(Router_ABI, contracts.Router);
     const tx3 = await Router.methods.multiHopSwap(
       tokens[axis],
       tokens[tokenSwapOut],
       balance,
-      paths,
+      [pool.path],
       Math.floor(Date.now()/1000) + 120
     ).send({
       from: fromAddr,
@@ -141,45 +176,84 @@ async function runProtoConsciousCycle(inputData = {}) {
     });
     txHashes.push(tx3.transactionHash);
 
-    // --------- UPDATE AFFECTIVE ---------
+    // --------- UPDATE AFFECTIVE/COGNITIVE/SOCIAL ---------
     const bals = {};
     for (const tokKey of Object.keys(tokens)) {
-      try { 
-        const instance = new web3.eth.Contract(ERC20_ABI, tokens[tokKey]);
-        bals[tokKey] = await instance.methods.balanceOf(fromAddr).call();
-      } catch (e) { 
-        bals[tokKey] = '0'; 
-        console.warn(`Failed to fetch balance for ${tokKey}:`, e.message); 
+      try {
+        const inst = new web3.eth.Contract(ERC20_ABI, tokens[tokKey]);
+        bals[tokKey] = await inst.methods.balanceOf(fromAddr).call();
+      } catch (e) {
+        bals[tokKey] = '0';
+        console.warn(`Failed to fetch balance for ${tokKey}:`, e.message);
       }
     }
 
-    if (typeof AliveAI.methods.updateAffective === 'function') {
-      const tx4 = await AliveAI.methods.updateAffective(bals.DRTv21, bals.DRTv22).send({ 
-        from: fromAddr, gas: 200000, gasPrice: CUSTOM_GAS_PRICE 
+    let tx4;
+    // Call the appropriate update function based on the axis used
+    if (axis === 'DRTv21' || axis === 'DRTv22') {
+      tx4 = await AliveAI.methods.updateAffective(bals.DRTv21, bals.DRTv22).send({
+        from: fromAddr, gas: 200000, gasPrice: CUSTOM_GAS_PRICE
       });
-      txHashes.push(tx4.transactionHash);
+    } else if (axis === 'DRTv23' || axis === 'DRTv24') {
+      tx4 = await AliveAI.methods.updateCognitive(bals.DRTv23, bals.DRTv24).send({
+        from: fromAddr, gas: 200000, gasPrice: CUSTOM_GAS_PRICE
+      });
+    } else if (axis === 'DRTv25' || axis === 'DRTv26') {
+      tx4 = await AliveAI.methods.updateSocial(bals.DRTv25, bals.DRTv26).send({
+        from: fromAddr, gas: 200000, gasPrice: CUSTOM_GAS_PRICE
+      });
+    } else {
+      // If axis is outside these groups, default to updating affective
+      tx4 = await AliveAI.methods.updateAffective(bals.DRTv21, bals.DRTv22).send({
+        from: fromAddr, gas: 200000, gasPrice: CUSTOM_GAS_PRICE
+      });
     }
+    txHashes.push(tx4.transactionHash);
 
+    // --------- COMPILE RESULTS ---------
     let E_final = null;
     try {
       const view = await AliveAI.methods.viewE().call();
       E_final = view[0];
-    } catch (e) { console.warn('Failed to call viewE after update:', e.message); }
-
-    if (E_final != null) { 
-      last10E.push(E_final); 
-      if (last10E.length > 10) last10E.shift(); 
+    } catch (e) {
+      console.warn('Failed to retrieve final emotional state E:', e.message);
     }
-    lastFourier = computeFourier(E_final);
 
-    return { E: E_final, last10E, txHashes, balances: bals, fourier: lastFourier };
+    // Convert E to a human-readable number (assumes E is fixed-point with 18 decimals)
+    let E_val = null;
+    if (E_final) {
+      try {
+        E_val = parseFloat(web3.utils.fromWei(E_final, 'ether'));
+      } catch {
+        E_val = E_final;
+      }
+      last10E.push(E_val);
+      if (last10E.length > 10) last10E.shift();
+    }
+    lastFourier = computeFourier(last10E);
 
+    // Construct a plain-English summary message
+    let messageParts = [];
+    messageParts.push(`Thought submitted (tx: ${tx1.transactionHash})`);
+    messageParts.push(`Minted ${amount} of ${axis} (tx: ${tx2.transactionHash})`);
+    messageParts.push(`Swapped ${balance} of ${axis} for ${tokenSwapOut} (tx: ${tx3.transactionHash})`);
+    messageParts.push(`Updated system state (tx: ${tx4.transactionHash})`);
+    if (E_val !== null) {
+      const status = E_val >= 0 ? 'positive' : 'negative';
+      messageParts.push(`Final emotional state E = ${E_val} (${status})`);
+    }
+    const message = messageParts.join('. ') + '.';
+    console.log("Cycle summary:", message);
+
+    return { E: E_val, last10E, txHashes, balances: bals, fourier: lastFourier, message };
   } catch (err) {
     console.error('Error in proto-conscious cycle:', err);
-    throw new Error(err.message || String(err));
+    throw err;
   }
 }
 
-function getLastFourier() { return lastFourier || computeFourier(null); }
+function getLastFourier() { 
+  return lastFourier || computeFourier([]); 
+}
 
 module.exports = { runProtoConsciousCycle, last10E, getLastFourier };
