@@ -137,7 +137,7 @@ async function runProtoConsciousCycle(inputData = {}) {
       tokens[oppToken],
       balance,
       [[tokens[axis], tokens[oppToken]]],
-      Math.floor(Date.now()/1000)+120
+      Math.floor(Date.now()/1000)+600
     ).send({ from: fromAddr, gas: 500_000, gasPrice: CUSTOM_GAS_PRICE });
 
     // ---------- Update AI State ----------
