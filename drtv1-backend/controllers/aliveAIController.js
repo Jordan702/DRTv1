@@ -95,7 +95,7 @@ function interpretAxis(text){
   if(text.match(/\b(admire|esteem|respect|appreciate)\b/)) return 'DRTv28';
   if(text.match(/\b(surprise|astonish|amazed|startled)\b/)) return 'DRTv29';
   if(text.match(/\b(anticipate|expect|eager|anticipating)\b/)) return 'DRTv30';
-  if(text.match(/\b(excited|thrilled|ecstatic)\b/)) return 'DRTv31');
+  if(text.match(/\b(excited|thrilled|ecstatic)\b/)) return 'DRTv31';
   if(text.match(/\b(contempt|scorn|scornful)\b/)) return 'DRTv32';
   if(text.match(/\b(shame|guilty|embarrassed)\b/)) return 'DRTv33';
   if(text.match(/\b(pride|dignity|honor|vain)\b/)) return 'DRTv34';
